@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Pool Doctor · pool care, repair and new pools · Example site by Local Form</title>
+<meta name="description" content="Pool Doctor is a fictional pool company: an example site by Local Form. Diagnose a pool problem, see an example price range and book a simulated visit.">
+<meta name="theme-color" content="#061A22">
+<meta property="og:title" content="Pool Doctor · an example site by Local Form">
+<meta property="og:description" content="Drag the water from green to clear, diagnose a pool problem and book a simulated visit. A fictional company.">
+<meta property="og:image" content="https://preview.localform.online/pool-doctor-preview/og.jpg?v=1">
+<meta property="og:url" content="https://preview.localform.online/pool-doctor-preview/">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/geist-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css?v=15">
+<script type="module" src="app.js?v=15"></script>
+</head>
+<body>
+<a class="skip" href="#diagnose">Skip to the Health Check</a>
+<div class="sr-only" id="sr" aria-live="polite" aria-atomic="true"></div>
+
+<header class="top" id="topbar">
+  <a class="brand" href="#top" aria-label="Pool Doctor, back to top">
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><defs><clipPath id="mk"><circle cx="16" cy="16" r="14.5"/></clipPath></defs><circle cx="16" cy="16" r="14.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path clip-path="url(#mk)" d="M0 17c4-3.2 8-3.2 12 0s8 3.2 12 0 6-2.6 8-1.4V32H0Z" fill="currentColor" opacity=".9"/></svg>
+    <span class="word">Pool Doctor</span>
+  </a>
+  <nav class="nav" id="nav" aria-label="Sections">
+    <a href="#diagnose">Diagnose</a><a href="#care">Care</a><a href="#repair">Repairs</a><a href="#build">Build</a><a href="#design">Design</a><a href="#area">Area</a>
+  </nav>
+  <a class="btn btn--solid btn--sm book-top" href="#book">Book</a>
+  <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menu"><span></span><span></span></button>
+</header>
+
+<main>
+<!-- ============ HERO ============ -->
+<section class="hero" id="top" aria-label="Pool Doctor: before and after">
+  <img class="hero-poster" id="hero-poster" src="hero-poster.webp" alt="" fetchpriority="high" width="1600" height="1000">
+  <canvas class="hero-canvas" id="water" aria-hidden="true"></canvas>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="hero-tags mono" aria-hidden="true"><span>Before · day 1</span><span>After · day 3</span></div>
+  <div class="split" id="split" role="slider" tabindex="0" aria-label="Water treatment, before and after" aria-valuemin="0" aria-valuemax="100" aria-valuenow="55" aria-valuetext="55% treated">
+    <span class="knob" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span>
+  </div>
+  <div class="hero-copy">
+    <p class="eyebrow mono">Essex County, NJ<span class="ex"> · Example site<span class="by"> by Local Form</span></span></p>
+    <h1 class="reveal-lines"><span class="ln"><span>Green on Friday.</span></span><span class="ln"><span><em>Swimming</em> by Monday.</span></span></h1>
+    <p class="hero-desc">Pool cleaning, repairs and weekly care in Essex County, NJ.</p>
+    <p class="season-note mono" id="season-line"></p>
+    <div class="actions">
+      <a class="btn btn--light" href="#diagnose" id="hero-diagnose">Diagnose my pool</a>
+      <a class="btn btn--outline-light" href="#book">Book a visit</a>
+    </div>
+  </div>
+  <p class="hero-read mono" aria-hidden="true"><span>pH 7.4</span><span>Cl 2.0 ppm</span><span>Clear</span></p>
+  <button type="button" class="night-btn mono" id="night-btn" aria-pressed="false" hidden><span class="nb-dot" aria-hidden="true"></span><span id="night-label">Pool lights</span></button>
+  <p class="hero-note mono" id="water-note" hidden>Still image · live water needs WebGL</p>
+  <p class="hero-credit mono">Fictional company · example site by Local Form</p>
+</section>
+
+<!-- ============ TWO PATHS ============ -->
+<nav class="paths" id="paths" aria-label="Where to start">
+  <div class="wrap paths-in">
+    <a class="path" href="#diagnose"><span class="mono label">I have a pool</span><strong>Care for my pool</strong><span class="path-links">Health Check · Care plans · Repairs · Book a visit</span></a>
+    <a class="path" href="#build"><span class="mono label">I want a pool</span><strong>Build a new pool</strong><span class="path-links">How it’s built · Design &amp; price · Free consult</span></a>
+  </div>
+</nav>
+
+<!-- ============ 01 DIAGNOSE ============ -->
+<section class="sec sec--bone" id="diagnose" aria-labelledby="diagnose-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="marker mono">01 — Diagnose</p>
+      <h2 id="diagnose-h" data-reveal>The Pool Health <em>Check</em>.</h2>
+      <p class="lede" data-reveal>Tap what you see. Add readings if you have a test kit. You get a likely cause, whether it’s safe to swim, an example price and how soon we’d come.</p>
+      <span class="waterline" aria-hidden="true"></span>
+    </header>
+    <div class="diag">
+      <div class="diag-in">
+        <fieldset class="field">
+          <legend class="mono label">What do you see?</legend>
+          <div class="sym-grid" id="symptoms"></div>
+        </fieldset>
+        <fieldset class="field readings">
+          <legend class="mono label">Readings <span class="opt">optional</span></legend>
+          <div class="reading">
+            <label for="r-ph">pH</label>
+            <input id="r-ph" type="number" inputmode="decimal" step="0.1" min="6" max="9" placeholder="7.4" autocomplete="off">
+            <div class="gauge" id="g-ph" aria-hidden="true"></div>
+            <p class="fine mono" id="g-ph-t">Healthy 7.2–7.8</p>
+          </div>
+          <div class="reading">
+            <label for="r-cl">Free chlorine, ppm</label>
+            <input id="r-cl" type="number" inputmode="decimal" step="0.1" min="0" max="10" placeholder="2.0" autocomplete="off">
+            <div class="gauge" id="g-cl" aria-hidden="true"></div>
+            <p class="fine mono" id="g-cl-t">Healthy 1–3 ppm</p>
+          </div>
+        </fieldset>
+        <figure class="photo diag-photo" data-reveal><img src="img/hand-water-sm.webp" srcset="img/hand-water-sm.webp 800w, img/hand-water-lg.webp 1600w" sizes="(min-width: 1000px) 46vw, 90vw" alt="A hand reaching into green-tinged pool water at the edge" loading="lazy" width="800" height="533"><figcaption class="mono">Example photography</figcaption></figure>
+      </div>
+      <a class="see-report btn btn--solid" id="see-report" href="#report" hidden>See your report <span class="mono" id="see-report-r"></span></a>
+      <article class="report" id="report" aria-labelledby="report-h" tabindex="-1">
+        <p class="report-top mono"><span>Report</span><span id="report-date"></span></p>
+        <div id="report-body"></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 WATER LAB ============ -->
+<section class="sec sec--deep" id="lab" aria-labelledby="lab-h">
+  <div class="wrap lab">
+    <header class="sec-head">
+      <p class="marker mono">02 — The water lab</p>
+      <h2 id="lab-h" data-reveal>Three numbers decide the <em>colour</em>.</h2>
+      <p class="lede" data-reveal>An illustration, not a test: pH, chlorine and temperature are three of the readings a technician takes on site. Move them and watch the water react.</p>
+    </header>
+    <div class="lab-grid">
+      <figure class="lab-view">
+        <canvas id="lab-canvas" aria-hidden="true"></canvas>
+        <svg class="lab-fallback" id="lab-fallback" viewBox="0 0 400 300" aria-hidden="true" hidden><rect width="400" height="300" id="lab-fb-water" fill="#2E8FA8"/><path d="M0 60h400M0 120h400M0 180h400M0 240h400" stroke="#ffffff22"/><circle cx="200" cy="150" r="60" fill="none" stroke="#F3EFE7" stroke-dasharray="2 6"/></svg>
+        <figcaption class="mono"><span id="lab-verdict" aria-live="polite">Balanced</span><span id="lab-read">pH 7.4 · Cl 2.0 ppm · 80°F</span></figcaption>
+        <p class="fine">Simulation for illustration. It doesn’t replace a water test.</p>
+      </figure>
+      <div class="lab-ctl">
+        <div class="slider"><label for="l-ph"><span>pH</span><output id="l-ph-o" class="mono">7.4</output></label><input type="range" id="l-ph" min="6.8" max="8.2" step="0.1" value="7.4"><p class="fine mono">Healthy 7.2–7.8</p></div>
+        <div class="slider"><label for="l-cl"><span>Free chlorine</span><output id="l-cl-o" class="mono">2.0 ppm</output></label><input type="range" id="l-cl" min="0" max="6" step="0.1" value="2"><p class="fine mono">Healthy 1–3 ppm</p></div>
+        <div class="slider"><label for="l-t"><span>Water temperature</span><output id="l-t-o" class="mono">80°F</output></label><input type="range" id="l-t" min="60" max="95" step="1" value="80"><p class="fine mono">Algae grows faster above 85°F</p></div>
+        <p class="lab-say" id="lab-say">Clear water, comfortable on eyes. Chlorine has room to work.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 CARE ============ -->
+<section class="sec sec--bone sec--tight" id="care" aria-labelledby="care-h">
+  <div class="wrap">
+    <header class="sec-head sec-head--split">
+      <div>
+        <p class="marker mono">03 — Care</p>
+        <h2 id="care-h" data-reveal>Weekly care, written down.</h2>
+      </div>
+      <div>
+        <p class="lede" data-reveal>Every visit follows the same checklist, ticked off on site. Monthly example prices.</p>
+        <div class="seg" role="radiogroup" aria-label="Visit frequency" id="freq">
+          <label><input type="radio" name="freq" value="weekly" checked><span>Weekly</span></label>
+          <label><input type="radio" name="freq" value="biweekly"><span>Every other week</span></label>
+        </div>
+      </div>
+    </header>
+    <div class="tiers" id="tiers"></div>
+    <div class="care-photos">
+      <figure class="photo" data-reveal><img src="img/coping-sm.webp" srcset="img/coping-sm.webp 600w, img/coping-lg.webp 1200w" sizes="(min-width: 900px) 30vw, 90vw" alt="A clean stone pool edge meeting pale blue water" loading="lazy" width="600" height="750"><figcaption class="mono">Example photography</figcaption></figure>
+      <figure class="photo photo--wide" data-reveal><img src="img/steps-shadow-sm.webp" srcset="img/steps-shadow-sm.webp 800w, img/steps-shadow-lg.webp 1600w" sizes="(min-width: 900px) 60vw, 90vw" alt="Pool steps in clear water with a crisp afternoon shadow" loading="lazy" width="800" height="533"><figcaption class="mono">Example photography</figcaption></figure>
+    </div>
+    <aside class="season-card" id="season-card" aria-labelledby="season-h">
+      <figure class="photo"><img src="img/leaves-sm.webp" srcset="img/leaves-sm.webp 600w, img/leaves-lg.webp 1200w" sizes="(min-width: 900px) 24vw, 90vw" alt="Autumn leaves floating on dark water" loading="lazy" width="600" height="750"><figcaption class="mono">Example photography</figcaption></figure>
+      <div>
+        <p class="mono label" id="season-tag">Closing season</p>
+        <h3 id="season-h">Openings and closings</h3>
+        <p id="season-copy">A closing before the first frost: water lowered, lines blown out, heater winterized, cover fitted. Example range $250–$450, included in Worry-free.</p>
+        <button class="btn btn--line" type="button" id="season-book">Book a closing</button>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ 04 REPAIR ============ -->
+<section class="sec sec--deep" id="repair" aria-labelledby="repair-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="marker mono">04 — Repair</p>
+      <h2 id="repair-h" data-reveal>Find the part that needs <em>repair</em>.</h2>
+      <p class="lede" data-reveal>Tap a part of a typical equipment pad to see how it usually fails, what that sounds like, and an example repair range.</p>
+    </header>
+    <div class="pad">
+      <div class="pad-view" id="pad-view">
+        <canvas id="pad-canvas" aria-hidden="true"></canvas>
+        <div class="pad-hot" id="pad-hot"></div>
+        <div class="pad-svg" id="pad-svg" hidden></div>
+        <p class="pad-note mono" id="pad-note">3D pad loading…</p>
+      </div>
+      <div class="pad-side">
+        <div class="part-list" id="part-list" role="group" aria-label="Equipment parts"></div>
+        <article class="part" id="part" aria-live="polite"></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 BUILD ============ -->
+<section class="sec sec--stone sec--story" id="build" aria-labelledby="build-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="marker mono">05 — Build</p>
+      <h2 id="build-h" data-reveal>Dirt to <em>dive</em>, in six stages.</h2>
+      <p class="lede" data-reveal>Pick a stage to watch it built. An example timeline for a gunite pool: about six weeks, give or take permits and weather.</p>
+      <span class="waterline" aria-hidden="true"></span>
+    </header>
+    <div class="bwrap" id="btrack">
+      <div class="bvis">
+        <p class="bday mono"><span id="b-day">Day 01 of 42</span><a href="#design" class="b-yours" id="b-yours">Your design: 32 × 16 ft rectangle · sport</a></p>
+        <svg viewBox="0 0 1000 520" class="bsvg" role="img" aria-labelledby="b-stage">
+          <defs>
+            <pattern id="rebar" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M0 11h22M11 0v22" stroke="#5D6B72" stroke-width="2"/></pattern>
+            <pattern id="soil" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#7F5A41"/><circle cx="7" cy="9" r="1.4" fill="#6B4934"/><circle cx="27" cy="23" r="1.1" fill="#94705A"/><circle cx="17" cy="33" r="1.6" fill="#6B4934"/><circle cx="35" cy="6" r=".9" fill="#94705A"/></pattern>
+            <pattern id="crete" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#B4AFA5"/><circle cx="3" cy="4" r=".8" fill="#9C978D"/><circle cx="9" cy="9" r=".6" fill="#C9C4BA"/></pattern>
+            <pattern id="tiles" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#0F5A73"/><path d="M0 0h14v14" fill="none" stroke="#ffffff40"/></pattern>
+            <linearGradient id="wat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FD3E0"/><stop offset="1" stop-color="#0F6E8C"/></linearGradient>
+            <linearGradient id="strata" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>
+            <clipPath id="hole"><path d="M150 200 L850 200 L850 300 Q850 330 820 345 L640 420 Q600 440 560 440 L190 440 Q150 440 150 400 Z"/></clipPath>
+          </defs>
+          <rect x="0" y="200" width="1000" height="320" fill="url(#soil)"/>
+          <rect x="0" y="200" width="1000" height="320" fill="url(#strata)"/>
+          <path d="M0 290h1000M0 380h1000" stroke="#00000018"/>
+          <path d="M0 199h1000" stroke="#55703F" stroke-width="6"/>
+          <path id="b-hole" fill="#3A2618"/>
+          <path id="b-pile" fill="#6B4934"/>
+          <g id="b-steel" clip-path="url(#hole)"><path d="M150 200 L850 200 L850 300 Q850 330 820 345 L640 420 Q600 440 560 440 L190 440 Q150 440 150 400 Z" fill="url(#rebar)"/></g>
+          <g id="b-stamp" transform="translate(600 300) rotate(-6)"><rect x="-118" y="-26" width="236" height="52" fill="none" stroke="#E3A048" stroke-width="2"/><text text-anchor="middle" y="6" font-family="Geist Mono, monospace" font-size="16" letter-spacing="2" fill="#E3A048">STEEL INSPECTED</text></g>
+          <path id="b-shell" d="M150 200 L850 200 L850 300 Q850 330 820 345 L640 420 Q600 440 560 440 L190 440 Q150 440 150 400 Z" fill="none" stroke="url(#crete)" stroke-width="28"/>
+          <path id="b-plaster" d="M150 200 L850 200 L850 300 Q850 330 820 345 L640 420 Q600 440 560 440 L190 440 Q150 440 150 400 Z" fill="#F1F2EE" stroke="#E2E4DE" stroke-width="2"/>
+          <rect id="b-tile" x="150" y="200" width="700" height="16" fill="url(#tiles)"/>
+          <g id="b-coping"><rect x="112" y="186" width="54" height="16" rx="2" fill="#D9D2C4"/><rect x="834" y="186" width="54" height="16" rx="2" fill="#D9D2C4"/><path d="M0 195h112M888 195h112" stroke="#D9D2C4" stroke-width="10"/></g>
+          <g clip-path="url(#hole)"><rect id="b-water" x="150" width="700" fill="url(#wat)" opacity=".92"/><path id="b-surface" fill="none" stroke="#ffffffb0" stroke-width="2.5"/></g>
+          <g id="b-swim"><path d="M790 120v100M822 120v100M790 150h32M790 182h32" stroke="#C9D4D6" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M30 186h84l22-34" fill="none" stroke="#F3EFE7" stroke-width="8" stroke-linecap="round"/><path d="M30 196v-10M110 196v-10" stroke="#F3EFE7" stroke-width="4"/></g>
+        </svg>
+      </div>
+      <div class="bside">
+        <ol class="bsteps" aria-label="Build stages">
+          <li><button type="button">Dig</button></li><li><button type="button">Steel</button></li><li><button type="button">Gunite</button></li><li><button type="button">Plaster &amp; tile</button></li><li><button type="button">Fill</button></li><li><button type="button">Swim</button></li>
+        </ol>
+        <p class="bstage" id="b-stage" aria-live="polite">Dig</p>
+        <p class="bsay" id="b-say">The shape we drew together is staked out and dug. Spoil leaves the same week.</p>
+        <div class="bnav"><button type="button" class="btn btn--line btn--sm" id="b-prev" disabled>Previous</button><button type="button" class="btn btn--solid btn--sm" id="b-next">Next stage</button><button type="button" class="btn btn--line btn--sm" id="b-play">Play all</button></div>
+        <div class="bscrub"><label for="b-scrub"><span class="mono label">Scrub the timeline</span><output id="b-scrub-o" class="mono">Day 01</output></label><input type="range" id="b-scrub" min="0" max="1000" step="1" value="2" aria-label="Build progress, day 1 to day 42"></div>
+        <div class="bphotos" id="bphotos"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONFIGURATOR ============ -->
+<section class="sec sec--bone" id="design" aria-labelledby="design-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="marker mono">05b — Design</p>
+      <h2 id="design-h" data-reveal>Draw yours. Price it.</h2>
+      <p class="lede" data-reveal>A rough plan and an example range before the design consult. Real quotes follow a site visit.</p>
+    </header>
+    <div class="cfg" id="cfg">
+      <div class="cfg-ctl">
+        <fieldset class="field"><legend class="mono label">Shape</legend><div class="chips" id="cfg-shape"></div></fieldset>
+        <div class="field slider"><label for="cfg-len"><span class="mono label">Size</span><output id="cfg-len-out" class="mono"></output></label><input type="range" id="cfg-len" min="24" max="48" step="1" value="32"></div>
+        <fieldset class="field"><legend class="mono label">Depth profile</legend><div class="chips" id="cfg-depth"></div></fieldset>
+        <fieldset class="field"><legend class="mono label">Interior</legend><div class="chips" id="cfg-interior"></div></fieldset>
+        <fieldset class="field"><legend class="mono label">Extras</legend><div class="chips" id="cfg-extras"></div></fieldset>
+        <p class="fine cfg-why" id="cfg-why" aria-live="polite"></p>
+      </div>
+      <div class="cfg-out">
+        <div class="cfg-stick">
+          <div class="plan" id="cfg-plan"></div>
+          <div class="cfg-pricebar"><p class="mono label">Example range</p><p class="quote-price"><span id="cfg-price" aria-live="polite">$77k–$95k</span></p></div>
+        </div>
+        <div class="quote">
+          <details class="moves"><summary>What moves the price</summary><ul class="spec" id="cfg-parts"></ul><p class="fine">Also: access for machines, soil and rock, drainage, permits and the town’s inspection schedule.</p></details>
+          <div class="fin">
+            <p class="mono label">Financing, example</p>
+            <div class="chips" id="cfg-term" role="radiogroup" aria-label="Loan term"></div>
+            <p class="fin-pay"><span id="cfg-monthly">$0/mo</span></p>
+            <p class="fine" id="cfg-fin-note"></p>
+            <p class="fine"><strong>Example only. Not an offer of credit.</strong> Real terms come from a lender.</p>
+          </div>
+          <button class="btn btn--solid" type="button" id="cfg-consult">Request a design consult</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 BEFORE & AFTER ============ -->
+<section class="sec sec--deep sec--story" id="cases" aria-labelledby="cases-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="marker mono">06 — Before and after</p>
+      <h2 id="cases-h" data-reveal>Three pools, <em>three</em> fixes.</h2>
+      <p class="lede" data-reveal>Three example cases from fictional pools. The day counts are typical, not promises.</p>
+    </header>
+  </div>
+  <div class="wrap case-nav" aria-hidden="false"><p class="mono label" id="case-count">01 / 03</p><div><button type="button" class="case-btn" id="case-prev" aria-label="Previous case" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button><button type="button" class="case-btn" id="case-next" aria-label="Next case"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button></div></div>
+  <div class="cases" id="case-list" tabindex="0" aria-label="Before and after cases, scroll sideways">
+    <article class="case"><div class="case-view"><canvas data-case="green" aria-hidden="true"></canvas><span class="case-fb case-fb--green" aria-hidden="true"></span></div><p class="mono label">Green-to-clean · day 1 → day 3</p><h3>The pool that sat through a heatwave.</h3><p>Shocked, brushed and filtered round the clock; the floor was back on day two.</p></article>
+    <article class="case"><div class="case-view"><canvas data-case="cloudy" aria-hidden="true"></canvas><span class="case-fb case-fb--cloudy" aria-hidden="true"></span></div><p class="mono label">Cloudy water · day 1 → day 2</p><h3>Milky after a pool party.</h3><p>A clogged filter and high pH. Clean sand, balanced water, clear by the next evening.</p></article>
+    <article class="case"><div class="case-view"><canvas data-case="black" aria-hidden="true"></canvas><span class="case-fb case-fb--black" aria-hidden="true"></span></div><p class="mono label">Black algae · day 1 → day 6</p><h3>Spots that came back every June.</h3><p>Brushed out by hand, treated at the roots, and a filter that finally kept up.</p></article>
+  </div>
+</section>
+
+<!-- ============ 07 REVIEWS ============ -->
+<section class="sec sec--bone" id="reviews" aria-labelledby="reviews-h">
+  <div class="wrap reviews">
+    <header class="sec-head">
+      <p class="marker mono">07 — Reviews</p>
+      <h2 id="reviews-h" data-reveal>Example customer <em>reviews</em>.</h2>
+      <p class="mono label rev-sub" data-reveal>Written for this demo · fictional customers and towns</p>
+    </header>
+    <div class="rev-grid">
+      <figure class="photo rev-photo" data-reveal><img src="img/shadow-pebble-sm.webp" srcset="img/shadow-pebble-sm.webp 800w, img/shadow-pebble-lg.webp 1600w" sizes="(min-width: 900px) 40vw, 90vw" alt="A person's shadow across a pebble-finish pool floor" loading="lazy" width="800" height="450"><figcaption class="mono">Example photography</figcaption></figure>
+      <blockquote class="rev" data-reveal><p>It was green on a Thursday night. Their report said not to swim and why; by Sunday the kids were in.</p><footer class="mono">Dana R. · Green-to-clean · Montclair</footer></blockquote>
+      <blockquote class="rev" data-reveal><p>The checklist after every visit is the thing. I know exactly what was done.</p><footer class="mono">Marcus T. · Complete plan · West Orange</footer></blockquote>
+      <blockquote class="rev" data-reveal><p>They named the pump bearing from my description before they arrived, and had the part on the truck.</p><footer class="mono">Priya S. · Pump repair · Livingston</footer></blockquote>
+      <blockquote class="rev" data-reveal><p>Forty-four days, dig to swim. The day counter on the site was honest.</p><footer class="mono">The Okafors · New pool · Verona</footer></blockquote>
+      <blockquote class="rev" data-reveal><p>Closing took an hour and a half, heater winterized, cover tight.</p><footer class="mono">Glen W. · Closing · Glen Ridge</footer></blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 TRUST ============ -->
+<section class="sec sec--stone" id="trust" aria-labelledby="trust-h">
+  <div class="wrap credits">
+    <p class="marker mono">08 — Credentials</p>
+    <h2 id="trust-h" class="h3">The fine print, up front.</h2>
+    <dl class="credit-list">
+      <div><dt class="mono">Registration</dt><dd>NJ Home Improvement Contractor registration <span class="ph">number shown on a real site</span></dd></div>
+      <div><dt class="mono">Insurance</dt><dd>Insured · general liability &amp; workers’ comp</dd></div>
+      <div><dt class="mono">Crew</dt><dd>Certified Pool Operator on every crew <span class="ph">example credential</span></dd></div>
+      <div><dt class="mono">Guarantee</dt><dd>5-day workmanship guarantee on repairs · structural warranty on new pools <span class="ph">example terms</span></dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ============ 09 AREA ============ -->
+<section class="sec sec--bone" id="area" aria-labelledby="area-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="marker mono">09 — Area</p>
+      <h2 id="area-h" data-reveal>Three routes, six days.</h2>
+      <p class="lede" data-reveal>An illustrative service area in Essex County. Trucks run a zone on fixed days, so visits land on time.</p>
+    </header>
+    <div class="area">
+      <div class="map" id="map"></div>
+      <div class="area-side">
+        <ul class="routes" id="routes"></ul>
+        <form class="zip" id="zip-form" novalidate>
+          <label for="zip-in" class="mono label">Check your zip</label>
+          <div class="zip-row"><input id="zip-in" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="07042" aria-describedby="zip-out"><button class="btn btn--line" type="submit">Check</button></div>
+          <p class="zip-out" id="zip-out" aria-live="polite"></p>
+        </form>
+        <figure class="photo" data-reveal><img src="img/aerial-sm.webp" srcset="img/aerial-sm.webp 600w, img/aerial-lg.webp 1200w" sizes="(min-width: 900px) 30vw, 90vw" alt="A rectangular pool and deck seen from above" loading="lazy" width="600" height="750"><figcaption class="mono">Example photography</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10 BOOK ============ -->
+<section class="sec sec--bone sec--book sec--tight" id="book" aria-labelledby="book-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="marker mono">10 — Book</p>
+      <h2 id="book-h" data-reveal>Book a <em>visit</em>.</h2>
+      <p class="lede" data-reveal>Three short steps. A simulated booking: nothing is sent, stored or charged.</p>
+      <span class="waterline" aria-hidden="true"></span>
+    </header>
+    <div class="book" id="book-ui">
+      <ol class="stepnav mono" id="stepnav" aria-label="Booking steps"></ol>
+      <div class="book-main">
+        <form id="bk" novalidate>
+          <fieldset class="step" data-step="0">
+            <legend class="sr-only">Service and details</legend>
+            <h3 tabindex="-1">What do you need?</h3>
+            <div class="opts" id="need-list"></div>
+            <div class="need-detail" id="need-detail"></div>
+            <p class="notice" id="need-notice" hidden></p>
+            <div class="grp" id="pool-fields" hidden>
+              <p class="grp-h">Your pool</p>
+              <p class="mono label">Type</p><div class="chips" id="pool-type"></div>
+              <p class="mono label">Shape and approximate size</p><div class="chips" id="pool-shape"></div>
+              <div class="field slider"><label for="pool-len"><span class="mono label">Length</span><output id="pool-len-o" class="mono"></output></label><input type="range" id="pool-len" min="10" max="75" step="1" value="32"></div>
+              <div class="pool-outline" id="pool-outline" aria-hidden="true"></div>
+              <p class="mono label">Equipment</p><div class="chips" id="pool-eq"></div>
+            </div>
+            <div class="grp" id="prop-fields" hidden>
+              <p class="grp-h">Your property</p>
+              <p class="mono label">Is there a pool there now?</p>
+              <div class="chips" role="radiogroup" aria-label="Existing pool" id="prop-existing">
+                <label class="chip chip--sm"><input type="radio" name="prop-existing" value="no" checked><span>No, it’s a new build</span></label>
+                <label class="chip chip--sm"><input type="radio" name="prop-existing" value="yes"><span>Yes, replacing an old pool</span></label>
+              </div>
+              <div id="prop-old" hidden><p class="mono label">The old pool</p><div class="chips" id="prop-old-type"></div></div>
+              <p class="mono label">Access for machines</p>
+              <div class="chips" role="radiogroup" aria-label="Access" id="prop-access">
+                <label class="chip chip--sm"><input type="radio" name="prop-access" value="side" checked><span>Side yard, 8 ft or wider</span></label>
+                <label class="chip chip--sm"><input type="radio" name="prop-access" value="tight"><span>Tight, under 8 ft</span></label>
+                <label class="chip chip--sm"><input type="radio" name="prop-access" value="unsure"><span>Not sure</span></label>
+              </div>
+              <p class="mono label">The yard</p>
+              <div class="chips" role="radiogroup" aria-label="Slope" id="prop-slope">
+                <label class="chip chip--sm"><input type="radio" name="prop-slope" value="flat" checked><span>Mostly flat</span></label>
+                <label class="chip chip--sm"><input type="radio" name="prop-slope" value="sloped"><span>Sloped</span></label>
+              </div>
+            </div>
+            <details class="grp photos-dt" id="photos-dt">
+              <summary>Add photos <span class="opt">optional</span></summary>
+              <p class="fine" id="photo-hint">They stay on this page: in this example nothing is uploaded.</p>
+              <div class="photo-btns" id="photo-btns"></div>
+              <input type="file" id="photo-in" accept="image/*" multiple hidden>
+              <ul class="thumbs" id="thumbs"></ul>
+              <p class="notice" id="photo-notice" hidden></p>
+            </details>
+          </fieldset>
+          <fieldset class="step" data-step="1" hidden>
+            <legend class="sr-only">Where and when</legend>
+            <h3 tabindex="-1">Where and when?</h3>
+            <div class="field"><label for="bk-zip">Zip code</label>
+            <input id="bk-zip" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="07042" aria-describedby="bk-zip-out err-zip">
+            <p class="zip-out" id="bk-zip-out"></p>
+            <p class="err" id="err-zip"></p></div>
+            <p class="mono label" id="when-meta"></p>
+            <div class="days" id="days" role="radiogroup" aria-label="Day"></div>
+            <div class="times" id="times" role="radiogroup" aria-label="Arrival time"></div>
+            <p class="notice" id="time-notice" hidden></p>
+          </fieldset>
+          <fieldset class="step" data-step="2" hidden>
+            <legend class="sr-only">Contact and review</legend>
+            <h3 tabindex="-1">Your details</h3>
+            <div class="field"><label for="f-name">First name</label><input id="f-name" type="text" autocomplete="given-name" aria-describedby="err-name"><p class="err" id="err-name"></p></div>
+            <div class="field"><label for="f-mobile">Mobile <span class="opt">optional</span></label><input id="f-mobile" type="tel" autocomplete="tel" inputmode="tel" aria-describedby="err-mobile"><p class="err" id="err-mobile"></p></div>
+            <div class="field"><label for="f-notes">Notes for the technician <span class="opt">optional</span></label><textarea id="f-notes" rows="3"></textarea></div>
+            <button type="button" class="btn btn--line" id="sample">Use sample details</button>
+            <h3 class="review-h" id="review-h">Review</h3>
+            <p class="notice" id="review-notice" hidden></p>
+            <dl class="review" id="review-list"></dl>
+            <div class="bill" id="review-bill"></div>
+          </fieldset>
+          <div class="book-nav">
+            <button type="button" class="btn btn--line" id="back">Back</button>
+            <button type="submit" class="btn btn--solid" id="next">Next</button>
+          </div>
+        </form>
+        <section class="done" id="done" hidden aria-labelledby="done-h">
+          <h3 id="done-h" tabindex="-1">Visit requested <span class="mono">(simulated)</span></h3>
+          <p class="done-strong">No visit was booked and nothing was sent.</p>
+          <dl class="review" id="done-list"></dl>
+          <div class="bill" id="done-bill"></div>
+          <div class="done-actions">
+            <a class="btn btn--line" id="ics" download="pool-doctor-example.ics" href="#">Download a sample calendar file</a>
+            <button type="button" class="btn btn--solid" id="restart">Start a new booking</button>
+          </div>
+          <p class="fine">On a real site the office would confirm by text. This example stores nothing: reload and it’s gone.</p>
+        </section>
+      </div>
+      <aside class="book-bar" id="book-bar" aria-label="Visit summary">
+        <p class="mono label">Your visit</p>
+        <p class="bb-visit" id="bb-visit">Choose what you need</p>
+        <p class="bb-range" id="bb-range" aria-live="polite"></p>
+        <p class="bb-meta mono" id="bb-meta"></p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="sec sec--bone" id="faq" aria-labelledby="faq-h">
+  <div class="wrap faq">
+    <header class="sec-head"><p class="marker mono">11 — Questions</p><h2 id="faq-h" data-reveal>Asked every season.</h2></header>
+    <div class="qa">
+      <details><summary>When should I book an opening or a closing?</summary><p>Openings go fast from late April; book in March for May. Close after the water stays under about 65°F, usually mid-October in Essex County, before the first hard frost.</p></details>
+      <details><summary>My pool is green. Can it be saved without draining?</summary><p>Almost always. A green-to-clean visit shocks, brushes and filters it back over two to four days. Draining is a last resort and can damage a pool.</p></details>
+      <details><summary>Do care plans need a contract?</summary><p>In this example, no: plans run month to month and pause in winter. A real company sets its own terms.</p></details>
+      <details><summary>How long does a new gunite pool take?</summary><p>As an example, about six to ten weeks from dig to swim, depending on permits, weather and curing time. A real builder gives a dated schedule in the contract.</p></details>
+      <details><summary>Who handles permits?</summary><p>The builder files the plans and books the town’s inspections, including the steel inspection before concrete.</p></details>
+      <details><summary>Why add photos to a quote?</summary><p>A photo of the water and the equipment pad lets the technician bring the right parts the first time. In this example photos never leave your phone.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOCAL FORM ============ -->
+<section class="sec sec--deep lf" id="localform" aria-labelledby="lf-h">
+  <div class="wrap lf-in">
+    <figure class="photo"><img src="img/night-pool-sm.webp" srcset="img/night-pool-sm.webp 800w, img/night-pool-lg.webp 1600w" sizes="(min-width: 900px) 40vw, 90vw" alt="A lit pool glowing in the dark" loading="lazy" width="800" height="533"><figcaption class="mono">Example photography</figcaption></figure>
+    <div>
+      <p class="marker mono">Local Form</p>
+      <h2 id="lf-h">Bring this experience to <em>your</em> business.</h2>
+      <p class="lede">Local Form builds websites for local businesses that answer the customer’s real question and turn it into a booked job.</p>
+      <a class="btn btn--light" href="https://localform.online/#contact">Talk to Local Form</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path clip-path="url(#mk)" d="M0 17c4-3.2 8-3.2 12 0s8 3.2 12 0 6-2.6 8-1.4V32H0Z" fill="currentColor" opacity=".9"/></svg>
+      <p class="word">Pool Doctor</p>
+    </div>
+    <div class="foot-text">
+      <p><strong>Pool Doctor is a fictional company.</strong> This is an example site by <a href="https://localform.online">Local Form</a>. Prices, reviews, credentials, routes and the service area are invented examples. Nothing on this page is sent or stored. Not affiliated with any real business called Pool Doctor.</p>
+      <p>Photos: example photography from Unsplash (Annie Spratt, Yusuf Onuk, Jorch Alon, Hydra 4x, Chris Lawton, RETRATO INMOBILIARIO, Autumn Studio, Brianna Lengacher, Johannes Hahn, Drew Dau, Heng Chiu, Erwan Hesry, Hasan Almasi). Not Pool Doctor’s work.</p>
+      <p class="mono">noindex example · <a href="https://localform.online">localform.online</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
