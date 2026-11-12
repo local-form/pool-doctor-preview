@@ -84,6 +84,10 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
   [[-3.25, .36, .35], [-1.95, .62, .35], [2.05, .32, .25]].forEach(([x, y, z]) => { const u = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, .1, 18), std(0xe6e3dc, .4)); u.rotation.z = Math.PI / 2; u.position.set(x, y, z); plumbing.add(u); });
   plumbing.traverse(m => { if (m.isMesh) m.userData.id = 'plumbing'; });
 
+  // glow for the picked part: bright emissive pulse, a light on it, and an additive halo shell
+  const glowL = new THREE.PointLight(0x5db6e6, 0, 3.2, 1.6); rig.add(glowL);
+  const halos = {};
+  const haloOf = id => halos[id] || (halos[id] = (() => { const h = [], ms = []; parts[id].traverse(m => { if (m.isMesh && m.geometry && !m.userData.halo) ms.push(m); }); ms.forEach(m => { { const s = new THREE.Mesh(m.geometry, new THREE.MeshBasicMaterial({ color: 0x49b8ff, transparent: true, opacity: 0, side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false })); s.scale.setScalar(1.09); s.userData.halo = 1; s.raycast = () => {}; m.add(s); h.push(s); } }); return h; })());
   // focus ring for flagged parts
   const ring = new THREE.Mesh(new THREE.RingGeometry(.55, .62, 48), new THREE.MeshBasicMaterial({ color: 0xffb547, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false }));
   ring.rotation.x = -Math.PI / 2; ring.position.y = .02; rig.add(ring);
@@ -94,7 +98,9 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
   const centerOf = id => { const b = new THREE.Box3().setFromObject(parts[id]); return b.getCenter(new THREE.Vector3()); };
   function select(id) {
     sel = id;
-    for (const [k, g] of Object.entries(parts)) g.traverse(m => { if (m.isMesh && m.material && m.material.emissive && !(m.material.isMeshBasicMaterial)) { m.material.emissive.setHex(k === id ? 0x1d5db5 : 0); m.material.emissiveIntensity = k === id ? .35 : 0; } });
+    for (const [k, g] of Object.entries(parts)) g.traverse(m => { if (m.isMesh && m.material && m.material.emissive && !(m.material.isMeshBasicMaterial)) { m.material.emissive.setHex(k === id ? 0x1f8fff : 0); m.material.emissiveIntensity = k === id ? .6 : 0; } });
+    for (const k in halos) if (k !== id) halos[k].forEach(s => { s.material.opacity = 0; });
+    if (id && parts[id]) { haloOf(id); rig.updateMatrixWorld(); const c = rig.worldToLocal(centerOf(id)); glowL.position.set(c.x, c.y + .9, c.z + .9); }
     if (id && parts[id]) { rig.updateMatrixWorld(); const c = centerOf(id); lookT.set(c.x * .6, Math.max(.45, c.y), c.z * .3); zoomT = id === 'plumbing' ? .95 : .72; } else { lookT.set(.2, .6, 0); zoomT = 1; }
     kick();
   }
@@ -117,10 +123,13 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
     flameM.opacity = run * (.75 + .25 * Math.sin(t * 13)); screenM.color.setRGB(.04 + run * .15, .14 + run * .45, .19 + run * .55);
     leds[0].material.color.setHex(running ? 0x39d98a : 0x1f3b2c);
     bubbles.forEach((b, i) => { const u = (b.userData.o + t * .45) % 1; b.position.set(-.3 + u * .6, -.08 + Math.sin(i * 3.3) * .07, Math.cos(i * 2.1) * .08); b.material.opacity = run * .8 * Math.sin(u * Math.PI); });
+    if (sel && parts[sel]) { const g = .5 + .5 * Math.sin(t * 3.2), e = .35 + .45 * g;
+      parts[sel].traverse(m => { if (m.isMesh && m.material && m.material.emissive && !m.material.isMeshBasicMaterial) m.material.emissiveIntensity = e; });
+      (halos[sel] || []).forEach(s => { s.material.opacity = .55 + .45 * g; }); glowL.intensity = 4 + 5 * g; } else glowL.intensity = 0;
     ring.material.opacity = flagged ? .55 + .35 * Math.sin(t * 4) : 0; ring.scale.setScalar(1 + .06 * Math.sin(t * 4));
     renderer.render(scene, cam);
   }
-  const busy = () => dragging || velY || running || run > .01 || look.distanceTo(lookT) > .005 || Math.abs(zoom - zoomT) > .002 || flagged;
+  const busy = () => dragging || velY || running || run > .01 || look.distanceTo(lookT) > .005 || Math.abs(zoom - zoomT) > .002 || flagged || sel;
   function loop() { raf = 0; if (!visible || document.hidden) return; draw(); if (!reduced || busy()) raf = requestAnimationFrame(loop); }
   function kick() { if (!raf) raf = requestAnimationFrame(loop); }
   canvas.addEventListener('pointerdown', e => { dragging = true; velY = 0; sx = e.clientX; sy = e.clientY; lastT = performance.now(); moved = 0; try { canvas.setPointerCapture(e.pointerId); } catch {} kick(); });

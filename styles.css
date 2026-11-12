@@ -388,16 +388,15 @@ input[type=file]::file-selector-button{min-height:44px;padding:0 16px;border-rad
 
 /* heartbeat-to-wave dividers (the card's own line), with a monitor sweep running along them */
 .sec,.builders,.doors{position:relative}
-.pulse{position:absolute;left:0;right:0;top:clamp(36px,4.5vw,64px);height:54px;transform:translateY(-50%);z-index:4;pointer-events:none}
-.builders>.pulse{top:clamp(30px,3.5vw,48px)}
-.doors{padding-top:clamp(72px,8vw,112px)!important}.doors>.pulse{top:clamp(36px,4vw,56px)}
+.pulse{position:absolute;left:0;right:0;top:0;height:54px;transform:translateY(-50%);z-index:4;pointer-events:none}
+.doors{padding-top:clamp(56px,6vw,88px)!important}
 .pl{position:absolute;inset:0;display:flex;align-items:center;color:rgba(93,182,230,.42)}
-.light .pl,.light+.pulse .pl{color:rgba(29,93,181,.3)}
+.pl{color:rgba(93,182,230,.85)}
 .pl i{flex:var(--a);height:2.2px;background:currentColor;transform:translateY(5.4px)}
 .pl i:last-child{flex:var(--b)}
 .pl svg{height:100%;width:auto;flex:none;fill:currentColor;overflow:visible}
 .pl.hi{color:#aee6ff;filter:drop-shadow(0 0 5px rgba(93,182,230,.95));-webkit-mask:linear-gradient(90deg,transparent 40%,#000 47%,#000 53%,transparent 60%) 0 0/300% 100% no-repeat;mask:linear-gradient(90deg,transparent 40%,#000 47%,#000 53%,transparent 60%) 0 0/300% 100% no-repeat;animation:sweep 4.2s linear infinite}
-.light .pl.hi{color:#2E7FD0;filter:drop-shadow(0 0 4px rgba(46,127,208,.6))}
+
 .pulse:nth-of-type(2n) .pl.hi{animation-delay:-2.1s}
 @keyframes sweep{from{-webkit-mask-position:100% 0;mask-position:100% 0}to{-webkit-mask-position:0 0;mask-position:0 0}}
 .pl svg path{transform-box:fill-box}
@@ -424,7 +423,7 @@ input[type=file]::file-selector-button{min-height:44px;padding:0 16px;border-rad
   .part-line{font-size:14px;margin:10px 0 16px;min-height:0}
   .sym{grid-template-columns:1fr}
   .sym button{min-height:48px}
-  .pulse{height:40px;top:36px}.builders>.pulse{top:30px}.doors>.pulse{top:36px}.pl i{height:1.8px;transform:translateY(4px)}
+  .pulse{height:40px}.pl i{height:1.8px;transform:translateY(4px)}
   .look{gap:10px}
   .chips.sw button{min-height:54px;font-size:11px}
 }
@@ -471,3 +470,10 @@ input[type=file]::file-selector-button{min-height:44px;padding:0 16px;border-rad
   .when button{font-size:13px;min-height:46px}
   .todo label{font-size:15px;padding:9px 6px}
 }
+
+/* back to top */
+.totop{position:fixed;right:clamp(14px,2vw,28px);bottom:calc(clamp(14px,2vw,28px) + env(safe-area-inset-bottom));z-index:21;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--royal);color:#fff;box-shadow:0 8px 24px rgba(6,17,27,.35),inset 0 0 0 1.5px rgba(255,255,255,.25);opacity:0;transform:translateY(16px) scale(.9);pointer-events:none;transition:opacity .3s,transform .35s cubic-bezier(.16,1,.3,1),background .2s}
+.totop svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.totop:hover{background:var(--royal2)}
+.totop.on{opacity:1;transform:none;pointer-events:auto}
+@media(max-width:860px){.totop{width:48px;height:48px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom))}}

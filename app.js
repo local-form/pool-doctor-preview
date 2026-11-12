@@ -230,7 +230,7 @@ $('#runBtn').addEventListener('click', e => { running = !running; e.currentTarge
 const padBox = $('.padbox');
 const padIO = new IntersectionObserver(([e]) => {
   if (!e.isIntersecting) return; padIO.disconnect();
-  import('./pad3d.js?v=1').then(m => m.mountPad($('#padCanvas'), { onPick: id => showPart(id, true), reduced })).then(p => {
+  import('./pad3d.js?v=2').then(m => m.mountPad($('#padCanvas'), { onPick: id => showPart(id, true), reduced })).then(p => {
     pad = p; $('#padNote').textContent = 'Drag to turn · tap a part';
     if (running) pad.setRun(true);
     if (padPending) pad.select(padPending);
@@ -287,3 +287,8 @@ const dock = $('#dock'); let inHero = true, inReq = false;
 const dockSet = () => dock.classList.toggle('on', !inHero && !inReq);
 new IntersectionObserver(([e]) => { inHero = e.isIntersecting; dockSet(); }).observe(hero);
 new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { threshold: .05 }).observe($('#request'));
+
+// back to top
+{ const t = $('#totop'), hh = () => ($('.hero')?.offsetHeight || innerHeight) * .8;
+  addEventListener('scroll', () => t.classList.toggle('on', scrollY > hh()), { passive: true });
+  t.addEventListener('click', e => { e.preventDefault(); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); history.replaceState(null, '', location.pathname + location.search); }); }
