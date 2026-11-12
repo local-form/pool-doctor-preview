@@ -479,9 +479,9 @@ input[type=file]::file-selector-button{min-height:44px;padding:0 16px;border-rad
 @media(max-width:860px){.totop{width:48px;height:48px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom))}}
 
 /* live monitor line: a canvas whose baseline is the exact seam between two sections */
-.pulse.live{height:64px;transform:translateY(-50%)}
+.pulse.live{height:104px;transform:translateY(-50%)}
 .pulse.live .pl{display:none}
 .pulse canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 /* no-JS fallback: put the drawn line's baseline on the seam too */
 .pulse:not(.live){transform:translateY(calc(-50% - 5.4px))}
-@media(max-width:860px){.pulse.live{height:48px}.pulse:not(.live){transform:translateY(calc(-50% - 4px))}}
+@media(max-width:860px){.pulse.live{height:68px}.pulse:not(.live){transform:translateY(calc(-50% - 4px))}}
