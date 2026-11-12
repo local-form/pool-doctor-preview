@@ -169,6 +169,63 @@ symBox.addEventListener('click', e => {
   if (phone()) box.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
 });
 showPart('pump');
+
+// pool care key
+const GAUGE = [
+  ['Free chlorine', '1–3 ppm', 0, 6, 1, 3, 'Test twice a week; more in summer heat.'],
+  ['pH', '7.4–7.6', 6.8, 8.2, 7.4, 7.6, 'Off-balance pH burns eyes and eats equipment.'],
+  ['Total alkalinity', '80–120 ppm', 0, 200, 80, 120, 'Keeps pH from bouncing around.'],
+  ['Calcium hardness', '200–400 ppm', 0, 600, 200, 400, 'Too low etches plaster, too high scales it.'],
+  ['Stabilizer (CYA)', '30–50 ppm', 0, 120, 30, 50, 'Shields chlorine from the sun. Salt pools often run a little higher.'],
+  ['Salt (salt pools)', 'per your cell', 2000, 4500, 2700, 3400, 'Most cells want about 3,200 ppm. Check its label.'],
+];
+$('#gauges').innerHTML = GAUGE.map(([n, t, lo, hi, a, b, s]) => `<li><b>${n}</b><em>${t}</em><span class="bar" aria-hidden="true"><i style="--l:${(a - lo) / (hi - lo) * 100}%;--w:${(b - a) / (hi - lo) * 100}%"></i></span><small>${s}</small></li>`).join('');
+const CARE = {
+  'New pool': ['The usual rules for fresh plaster in the first month. Joe walks you through startup.', [
+    '<b>Brush the whole pool twice a day</b> for the first two weeks to clear plaster dust',
+    '<b>Run the pump around the clock</b> for the first few days',
+    '<b>Test and balance every day</b> the first week, starting from Joe\'s startup numbers',
+    '<b>No automatic cleaner</b> for the first two weeks while the plaster hardens',
+    '<b>Hold off on the heater</b> for about two weeks',
+    '<b>Wait about a month before adding salt</b> on a salt pool',
+  ]],
+  Weekly: ['About 30 minutes a week keeps most problems away.', [
+    '<b>Test chlorine and pH</b> twice a week and adjust',
+    '<b>Empty the skimmer and pump baskets</b>',
+    '<b>Skim, brush</b> walls and steps, and <b>vacuum</b> or run the cleaner',
+    '<b>Check the water level</b>: halfway up the skimmer opening',
+    '<b>Glance at the filter gauge</b> and note the pressure',
+  ]],
+  Monthly: ['A quick once-over of the water and the equipment.', [
+    '<b>Test alkalinity, calcium and stabilizer</b>',
+    '<b>Clean the filter</b> when the gauge reads 8–10 psi above its clean reading: hose the cartridge, or backwash sand and DE',
+    '<b>Check the salt level</b> and look at the salt cell for white scale',
+    '<b>Check the pump lid O-ring</b> and keep it lubed with pool silicone',
+    '<b>Set run times</b> for the season on the timer or app',
+  ]],
+  Quarterly: ['A deeper check, ideally with the seasons.', [
+    '<b>Deep-clean the filter</b>: soak cartridges in filter cleaner, or check the sand or DE',
+    '<b>Clean the salt cell</b> if it\'s scaled, following its maker\'s steps',
+    '<b>Walk the equipment pad</b>: drips, cracks, a noisy pump',
+    '<b>Test the pool light\'s GFCI</b> with its test button',
+    '<b>Before a cold snap</b>, make sure freeze protection is on',
+  ]],
+};
+const when = $('#when'), todo = $('#todo');
+when.innerHTML = Object.keys(CARE).map((k, i) => `<button type="button" role="tab" aria-selected="${i === 1}" data-k="${k}">${k}</button>`).join('');
+function showCare(k) {
+  $$('button', when).forEach(b => b.setAttribute('aria-selected', b.dataset.k === k));
+  const [intro, list] = CARE[k];
+  todo.style.animation = 'none'; void todo.offsetWidth; todo.style.animation = '';
+  todo.innerHTML = `<p class="intro">${intro}</p>` + list.map(t => `<label><input type="checkbox"><span>${t}</span></label>`).join('');
+}
+when.addEventListener('click', e => { const b = e.target.closest('button'); if (b) showCare(b.dataset.k); });
+when.addEventListener('keydown', e => {
+  const bs = $$('button', when), i = bs.indexOf(document.activeElement), d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+  if (!d || i < 0) return; e.preventDefault(); const n = bs[(i + d + bs.length) % bs.length]; n.focus(); showCare(n.dataset.k);
+});
+showCare('Weekly');
+
 $('#runBtn').addEventListener('click', e => { running = !running; e.currentTarget.setAttribute('aria-pressed', running); pad?.setRun(running); });
 const padBox = $('.padbox');
 const padIO = new IntersectionObserver(([e]) => {
