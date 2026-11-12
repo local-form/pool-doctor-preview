@@ -230,7 +230,7 @@ $('#runBtn').addEventListener('click', e => { running = !running; e.currentTarge
 const padBox = $('.padbox');
 const padIO = new IntersectionObserver(([e]) => {
   if (!e.isIntersecting) return; padIO.disconnect();
-  import('./pad3d.js?v=3').then(m => m.mountPad($('#padCanvas'), { onPick: id => showPart(id, true), reduced })).then(p => {
+  import('./pad3d.js?v=4').then(m => m.mountPad($('#padCanvas'), { onPick: id => showPart(id, true), reduced })).then(p => {
     pad = p; $('#padNote').textContent = phone() ? 'Drag · pinch · tap a part' : 'Drag to turn · tap a part';
     const pz = $('#padZoom'); pz.hidden = false; pz.addEventListener('click', e => { const b = e.target.closest('button'); if (b) pad.zoomBy(+b.dataset.z); });
     if (running) pad.setRun(true);
@@ -270,7 +270,7 @@ reqForm.addEventListener('submit', e => {
   e.preventDefault();
   const name = $('#fName').value.trim(), ph = $('#fPhone').value.replace(/\D/g, ''), err = $('#reqErr');
   $('#fName').setAttribute('aria-invalid', !name); $('#fPhone').setAttribute('aria-invalid', ph.length < 10);
-  if (!name || ph.length < 10) { err.textContent = !name ? 'Add your name so Joe knows who to call.' : 'Add a mobile number (10 digits) so Joe can call or text you back.'; (!name ? $('#fName') : $('#fPhone')).focus(); return; }
+  if (!name || ph.length < 10) { err.textContent = !name ? 'Add your name so Joe knows who to call.' : 'Add a mobile number (10 digits) so Joe can call or text you back.'; const bad = !name ? $('#fName') : $('#fPhone'); (bad.closest('label') || bad).before(err); bad.focus(); err.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' }); return; }
   err.textContent = '';
   const rows = [['Request', reqType], carried && [carried.kind === 'plan' ? 'Plan' : 'Seeing', carried.text], ['Name', name], ['Mobile', $('#fPhone').value.trim()],
     $('#fEmail').value.trim() && ['Email', $('#fEmail').value.trim()], $('#fTown').value && ['Town', $('#fTown').value], $('#fDetail').value.trim() && ['Details', $('#fDetail').value.trim()],
@@ -292,7 +292,8 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
 // back to top
 { const t = $('#totop'), hh = () => ($('.hero')?.offsetHeight || innerHeight) * .8;
   addEventListener('scroll', () => t.classList.toggle('on', scrollY > hh()), { passive: true });
-  t.addEventListener('click', e => { e.preventDefault(); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); history.replaceState(null, '', location.pathname + location.search); }); }
+  const up = e => { e.preventDefault(); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); history.replaceState(null, '', location.pathname + location.search); };
+  t.addEventListener('click', up); $('#dockTop').addEventListener('click', up); }
 
 // live heartbeat-to-wave line on every section seam: the trace runs across like a monitor,
 // beats first, then the beats settle into rolling water. Baseline = the seam itself.
@@ -310,20 +311,20 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
     // heartbeat: tall uneven spikes; a pulse travels down the line about once a second and kicks each spike as it passes (lub, then a softer dub)
     for (let n = j - 1; n <= j + 1; n++) {
       const h1 = hash(n * 3.17 + seed), h2 = hash(n * 5.31 + seed + 9), h3 = hash(n * 7.77 + seed + 21), h4 = hash(n * 1.93 + seed + 33);
-      if (h3 < .14) continue;                                              // a skipped beat now and then
+      if (h3 < .08) continue;                                              // a skipped beat now and then
       const c = (n + .5 + (h1 - .5) * .42) * B, x = (s - c) / (B * (.8 + .35 * h4)) + .4;
       if (x <= 0 || x >= 1) continue;
       const ph = ((t * 1.05 - c / 760 + seed) % 1 + 1) % 1, kick = Math.exp(-ph * 5.5) + .5 * Math.exp(-(((ph + .72) % 1)) * 7);
-      v += (.5 + .22 * h2 + (h2 > .88 ? .1 : 0)) * (1 + .42 * kick) * (1 - water(c, seed)) * beat(x);
+      v += (.62 + .16 * h2) * (1 + .16 * kick) * (1 - water(c, seed)) * beat(x);
     }
     // water: sets of real swells. Sharp crests, long flat troughs, crests pushed forward so they lean and start to curl, rolling faster than the line travels
     const w = water(s, seed);
     if (w > .001) {
       const set = .55 + .45 * noise(s / 210 + seed + 70 - t * .1), ph = (s + 30 * Math.sin(s / 310 + seed)) / 104 * 6.2832 - t * 2.5;   // every moving part runs forward, the way the line travels
-      const c1 = Math.pow(.5 + .5 * Math.sin(ph), 2.4);
-      const hgt = w * set * c1;
-      v += hgt - w * .2;
-      lean = 44 * hgt * hgt * hgt;                                    // the top of the crest is thrown forward so it curls over its own face
+      const c1 = Math.pow(.5 + .5 * Math.sin(ph), 1.5);
+      const hgt = w * set * c1 * .78;
+      v += hgt - w * .26;
+      lean = 15 * hgt * hgt;                                    // the top of the crest is thrown forward so it curls over its own face
     }
     return v;
   };
@@ -338,14 +339,15 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
   };
   const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); it.up = edge(it.prev, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
   const draw = (it, t) => {
-    const { ctx, w, h } = it, mid = h / 2, amp = h * (it.one ? .34 : .47), sh = t * it.sp + 16 * Math.sin(t * .45 + it.seed) + it.off, k = w < 700 ? .55 : 1;
+    const { ctx, w, h } = it, mid = h / 2, amp = h * (it.one ? .36 : .46), sh = t * it.sp + 16 * Math.sin(t * .45 + it.seed) + it.off, k = w < 700 ? .55 : 1;
     ctx.clearRect(0, 0, w, h);
-    const line = new Path2D(), body = new Path2D(); body.moveTo(-60, mid);
-    for (let x = -60; x <= w + 60; x += 1.5) { let v = trace(x / k - sh, t, it.seed); if (it.one) v = Math.abs(v); const y = mid - v * amp, X = x + lean * k * (v > 0 ? 1 : 0); x > -60 ? line.lineTo(X, y) : line.moveTo(X, y); body.lineTo(X, y); }
-    body.lineTo(w + 60, mid); body.closePath();
+    const line = new Path2D(), bDn = new Path2D(), bUp = new Path2D(), O = 2; bDn.moveTo(-60, mid + O); bUp.moveTo(-60, mid - O);
+    for (let x = -60; x <= w + 60; x += 1.5) { let v = trace(x / k - sh, t, it.seed); if (it.one) v = Math.abs(v); const y = mid - v * amp, X = x + lean * k * (v > 0 ? 1 : 0); x > -60 ? line.lineTo(X, y) : line.moveTo(X, y); bDn.lineTo(X, y); bUp.lineTo(X, y); }
+    bDn.lineTo(w + 60, mid + O); bDn.closePath(); bUp.lineTo(w + 60, mid - O); bUp.closePath();
     // the trace IS the edge: lower section's colour fills what rises above the seam, upper section's fills what dips below
-    if (it.dn) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, mid); ctx.clip(); ctx.fillStyle = it.dn; ctx.fill(body); ctx.restore(); }
-    if (it.up) { ctx.save(); ctx.beginPath(); ctx.rect(0, mid, w, h - mid); ctx.clip(); ctx.fillStyle = it.up; ctx.fill(body); ctx.restore(); }
+    if (it.dn && it.up) { ctx.fillStyle = it.up; ctx.fillRect(0, mid - O, w, O); ctx.fillStyle = it.dn; ctx.fillRect(0, mid, w, O); }   // seal the seam itself
+    if (it.dn) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, mid + O); ctx.clip(); ctx.fillStyle = it.dn; ctx.fill(bDn); ctx.restore(); }
+    if (it.up) { ctx.save(); ctx.beginPath(); ctx.rect(0, mid - O, w, h - mid + O); ctx.clip(); ctx.fillStyle = it.up; ctx.fill(bUp); ctx.restore(); }
     ctx.lineJoin = ctx.lineCap = 'round';
     ctx.strokeStyle = 'rgba(93,182,230,.28)'; ctx.lineWidth = 6; ctx.stroke(line);
     ctx.strokeStyle = '#7cc9f2'; ctx.lineWidth = 2; ctx.stroke(line);
@@ -358,3 +360,8 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
   addEventListener('resize', () => { items.forEach(it => { fit(it); draw(it, (performance.now() - t0) / 1000); }); kick(); });
   document.addEventListener('visibilitychange', kick);
 }
+
+// phones: no page pinch-zoom, so the page can never get stuck zoomed in (the 3D pad handles its own pinch)
+{ const stop = e => e.preventDefault();
+  for (const g of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(g, stop, { passive: false });
+  document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false }); }

@@ -124,8 +124,8 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
     leds[0].material.color.setHex(running ? 0x39d98a : 0x1f3b2c);
     bubbles.forEach((b, i) => { const u = (b.userData.o + t * .45) % 1; b.position.set(-.3 + u * .6, -.08 + Math.sin(i * 3.3) * .07, Math.cos(i * 2.1) * .08); b.material.opacity = run * .8 * Math.sin(u * Math.PI); });
     if (sel && parts[sel]) { const g = .5 + .5 * Math.sin(t * 3.2), e = .35 + .45 * g;
-      parts[sel].traverse(m => { if (m.isMesh && m.material && m.material.emissive && !m.material.isMeshBasicMaterial) m.material.emissiveIntensity = e; });
-      (halos[sel] || []).forEach(s => { s.material.opacity = .55 + .45 * g; }); glowL.intensity = 4 + 5 * g; } else glowL.intensity = 0;
+      parts[sel].traverse(m => { if (m.isMesh && m.material && m.material.emissive && !m.material.isMeshBasicMaterial) { const c = m.material.color, lum = m.material.map ? .75 : .3 * c.r + .59 * c.g + .11 * c.b; m.material.emissiveIntensity = e * (1 - .8 * Math.min(1, lum)); } });
+      (halos[sel] || []).forEach(s => { s.material.opacity = .55 + .45 * g; }); glowL.intensity = 2.2 + 2.6 * g; } else glowL.intensity = 0;
     ring.material.opacity = flagged ? .55 + .35 * Math.sin(t * 4) : 0; ring.scale.setScalar(1 + .06 * Math.sin(t * 4));
     renderer.render(scene, cam);
   }
