@@ -297,15 +297,29 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
 // beats first, then the beats settle into rolling water. Baseline = the seam itself.
 { const G = (x, m, s) => Math.exp(-((x - m) * (x - m)) / (2 * s * s));
   const beat = x => .12 * G(x, .2, .045) - .16 * G(x, .36, .014) + G(x, .4, .016) - .3 * G(x, .445, .016) + .24 * G(x, .66, .06);   // P Q R S T, x in 0..1
-  const P = 860, FL = 110, EC = 330, WV = 330;            // px: flat lead-in, three beats, water
-  const trace = (u, t) => {
-    if (u < FL) return 0;
-    if (u < FL + EC) { const k = (u - FL) / EC * 3; return beat(k % 1) * (1 - .12 * Math.floor(k)); }
-    if (u < FL + EC + WV) { const k = (u - FL - EC) / WV, env = Math.sin(Math.PI * Math.min(1, k * 1.15)) ** .8 * (1 - .35 * k), ph = k * 4.2 * 6.2832 - t * 2.6;
-      return env * (.42 * Math.sin(ph) + .13 * Math.sin(2 * ph + .9)); }
-    return 0;
+  // No fixed loop: beats come at uneven gaps and heights, sometimes skip, and give way to stretches of
+  // rolling water wherever a slow noise field says so. Every divider gets its own seed and speed.
+  const hash = n => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
+  const noise = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return hash(i) * (1 - u) + hash(i + 1) * u; };
+  const ss = (a, b, x) => { const v = Math.max(0, Math.min(1, (x - a) / (b - a))); return v * v * (3 - 2 * v); };
+  const water = (s, seed) => ss(.5, .7, noise(s / 430 + seed));
+  const B = 118;
+  const trace = (s, t, seed) => {
+    let v = 0; const j = Math.floor(s / B);
+    for (let n = j - 1; n <= j + 1; n++) {
+      const h1 = hash(n * 3.17 + seed), h2 = hash(n * 5.31 + seed + 9), h3 = hash(n * 7.77 + seed + 21), h4 = hash(n * 1.93 + seed + 33);
+      if (h3 < .16) continue;                                              // a skipped beat now and then
+      const c = (n + .5 + (h1 - .5) * .42) * B, x = (s - c) / (B * (.8 + .35 * h4)) + .4;
+      if (x <= 0 || x >= 1) continue;
+      const a = (.62 + .38 * h2 + (h2 > .9 ? .1 : 0)) * (1 - water(c, seed)) * (1 + .1 * Math.sin(t * 5.2 + n));
+      v += a * beat(x);
+    }
+    const w = water(s, seed);
+    if (w > .001) { const sw = .7 + .3 * Math.sin(t * .55 + s / 520 + seed);
+      v += w * sw * (.3 * Math.sin(s / 62 * 6.2832 + t * 2.1) + .13 * Math.sin(s / 37 * 6.2832 - t * 1.5 + 1.3) + .1 * Math.sin(s / 141 * 6.2832 + t * .8 + seed)); }
+    return v;
   };
-  const items = $$('.pulse').map((el, i) => { const cv = document.createElement('canvas'); el.append(cv); el.classList.add('live'); return { el, cv, ctx: cv.getContext('2d'), on: false, off: i * 197, w: 0, h: 0, sec: el.parentElement, prev: el.parentElement.previousElementSibling }; });
+  const items = $$('.pulse').map((el, i) => { const cv = document.createElement('canvas'); el.append(cv); el.classList.add('live'); return { el, cv, ctx: cv.getContext('2d'), on: false, off: i * 1733.3, seed: i * 17.37 + 3, sp: 52 + (i * 7 % 5) * 6, w: 0, h: 0, sec: el.parentElement, prev: el.parentElement.previousElementSibling }; });
   // the colour a section shows along one of its edges, so humps and dips can be filled with the right side's colour
   const mixc = t => { t = Math.max(0, Math.min(1, t)); return `rgb(${Math.round(29 + (15 - 29) * t)},${Math.round(93 + (58 - 93) * t)},${Math.round(181 + (117 - 181) * t)})`; };
   const edge = (sec, bottom, ctx, w) => {
@@ -316,10 +330,10 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
   };
   const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); it.up = edge(it.prev, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
   const draw = (it, t) => {
-    const { ctx, w, h } = it, mid = h / 2, amp = h * .46, sh = t * 70 + it.off, k = w < 700 ? .55 : 1;
+    const { ctx, w, h } = it, mid = h / 2, amp = h * .44, sh = t * it.sp + 16 * Math.sin(t * .45 + it.seed) + it.off, k = w < 700 ? .55 : 1;
     ctx.clearRect(0, 0, w, h);
     const line = new Path2D(), body = new Path2D(); body.moveTo(0, mid);
-    for (let x = 0; x <= w + 1.5; x += 1.5) { let v = trace(((x / k - sh) % P + P) % P, t); if (it.one) v = Math.abs(v); const y = mid - v * amp; x ? line.lineTo(x, y) : line.moveTo(x, y); body.lineTo(x, y); }
+    for (let x = 0; x <= w + 1.5; x += 1.5) { let v = trace(x / k - sh, t, it.seed); if (it.one) v = Math.abs(v); const y = mid - v * amp; x ? line.lineTo(x, y) : line.moveTo(x, y); body.lineTo(x, y); }
     body.lineTo(w + 2, mid); body.closePath();
     // the trace IS the edge: lower section's colour fills what rises above the seam, upper section's fills what dips below
     if (it.dn) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, mid); ctx.clip(); ctx.fillStyle = it.dn; ctx.fill(body); ctx.restore(); }
