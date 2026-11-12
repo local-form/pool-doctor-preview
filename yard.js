@@ -75,6 +75,10 @@ vec3 wallCol(vec2 p, float k){
   if (k < 1.5) return mix(vec3(dot(sl, vec3(.33))), sl, .3) * vec3(1.75, 1.66, 1.48) + vec3(.1, .09, .07);
   return mix(texture2D(tPl, p / 3.).rgb, vec3(.74), .55) * vec3(.86, .87, .88);
 }
+// the chosen material, blending two only while the deck choice is changing
+vec3 deckM(vec2 p){ vec3 a = deckCol(p, floor(uDeck)); float f = fract(uDeck); if (f < .001) return a; return mix(a, deckCol(p, ceil(uDeck)), f); }
+vec3 copM(vec2 p){ vec3 a = copCol(p, floor(uDeck)); float f = fract(uDeck); if (f < .001) return a; return mix(a, copCol(p, ceil(uDeck)), f); }
+vec3 wallM(vec2 p){ vec3 a = wallCol(p, floor(uDeck)); float f = fract(uDeck); if (f < .001) return a; return mix(a, wallCol(p, ceil(uDeck)), f); }
 float cn(vec2 p){ vec2 i = floor(p), f = fract(p); float d = 1.;
   for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) { vec2 g = vec2(x, y); vec2 o = vec2(h21(i + g), h21(i + g + 17.3)); o = .5 + .5 * sin(uTime * .8 + 6.2831 * o); d = min(d, length(g + o - f)); }
   return d; }
@@ -96,10 +100,10 @@ void main(){
   float d = allD(p);
   // deck: one clean paver rectangle that grows to take the spa and the fire pit
   float dDeck = deckD(p);
-  vec3 pave = mix(deckCol(p, floor(uDeck)), deckCol(p, ceil(uDeck)), fract(uDeck));
-  pave *= mix(.8, 1., smoothstep(-.7, -.5, dDeck));                    // soldier course edge
   col *= 1. - .3 * smoothstep(1.4, 0., dDeck) * step(0., dDeck);        // lawn contact shadow
-  col = mix(col, pave, smoothstep(fw, -fw, dDeck));
+  if (dDeck < fw * 3.) { vec3 pave = deckM(p);                          // margin keeps whole pixel quads inside the branch
+    pave *= mix(.8, 1., smoothstep(-.7, -.5, dDeck));                  // soldier course edge
+    col = mix(col, pave, smoothstep(fw, -fw, dDeck)); }
   // dappled shade from a tree outside the frame
   float tree = smoothstep(.5, .62, fbm(p * .22 + vec2(t * .03, 0.))) * smoothstep(34., 14., length(p - vec2(-uL * .5 - 18., uW * .5 + 16.)));
   // cast shadows (sun from the upper left)
@@ -115,8 +119,8 @@ void main(){
   col *= 1. - .48 * sh * day;
   // raised stone wall with three bronze scuppers
   float dw = wallD(p);
-  if (uWall > .01) { vec3 st = mix(wallCol(p, floor(uDeck)), wallCol(p, ceil(uDeck)), fract(uDeck)); vec2 q = p - vec2(0., uW * .5 + 2.4);
-    st = mix(st, mix(copCol(p, floor(uDeck)), copCol(p, ceil(uDeck)), fract(uDeck)) * 1.04, step(.35, abs(q.y)));   // cap in the coping material
+  if (uWall > .01 && dw < fw * 3.) { vec3 st = wallM(p); vec2 q = p - vec2(0., uW * .5 + 2.4);
+    st = mix(st, copM(p) * 1.04, step(.35, abs(q.y)));   // cap in the coping material
     col = mix(col, st, smoothstep(fw, -fw, dw)); }
   // fire pit: stone ring, dark rock bed and embers
   vec2 fq = p - fireC(); float fr = length(fq);
@@ -153,18 +157,29 @@ void main(){
     col = mix(col, lc, smoothstep(fw, -fw, fol)); }
   // coping (travertine bullnose) round pool and spa
   vec2 g = vec2(dFdx(d), dFdy(d)); vec2 en = length(g) > 0. ? normalize(g) : vec2(0.);
-  vec3 cop = mix(copCol(p, floor(uDeck)), copCol(p, ceil(uDeck)), fract(uDeck)) * (.93 + .14 * dot(en, TL) * smoothstep(.0, .5, d));
-  cop *= 1. - .22 * smoothstep(1.5, 2., uDeck) * smoothstep(.12, .0, abs(d - 1.02));   // concrete: a shadow joint where the edge meets the slab
-  cop *= .8 + .2 * smoothstep(0., .25, d);
-  col = mix(col, cop, smoothstep(fw, -fw, d - 1.1));
+  vec3 cop = vec3(0.);
+  if (d < 1.1 + fw * 3.) {                                               // also covers the spa wall ring, which reuses cop (d <= sd < .7 there)
+    cop = copM(p) * (.93 + .14 * dot(en, TL) * smoothstep(.0, .5, d));
+    cop *= 1. - .22 * smoothstep(1.5, 2., uDeck) * smoothstep(.12, .0, abs(d - 1.02));   // concrete: a shadow joint where the edge meets the slab
+    cop *= .8 + .2 * smoothstep(0., .25, d);
+    col = mix(col, cop, smoothstep(fw, -fw, d - 1.1)); }
   // water
   float spillM = 0.;
   float sd = spaD(p), inSpa = smoothstep(fw, -fw, sd);
+  // what the deck glow and the spillover need, worked out for every pixel
+  vec2 sq0 = p - spaC();
+  float glow = 0.;
+  for (int i = 0; i < 2; i++) { vec2 lp = vec2((float(i) * 2. - 1.) * uL * .22, -uW * .5 + .3); glow += 1.2 / (1. + dot(p - lp, p - lp) * .05); }
+  vec2 sL = vec2(2.7, 0.), eq = sq0 - vec2(-4.75, 0.); float sOn = smoothstep(.3, .9, uSpa);
+  float sg = 2.1 / (1. + dot(sq0 - sL, sq0 - sL) * .17) * sOn;
+  glow += .7 / (1. + dot(eq, eq) * .25) * sOn * (1. - inSpa);
+  // the water itself only where it can show (margin keeps whole pixel quads inside the branch)
+  if (d < fw * 3. || (uSpa > .01 && sd < .7)) {
   float depth = mix(3.6, 7.4, smoothstep(-uL * .25, uL * .3, p.x));
   float shelf = uShelf * smoothstep(-uL * .5 + 6.6, -uL * .5 + 6., p.x);
   depth = mix(depth, .9, shelf); depth = mix(depth, mix(3.4, 1.7, smoothstep(-1.15, -.95, sd)), inSpa);   // spa: bench ring round the wall
   vec2 e = vec2(.06, 0.); vec2 n2 = vec2(wave(p + e) - wave(p - e), wave(p + e.yx) - wave(p - e.yx)) / (2. * e.x) * .12;
-  vec2 sq0 = p - spaC(); float jet = 0.;
+  float jet = 0.;
   if (uSpa > .01) { for (int i = 0; i < 6; i++) { float a = float(i) * 1.0472 + .52; vec2 jp = vec2(cos(a), sin(a)) * 2.3; jet += exp(-dot(sq0 - jp, sq0 - jp) * 1.1); }
     vec2 tb = vec2(vn(sq0 * 2.4 + vec2(t * 1.7, -t * 1.1)) - .5, vn(sq0 * 2.4 + vec2(-t * 1.3, t * 1.9) + 5.) - .5);
     n2 += tb * (.3 + jet * .8) * inSpa; }
@@ -184,12 +199,7 @@ void main(){
   vec3 n3 = normalize(vec3(-n2 * 2.2, 1.)); vec3 r = reflect(vec3(0., 0., -1.), n3);
   float spec = pow(max(dot(r, normalize(SUN)), 0.), 260.) * 2.2;
   wat += vec3(1., .95, .85) * spec * day + vec3(.55, .7, .85) * .05;
-  // night: underwater lights on the front wall, fire glow
-  float glow = 0.;
-  for (int i = 0; i < 2; i++) { vec2 lp = vec2((float(i) * 2. - 1.) * uL * .22, -uW * .5 + .3); glow += 1.2 / (1. + dot(p - lp, p - lp) * .05); }
-  vec2 sL = vec2(2.7, 0.), eq = sq0 - vec2(-4.75, 0.); float sOn = smoothstep(.3, .9, uSpa);
-  float sg = 2.1 / (1. + dot(sq0 - sL, sq0 - sL) * .17) * sOn;
-  glow += .7 / (1. + dot(eq, eq) * .25) * sOn * (1. - inSpa);
+  // night: underwater lights on the front wall (glow, worked out above), the spa lamp
   float gw = mix(glow, sg + .3, inSpa);
   vec3 nwat = vec3(.02, .5, .72) * (.12 + gw * .8) + vec3(.4, .9, 1.) * c * gw * .35 + floorC * .02;
   nwat += vec3(.7, .97, 1.) * exp(-dot(sq0 - sL, sq0 - sL) * 1.6) * inSpa * sOn * .45;   // the lamp itself
@@ -206,11 +216,14 @@ void main(){
     vec3 ffc = mix(vec3(.93, .98, 1.), vec3(.55, .9, 1.) * (.45 + glow * .3), uNight);
     wat = mix(wat, ffc, clamp(sf * em * 1.3 + em * .2, 0., 1.)); }
   col = mix(col, wat, smoothstep(fw, -fw, d));
-  if (uSpa > .01) { float wallR = abs(sd - .3) - .3;                       // raised spa wall
-    vec2 sq = p - spaC(); vec3 sw = mix(wallCol(p * 1.5, floor(uDeck)), wallCol(p * 1.5, ceil(uDeck)), fract(uDeck)) * .95 * (.9 + .2 * dot(normalize(sq), TL));
-    col = mix(col, mix(sw, cop, smoothstep(.12, .2, abs(sd - .3))), smoothstep(fw, -fw, wallR) * step(.2, uSpa));
-    // sheet of water spilling from the spa to the pool
-    // a clear sheet slides over the wall top (stone shows through), then tips over the edge and whitens as it falls
+  }
+  vec2 sq = p - spaC();
+  if (uSpa > .01 && sd < .6 + fw * 3.) { float wallR = abs(sd - .3) - .3;   // raised spa wall
+    vec3 sw = wallM(p * 1.5) * .95 * (.9 + .2 * dot(normalize(sq), TL));
+    col = mix(col, mix(sw, cop, smoothstep(.12, .2, abs(sd - .3))), smoothstep(fw, -fw, wallR) * step(.2, uSpa)); }
+  // sheet of water spilling from the spa to the pool (spillM is 0 outside |sq.y| < .81, -4.72 < sq.x < -3.05)
+  // a clear sheet slides over the wall top (stone shows through), then tips over the edge and whitens as it falls
+  if (uSpa > .01 && abs(sq.y) < 1. && sq.x > -5. && sq.x < -2.9) {
     float u = (-sq.x - 3.1) / 1.5, v = sq.y / .75;               // u: 0 at the spa water, 1 at the pool water
     float bow = .08 * sin(u * 3.1416);                            // the sheet bellies out a touch as it falls
     spillM = smoothstep(1., .84, abs(v) - bow) * smoothstep(-.03, .04, u) * smoothstep(1.08, .99, u) * smoothstep(.85, .95, uSpa);
@@ -267,12 +280,13 @@ export function mountYard(canvas, opts = {}) {
       gl.generateMipmap(gl.TEXTURE_2D); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT); res(); };
     im.onerror = () => res(); im.src = base + name + '.webp'; });
   [['tG', 0], ['tP', 1], ['tPl', 2], ['tS', 3]].forEach(([n, u]) => gl.uniform1i(U[n], u));
-  const ready = Promise.all([tex('grass-col', 0), tex('paving-col', 1), tex('plaster-col', 2), tex('slate-col', 3)]);
+  // if the context is lost before the textures arrive, never resolve, so the hero is not marked live over a dead canvas
+  const ready = Promise.all([tex('grass-col', 0), tex('paving-col', 1), tex('plaster-col', 2), tex('slate-col', 3)]).then(() => lost ? new Promise(() => {}) : undefined);
 
   const cur = { L: 32, W: 16, spa: 0, shelf: 0, wall: 0, fire: 0, night: 0, m: 1, deck: 0, peb: 0, fr: .93, fg: .97, fb: 1 }, tgt = { ...cur };
   const FIN = { 'White plaster': [.93, .97, 1, 0], 'Pebble blue': [.52, .6, .66, 1], Midnight: [.2, .23, .3, .6] }, DECK = ['Pavers', 'Travertine', 'Concrete'];
   let held = false;
-  let sa = 0, sb = 0, time = 0, raf = 0, last = 0, visible = true, dirty = true;
+  let sa = 0, sb = 0, time = 0, raf = 0, last = 0, visible = true, dirty = true, lost = false;
   const view = { w: 1, h: 1, dpr: 1, cx: 0, cy: 0, s: 10 };
   function set(p) {
     tgt.L = p.len; tgt.W = p.wid; const ex = new Set(p.extras || []);
@@ -283,9 +297,11 @@ export function mountYard(canvas, opts = {}) {
     dirty = true; start();
   }
   function size() {
-    const r = canvas.getBoundingClientRect(); view.dpr = Math.min(devicePixelRatio || 1, opts.dpr || 1.5);
-    view.w = Math.max(1, Math.round(r.width * view.dpr)); view.h = Math.max(1, Math.round(r.height * view.dpr));
-    canvas.width = view.w; canvas.height = view.h; gl.viewport(0, 0, view.w, view.h); dirty = true;
+    const r = canvas.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, opts.dpr || 1.5);
+    const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+    if (w === view.w && h === view.h && w === canvas.width && h === canvas.height && dpr === view.dpr) return false;   // nothing changed
+    view.dpr = dpr; view.w = w; view.h = h;
+    canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); dirty = true; return true;
   }
   function place() {
     const a = opts.area ? opts.area() : { x: 0, y: 0, w: view.w / view.dpr, h: view.h / view.dpr }, pad = opts.pad || [34, 30];
@@ -318,8 +334,17 @@ export function mountYard(canvas, opts = {}) {
     draw(); dirty = false;
     if (!opts.reduced || Object.keys(tgt).some(k => k !== 'm' && cur[k] !== tgt[k]) || cur.m < 1) raf = requestAnimationFrame(loop);
   }
-  function start() { if (!raf && visible) { last = 0; raf = requestAnimationFrame(loop); } }
-  size(); let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { size(); start(); }, 100); });
+  function start() { if (!raf && visible && !lost) { last = 0; raf = requestAnimationFrame(loop); } }
+  // follow the canvas box itself (the planner changes its height on phones), not just the window;
+  // the next frame's draw() re-runs place(), so the grip and dimension lines follow too
+  size(); const resized = () => { if (size()) start(); };
+  if (typeof ResizeObserver === 'function') new ResizeObserver(resized).observe(canvas);
+  else { let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resized, 100); }); }
+  // if the phone drops the GPU context, stop and let the poster image show again
+  canvas.addEventListener('webglcontextlost', e => {
+    e.preventDefault(); lost = true; if (raf) cancelAnimationFrame(raf); raf = 0;
+    const hero = canvas.closest('.hero'); if (hero) hero.classList.remove('live');
+  });
   return {
     set, start, ready, size,
     setVisible(v) { visible = v; if (v) start(); },

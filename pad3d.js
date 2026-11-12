@@ -49,7 +49,7 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
   const flame = new THREE.Mesh(new THREE.PlaneGeometry(.8, .12), flameM); flame.position.set(1.65, 1.2, .2); rig.add(flame);
   // salt cell: clear body, unions, sensor cap, bubbles inside
   const salt = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.CylinderGeometry(.15, .15, .7, 32, 1, true), new THREE.MeshPhysicalMaterial({ color: 0xcfeaf2, roughness: .08, transmission: .85, thickness: .2, transparent: true, opacity: .55, side: THREE.DoubleSide }));
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(.15, .15, .7, 32, 1, true), new THREE.MeshStandardMaterial({ color: 0xcfeaf2, roughness: .1, transparent: true, opacity: .4, side: THREE.DoubleSide, depthWrite: false }));
   body.rotation.z = Math.PI / 2; salt.add(body);
   const plates = new THREE.Mesh(new THREE.BoxGeometry(.6, .18, .12), std(0x9aa5ad, .3, .8)); salt.add(plates);
   for (const sx of [-.4, .4]) { const u = new THREE.Mesh(new THREE.CylinderGeometry(.19, .19, .12, 32), std(0x2d3238, .45)); u.rotation.z = Math.PI / 2; u.position.x = sx; salt.add(u); }
@@ -68,7 +68,7 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
   const flowM = new THREE.MeshBasicMaterial({ color: new THREE.Color(.5, 1.6, 2.2), transparent: true, opacity: 0, depthWrite: false });
   const flows = [];
   const pipe = (pts, r = .065) => { const c = new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p)), false, 'catmullrom', .05);
-    const m = new THREE.Mesh(new THREE.TubeGeometry(c, 90, r, 14), pipeM); m.castShadow = true; m.userData.id = 'plumbing'; plumbing.add(m);
+    const m = new THREE.Mesh(new THREE.TubeGeometry(c, 90, r, 14), pipeM); m.castShadow = true; m.userData.id = 'plumbing'; m.userData.curve = c; m.userData.r = r; plumbing.add(m);
     const f = new THREE.Mesh(new THREE.TubeGeometry(c, 90, r * 1.08, 10), flowM.clone()); f.userData.id = 'plumbing'; f.renderOrder = 2;
     const tex = (() => { const cv = document.createElement('canvas'); cv.width = 64; cv.height = 4; const g = cv.getContext('2d'); const gr = g.createLinearGradient(0, 0, 64, 0); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.75, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 4); const t = new THREE.CanvasTexture(cv); t.wrapS = THREE.RepeatWrapping; t.repeat.set(Math.max(2, c.getLength() * 2.2), 1); return t; })();
     f.material.alphaMap = tex; f.material.map = tex; plumbing.add(f); flows.push(f); return c; };
@@ -87,7 +87,14 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
   // glow for the picked part: bright emissive pulse, a light on it, and an additive halo shell
   const glowL = new THREE.PointLight(0x5db6e6, 0, 3.2, 1.6); rig.add(glowL);
   const halos = {};
-  const haloOf = id => halos[id] || (halos[id] = (() => { const h = [], ms = []; parts[id].traverse(m => { if (m.isMesh && m.geometry && !m.userData.halo) ms.push(m); }); ms.forEach(m => { { const s = new THREE.Mesh(m.geometry, new THREE.MeshBasicMaterial({ color: 0x49b8ff, transparent: true, opacity: 0, side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false })); s.scale.setScalar(1.09); s.userData.halo = 1; s.raycast = () => {}; m.add(s); h.push(s); } }); return h; })());
+  // flow tubes and bubbles get no halo; pipes get a slightly fatter tube from their own curve at scale 1;
+  // every other mesh gets a 1.09 shell scaled about its own geometry centre, so it never drifts off the part.
+  const noHalo = new Set([...flows, ...bubbles]);
+  const haloOf = id => halos[id] || (halos[id] = (() => { const h = [], ms = []; parts[id].traverse(m => { if (m.isMesh && m.geometry && !m.userData.halo && !noHalo.has(m)) ms.push(m); });
+    ms.forEach(m => { const hm = new THREE.MeshBasicMaterial({ color: 0x49b8ff, transparent: true, opacity: 0, side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false }); let s;
+      if (m.userData.curve) s = new THREE.Mesh(new THREE.TubeGeometry(m.userData.curve, 90, m.userData.r * 1.6, 10), hm);
+      else { s = new THREE.Mesh(m.geometry, hm); if (!m.geometry.boundingBox) m.geometry.computeBoundingBox(); const gc = m.geometry.boundingBox.getCenter(new THREE.Vector3()); s.scale.setScalar(1.09); s.position.copy(gc).multiplyScalar(-.09); }
+      s.userData.halo = 1; s.raycast = () => {}; m.add(s); h.push(s); }); return h; })());
   // focus ring for flagged parts
   const ring = new THREE.Mesh(new THREE.RingGeometry(.55, .62, 48), new THREE.MeshBasicMaterial({ color: 0xffb547, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false }));
   ring.rotation.x = -Math.PI / 2; ring.position.y = .02; rig.add(ring);
@@ -97,14 +104,14 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
   const look = new THREE.Vector3(.2, .6, 0), lookT = look.clone(); let zoom = 1, zoomT = 1;
   const centerOf = id => { const b = new THREE.Box3().setFromObject(parts[id]); return b.getCenter(new THREE.Vector3()); };
   function select(id) {
-    sel = id;
+    sel = id; if (id !== flagged) flagged = null;
     for (const [k, g] of Object.entries(parts)) g.traverse(m => { if (m.isMesh && m.material && m.material.emissive && !(m.material.isMeshBasicMaterial)) { m.material.emissive.setHex(k === id ? 0x1f8fff : 0); m.material.emissiveIntensity = k === id ? .6 : 0; } });
     for (const k in halos) if (k !== id) halos[k].forEach(s => { s.material.opacity = 0; });
     if (id && parts[id]) { haloOf(id); rig.updateMatrixWorld(); const c = rig.worldToLocal(centerOf(id)); glowL.position.set(c.x, c.y + .9, c.z + .9); }
     if (id && parts[id]) { rig.updateMatrixWorld(); const c = centerOf(id); lookT.set(c.x * .6, Math.max(.45, c.y), c.z * .3); zoomT = id === 'plumbing' ? .95 : .72; } else { lookT.set(.2, .6, 0); zoomT = 1; }
     kick();
   }
-  function flag(id) { flagged = id; if (id && parts[id]) { const c = centerOf(id); ring.position.x = c.x; ring.position.z = c.z; } select(id); }
+  function flag(id) { flagged = id; if (id && parts[id]) { rig.updateMatrixWorld(); const c = rig.worldToLocal(centerOf(id)); ring.position.x = c.x; ring.position.z = c.z; } select(id); }
   function setRun(on) { running = on; kick(); }
   function size() {
     const w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return;
@@ -120,18 +127,23 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
     cam.position.set(look.x, look.y + (narrow ? 3.6 : 2.9) * zoom * uz, d); cam.lookAt(look);
     fan.rotation.x += run * .5;
     flows.forEach((f, i) => { f.material.opacity = run * .85; f.material.map.offset.x -= .02 * run; });
-    flameM.opacity = run * (.75 + .25 * Math.sin(t * 13)); screenM.color.setRGB(.04 + run * .15, .14 + run * .45, .19 + run * .55);
+    flameM.opacity = run * (reduced ? .85 : .75 + .25 * Math.sin(t * 13)); screenM.color.setRGB(.04 + run * .15, .14 + run * .45, .19 + run * .55);
     leds[0].material.color.setHex(running ? 0x39d98a : 0x1f3b2c);
     bubbles.forEach((b, i) => { const u = (b.userData.o + t * .45) % 1; b.position.set(-.3 + u * .6, -.08 + Math.sin(i * 3.3) * .07, Math.cos(i * 2.1) * .08); b.material.opacity = run * .8 * Math.sin(u * Math.PI); });
-    if (sel && parts[sel]) { const g = .5 + .5 * Math.sin(t * 3.2), e = .35 + .45 * g;
+    if (sel && parts[sel]) { const g = reduced ? .8 : .5 + .5 * Math.sin(t * 3.2), e = .35 + .45 * g;
       parts[sel].traverse(m => { if (m.isMesh && m.material && m.material.emissive && !m.material.isMeshBasicMaterial) { const c = m.material.color, lum = m.material.map ? .75 : .3 * c.r + .59 * c.g + .11 * c.b; m.material.emissiveIntensity = e * (1 - .8 * Math.min(1, lum)); } });
       (halos[sel] || []).forEach(s => { s.material.opacity = .55 + .45 * g; }); glowL.intensity = 2.2 + 2.6 * g; } else glowL.intensity = 0;
-    ring.material.opacity = flagged ? .55 + .35 * Math.sin(t * 4) : 0; ring.scale.setScalar(1 + .06 * Math.sin(t * 4));
+    if (reduced) { ring.material.opacity = flagged ? .8 : 0; ring.scale.setScalar(1); }
+    else { ring.material.opacity = flagged ? .55 + .35 * Math.sin(t * 4) : 0; ring.scale.setScalar(1 + .06 * Math.sin(t * 4)); }
     renderer.render(scene, cam);
   }
-  const busy = () => dragging || velY || running || run > .01 || look.distanceTo(lookT) > .005 || Math.abs(zoom - zoomT) > .002 || Math.abs(uz - uzT) > .002 || flagged || sel;
-  function loop() { raf = 0; if (!visible || document.hidden) return; draw(); if (!reduced || busy()) raf = requestAnimationFrame(loop); }
-  function kick() { if (!raf) raf = requestAnimationFrame(loop); }
+  // with reduced motion the glow and ring are steady, so a selected or flagged part alone never keeps the loop running
+  const busy = () => dragging || velY || running || run > .01 || look.distanceTo(lookT) > .005 || Math.abs(zoom - zoomT) > .002 || Math.abs(uz - uzT) > .002;
+  let lost = false;
+  function loop() { raf = 0; if (lost || !visible || document.hidden) return; draw(); if (!reduced || busy()) raf = requestAnimationFrame(loop); }
+  function kick() { if (!raf && !lost) raf = requestAnimationFrame(loop); }
+  canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); lost = true; if (raf) cancelAnimationFrame(raf); raf = 0; });
+  canvas.addEventListener('webglcontextrestored', () => { lost = false; size(); kick(); });
   // zoom: two-finger pinch on the canvas, ctrl/trackpad-pinch wheel, or the +/- buttons. The page itself never zooms from here.
   let uz = 1, uzT = 1; const pts = new Map(); let pinch0 = 0, uz0 = 1;
   const zoomTo = v => { uzT = Math.max(.45, Math.min(1.5, v)); kick(); };

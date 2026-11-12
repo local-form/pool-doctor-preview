@@ -14,7 +14,8 @@
 <meta property="og:image" content="https://preview.localform.online/pool-doctor-preview/og.jpg">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/montserrat-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=19">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="stylesheet" href="styles.css?v=20">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"HomeAndConstructionBusiness","name":"The Pool Doctor","telephone":"+1-843-737-3165","email":"thepooldoc@yahoo.com","founder":{"@type":"Person","name":"Joseph Penna"},"areaServed":["Charleston, SC","Sullivan's Island, SC","Isle of Palms, SC","James Island, SC","Summerville, SC"],"openingHours":"Mo-Fr 07:00-19:00","sameAs":["https://www.instagram.com/the_pooldoctor/"]}</script>
 </head>
 <body>
@@ -67,7 +68,7 @@
           <button type="button" data-v="Fire pit" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-3 2-4 2-6 2 1 3 3 3 5 1-1 1-3 0-9z"/><path d="M4 21h16"/></svg>Fire pit</button>
           <button type="button" data-v="Lights" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>Night lights</button>
         </div></div>
-      <p class="readout mono" aria-live="polite"><span id="planDims">32 &times; 16 ft rectangle</span><span id="planGal">about 19,100 gallons</span></p>
+      <p class="readout mono"><span id="planDims"><span class="pre">Concept sketch &middot; </span>32 &times; 16 ft rectangle</span><span id="planGal">about 20,100 gallons at 5.25 ft average depth</span></p><span class="sr" id="planLive" aria-live="polite"></span>
       <div class="actions">
         <button type="button" class="btn btn-p" id="heroSend">Continue with this plan<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
         <a class="btn btn-s" href="#repair">Something's wrong with my pool</a>
@@ -112,9 +113,9 @@
     </header>
     <div class="story" data-reveal>
       <div class="story-media">
-        <img id="storyImg" src="img/b1-stakes-lg.webp" srcset="img/b1-stakes-sm.webp 600w, img/b1-stakes-lg.webp 1000w" sizes="(max-width: 860px) 100vw, 56vw" alt="The backyard lawn marked out with wooden stakes" width="1000" height="1000">
+        <img id="storyImg" loading="lazy" decoding="async" src="img/b1-stakes-lg.webp" srcset="img/b1-stakes-sm.webp 600w, img/b1-stakes-lg.webp 1000w" sizes="(max-width: 860px) 100vw, 56vw" alt="The backyard lawn marked out with wooden stakes" width="1000" height="1000">
         <span class="story-count mono" id="storyCount">01 / 07</span>
-        <span class="swipe-hint mono" aria-hidden="true">Swipe &rarr;</span>
+        <span class="swipe-hint mono" aria-hidden="true">Swipe for next &rarr;</span>
       </div>
       <div class="story-side">
         <ol class="story-steps" id="storySteps">
@@ -143,12 +144,12 @@
     </header>
     <div class="reno-lay">
     <div class="ba" data-reveal>
-      <figure><img src="img/r-liner-before-lg.webp" srcset="img/r-liner-before-sm.webp 600w, img/r-liner-before-lg.webp 1000w" sizes="(max-width: 860px) 100vw, 45vw" alt="An empty vinyl-liner pool with the old liner torn out" loading="lazy" width="1000" height="1000"><figcaption class="mono">Before &middot; liner day</figcaption></figure>
-      <figure><img src="img/r-liner-after-lg.webp" srcset="img/r-liner-after-sm.webp 600w, img/r-liner-after-lg.webp 1000w" sizes="(max-width: 860px) 100vw, 45vw" alt="The same pool with a new blue patterned liner and steps" loading="lazy" width="1000" height="1000"><figcaption class="mono">After &middot; new liner</figcaption></figure>
+      <figure><img src="img/r-liner-before-lg.webp" srcset="img/r-liner-before-sm.webp 600w, img/r-liner-before-lg.webp 1000w" sizes="(max-width: 860px) calc(50vw - 21px), min(30vw, 370px)" alt="An empty vinyl-liner pool with the old liner torn out" loading="lazy" width="1000" height="1000"><figcaption class="mono">Before &middot; liner day</figcaption></figure>
+      <figure><img src="img/r-liner-after-lg.webp" srcset="img/r-liner-after-sm.webp 600w, img/r-liner-after-lg.webp 1000w" sizes="(max-width: 860px) calc(50vw - 21px), min(30vw, 370px)" alt="The same pool with a new blue patterned liner and steps" loading="lazy" width="1000" height="1000"><figcaption class="mono">After &middot; new liner</figcaption></figure>
     </div>
     <div class="reno-grid">
       <article class="reno" data-reveal><img src="img/r-coping-sm.webp" alt="Freshly set travertine coping along a pool edge" loading="lazy" width="600" height="600"><div><h3>Coping &amp; patios</h3><p>Travertine coping and patio sets.</p></div></article>
-      <article class="reno" data-reveal><img src="img/r-firepit-sm.webp" alt="A round stone fire pit with a copper rim beside a pool" loading="lazy" width="600" height="600"><div><h3>Fire features</h3><p>A fire pit built to match the pool.</p></div></article>
+      <article class="reno" data-reveal><img src="img/r-firepit-sm.webp" alt="A round stone fire pit with a copper rim beside a pool" loading="lazy" width="600" height="600"><div><h3>Fire features</h3><p>A stone fire pit added beside the pool.</p></div></article>
       <article class="reno" data-reveal><img src="img/r-deck-sm.webp" alt="A pool with a refreshed patterned concrete deck" loading="lazy" width="600" height="600"><div><h3>Decks &amp; pavers</h3><p>Bringing a tired deck back to life.</p></div></article>
     </div>
     </div>
@@ -201,7 +202,7 @@
         <p class="step mono"><b>2</b>What to do, and when</p>
         <div class="when" role="tablist" aria-label="How often" id="when"></div>
         <div class="todo" id="todo" role="tabpanel"></div>
-        <p class="fine">General guide. Every pool is a little different, so Joe sets the exact plan for yours.</p>
+        <p class="fine">General guide. Every pool is a little different, so ask Joe what yours needs.</p>
         <a class="btn btn-p" href="tel:+18437373165"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-phone"/></svg>Ask Joe a quick question</a>
       </div>
     </div>
@@ -216,7 +217,7 @@
       <h2 id="builders-h" data-reveal>Problem build? Call the doctor.</h2>
     </div>
     <div data-reveal>
-      <p>Joe is a licensed SC swimming pool contractor, and other contractors call him when an existing build has a problem. He also manages renovation and build projects from start to finish. If it has to do with a pool, he handles it.</p>
+      <p>Joe is a licensed SC swimming pool contractor, and other contractors call him when an existing build has a problem. He also takes on renovations and full builds.</p>
       <a class="btn btn-w" href="#request" data-req="Contractor help">Contractor request<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
     </div>
   </div>
@@ -240,17 +241,17 @@
   </div>
 </section>
 
-<section class="sec dark joe" aria-labelledby="joe-h">
+<section class="sec dark joe" id="joe" aria-labelledby="joe-h">
   <div class="wrap joe-in">
     <figure class="joe-img" data-reveal><img src="img/j-marsh-lg.webp" srcset="img/j-marsh-sm.webp 600w, img/j-marsh-lg.webp 1000w" sizes="(max-width: 860px) 100vw, 44vw" alt="A boardwalk across the salt marsh, Joe's view from a job" loading="lazy" width="720" height="720"><figcaption class="mono">&ldquo;My corner office&rdquo; &middot; from Joe's Instagram</figcaption></figure>
     <div>
-      <p class="marker mono" data-reveal>Meet Joe</p>
-      <blockquote class="big" id="joe-h" data-reveal>&ldquo;I am The Pool Doctor. I am what it says. If you have a problem, I am the answer.&rdquo;</blockquote>
+      <h2 class="marker mono" id="joe-h" data-reveal>Meet Joe</h2>
+      <blockquote class="big" data-reveal>&ldquo;I am The Pool Doctor. I am what it says. If you have a problem, I am the answer.&rdquo;</blockquote>
       <dl class="facts" data-reveal>
-        <div><dt class="mono">Owner</dt><dd>Joseph Penna, on every job</dd></div>
+        <div><dt class="mono">Owner</dt><dd>Joseph Penna, owner and operator</dd></div>
         <div><dt class="mono">Experience</dt><dd>10 years in Charleston pools</dd></div>
         <div><dt class="mono">Licence</dt><dd>SC swimming pool contractor</dd></div>
-        <div><dt class="mono">Does</dt><dd>Builds, renovations, project management and repairs. No weekly cleaning.</dd></div>
+        <div><dt class="mono">Does</dt><dd>New builds, renovations and repairs. No weekly cleaning.</dd></div>
       </dl>
       <a class="link" href="https://www.instagram.com/the_pooldoctor/" rel="noopener">See his work on Instagram &rarr;</a>
     </div>
@@ -280,7 +281,7 @@
   <div class="wrap req-in">
     <header class="sec-head">
       <p class="marker mono" data-reveal>Request</p>
-      <h2 id="req-h" data-reveal>Get Joe on it.</h2>
+      <h2 id="req-h" tabindex="-1" data-reveal>Get Joe on it.</h2>
       <p class="lede" data-reveal>Tell him what you need. He calls or texts you back.</p>
     </header>
     <form class="req" id="req" novalidate>
@@ -306,6 +307,7 @@
         <label class="wide file"><span>Photos <small>optional, up to 6, they stay on this device</small></span><input id="fPhotos" type="file" accept="image/*" multiple aria-describedby="photoNote"></label>
         <p class="note wide" id="photoNote" role="status"></p>
         <div class="thumbs wide" id="thumbs"></div>
+        <fieldset class="wide" id="urgWrap" hidden><legend>How urgent is it?</legend><div class="chips" id="fUrgent" data-one><button type="button" data-v="Pool is down now" aria-pressed="false">Pool is down now</button><button type="button" data-v="This week" aria-pressed="false">This week</button><button type="button" data-v="When you can" aria-pressed="false">When you can</button></div></fieldset>
         <fieldset class="wide"><legend>Best time to reach you</legend><div class="chips" id="fWhen" data-one><button type="button" data-v="Morning" aria-pressed="false">Morning</button><button type="button" data-v="Afternoon" aria-pressed="false">Afternoon</button><button type="button" data-v="Evening" aria-pressed="false">Evening</button></div></fieldset>
       </div>
       <button class="btn btn-p big" type="submit" id="reqBtn">Preview my request<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
@@ -325,9 +327,9 @@
   <div class="wrap faq-in">
     <h2 id="faq-h" data-reveal>Questions</h2>
     <div class="faq">
-      <details data-reveal><summary>What does a new pool cost?</summary><p>It depends on the size, the build type, the extras and your yard. Sketch yours in the planner above with the budget you have in mind, and Joe prices it with you.</p></details>
-      <details data-reveal><summary>Can you really tell what's wrong over the phone?</summary><p>Often, yes. That's Joe's specialty: describe it (or text a photo) and he'll point you the right way, whether it's a quick fix you can do or a visit.</p></details>
-      <details data-reveal><summary>Do you clean pools?</summary><p>No. The Pool Doctor builds, renovates and repairs. For weekly cleaning, ask Joe who he'd recommend.</p></details>
+      <details data-reveal><summary>What does a new pool cost?</summary><p>It depends on the size, the build type, the extras and your yard. <a href="#design">Sketch yours</a>, add the budget you have in mind in the request, and Joe prices it with you.</p></details>
+      <details data-reveal><summary>Can you really tell what's wrong over the phone?</summary><p>Often. Text Joe a photo and describe it, and he'll tell you if it needs a visit.</p></details>
+      <details data-reveal><summary>Do you clean pools?</summary><p>No. The Pool Doctor builds, renovates and repairs.</p></details>
       <details data-reveal><summary>Do you work with other contractors?</summary><p>Yes. Joe is a licensed SC swimming pool contractor and helps other builders with problem builds.</p></details>
       <details data-reveal><summary>Do you work weekends?</summary><p>Emergencies only. Weekdays 7am to 7pm.</p></details>
     </div>
@@ -357,7 +359,8 @@
   <symbol id="i-reno" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M8 40h32M10 40V22h28v18"/><path d="M14 22v-6h20v6M18 16v-6h12v6" opacity=".6"/><path d="M15 31h18"/></g></symbol>
   <symbol id="i-fix" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><circle cx="18" cy="26" r="10"/><path d="M28 26h12v8H28M14 26h8M18 22v8"/><path d="M18 16v-6M14 10h8" opacity=".6"/></g></symbol>
 </svg>
-<script type="module" src="app.js?v=24"></script>
+<script type="module" src="app.js?v=25"></script>
+
 
 
 

@@ -34,22 +34,25 @@ function planText() {
   if (p.extras.length) bits.push(p.extras.map(e => e === 'Lights' ? 'LED lighting' : e).join(', '));
   return bits.join(' · ');
 }
+const announce = () => { const l = $('#planLive'); if (l) l.textContent = `${$('#planDims').textContent}, ${$('#planGal').textContent}`; };
 function updatePlan() {
   readPlan();
   const { shape: s, len: L, wid: W } = plan;
   const depth = s === 'Plunge' ? 4.5 : s === 'Lap' ? 4.25 : 5.25, area = s === 'Freeform' ? .8 : s === 'L-shape' ? .74 : 1;
   plan.gal = Math.round(L * W * area * depth * 7.48 / 100) * 100;
-  $('#planDims').textContent = `Concept sketch · ${L} × ${W} ft ${s.toLowerCase()}`;
+  $('#planDims').innerHTML = `<span class="pre">Concept sketch · </span>${L} × ${W} ft ${s.toLowerCase()}`;
   $('#planGal').textContent = `about ${plan.gal.toLocaleString()} gallons at ${depth} ft average depth`;
   $('#lenOut').textContent = L + ' ft'; $('#widOut').textContent = W + ' ft'; fill(lenI); fill(widI);
   $('#dimL span').textContent = L + ' ft'; $('#dimW span').textContent = W + ' ft';
   yard?.set(plan);
 }
+let lastShape = plan.shape;
 $$('#designer .chips').forEach(c => chips(c, b => {
-  if (c.dataset.k === 'shape') { const v = b.dataset.v; if (v === 'Plunge') { lenI.value = 14; widI.value = 8; } else if (v === 'Lap') { lenI.value = 45; widI.value = 9; } else if (+lenI.value < 20 || +widI.value < 11) { lenI.value = 32; widI.value = 16; } }
-  updatePlan();
+  if (c.dataset.k === 'shape') { const v = b.dataset.v, was = lastShape, odd = x => x === 'Plunge' || x === 'Lap'; lastShape = v;
+    if (v !== was) { if (v === 'Plunge') { lenI.value = 14; widI.value = 8; } else if (v === 'Lap') { lenI.value = 45; widI.value = 9; } else if (odd(was)) { lenI.value = 32; widI.value = 16; } } }
+  updatePlan(); announce();
 }));
-[lenI, widI].forEach(i => i.addEventListener('input', updatePlan));
+[lenI, widI].forEach(i => { i.addEventListener('input', updatePlan); i.addEventListener('change', announce); });
 updatePlan();
 const grip = $('#grip'), clampI = (i, v) => Math.max(+i.min, Math.min(+i.max, Math.round(v)));
 grip.addEventListener('pointerdown', e => { if (!yard) return; e.preventDefault(); grip.setPointerCapture(e.pointerId); grip.classList.add('drag'); hero.classList.add('sized'); yard.hold(true); });
@@ -58,23 +61,23 @@ grip.addEventListener('pointermove', e => {
   const r = cv.getBoundingClientRect(), [cx, cy, s] = yard.origin;
   lenI.value = clampI(lenI, 2 * (e.clientX - r.left - cx) / s); widI.value = clampI(widI, 2 * (e.clientY - r.top - cy) / s); updatePlan();
 });
-const gripUp = () => { if (!grip.classList.contains('drag')) return; grip.classList.remove('drag'); yard.hold(false); };
+const gripUp = () => { if (!grip.classList.contains('drag')) return; grip.classList.remove('drag'); yard.hold(false); announce(); };
 grip.addEventListener('pointerup', gripUp); grip.addEventListener('pointercancel', gripUp);
 grip.addEventListener('keydown', e => {
   const k = e.key, dl = k === 'ArrowRight' ? 1 : k === 'ArrowLeft' ? -1 : 0, dw = k === 'ArrowDown' ? 1 : k === 'ArrowUp' ? -1 : 0;
-  if (!dl && !dw) return; e.preventDefault(); lenI.value = clampI(lenI, +lenI.value + dl); widI.value = clampI(widI, +widI.value + dw); updatePlan();
+  if (!dl && !dw) return; e.preventDefault(); lenI.value = clampI(lenI, +lenI.value + dl); widI.value = clampI(widI, +widI.value + dw); updatePlan(); announce();
 });
 $('#heroSend').addEventListener('click', () => { readPlan(); openRequest('New pool', { kind: 'plan', text: planText() }); });
 // phones: the three services come first; the planner opens from "Design my pool" and the sketch stays pinned above the controls
 function openPlanner() {
   if (phone()) { hero.classList.add('planning'); $('#svcPlan').setAttribute('aria-expanded', 'true'); }
   hero.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-  if (phone()) setTimeout(() => $('#designer button').focus({ preventScroll: true }), reduced ? 0 : 500);
+  setTimeout(() => $('#designer button').focus({ preventScroll: true }), reduced ? 0 : 500);
 }
 $('#svcPlan').addEventListener('click', openPlanner);
 $('#planDone').addEventListener('click', () => { hero.classList.remove('planning'); $('#svcPlan').setAttribute('aria-expanded', 'false'); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); $('#svcPlan').focus({ preventScroll: true }); });
 $$('a[href="#design"]:not(#dockMain)').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openPlanner(); }));
-import('./yard.js?v=6').then(({ mountYard }) => {
+import('./yard.js?v=7').then(({ mountYard }) => {
   const copy = $('.hero-copy');
   yard = mountYard(cv, { dpr: phone() ? 1.5 : 1.25, reduced, still: q.has('still'), labels: { L: $('#dimL'), W: $('#dimW') }, grip: $('#grip'),
     pad: phone() ? [18, 30] : [34, 30],
@@ -94,21 +97,23 @@ const story = [
   ['b4-steel', 'Steel', 'A cage of rebar ties the whole shell together. This is the part you never see again, so it has to be right.', 'Rebar steel tied in a grid across the dug pool'],
   ['b5-gunite', 'Gunite', 'The crew sprays concrete over the steel to form the shell: walls, floor, steps and benches in one piece.', 'The crew spraying gunite concrete over the steel'],
   ['b6-plumbing', 'Plumbing', 'The pipes for the returns, drains and skimmers run back to the equipment pad, ready for the pump and filter.', 'Pool plumbing pipes laid in a trench'],
-  ['b7-finished', 'Finished', 'Coping, decking, water and lights. The same yard from the first photo, now a pool.', 'The finished pool at dusk with lights on'],
+  ['b7-finished', 'Finished', 'Coping, decking, water and lights: what the yard turns into.', 'The finished pool at dusk with lights on'],
 ];
 let si = 0;
 const sImg = $('#storyImg');
+// load a step's photo at the size this screen uses (the same srcset and sizes as the <img>)
+const pre = i => { const f = story[i][0], im = new Image(); im.sizes = sImg.sizes; im.srcset = `img/${f}-sm.webp 600w, img/${f}-lg.webp 1000w`; im.src = `img/${f}-lg.webp`; return im; };
 function setStory(i, dir = 0) {
   si = (i + story.length) % story.length; const [f, t, b, alt] = story[si];
   $$('#storySteps button, #storyThumbs button').forEach(e => e.setAttribute('aria-pressed', +e.dataset.i === si));
   $('#storyTitle').textContent = t; $('#storyBody').textContent = b; $('#storyCount').textContent = String(si + 1).padStart(2, '0') + ' / 07';
   sImg.classList.add('swap');
-  const im = new Image(); im.src = `img/${f}-lg.webp`;
-  const go = () => { sImg.srcset = `img/${f}-sm.webp 600w, img/${f}-lg.webp 1000w`; sImg.src = `img/${f}-lg.webp`; sImg.alt = alt; sImg.classList.remove('swap');
+  const want = si, im = pre(si);
+  const go = () => { if (want !== si) return; sImg.srcset = im.srcset; sImg.src = im.src; sImg.alt = alt; sImg.classList.remove('swap');
     if (dir && !reduced) { sImg.style.transition = 'none'; sImg.style.transform = `translateX(${dir * 36}px)`; sImg.style.opacity = 0; void sImg.offsetWidth; sImg.style.transition = ''; }
     sImg.style.transform = ''; sImg.style.opacity = ''; };
   im.decode ? im.decode().then(go, go) : go();
-  const btn = $$('#storySteps button')[si]; if (phone() && btn) btn.parentElement.parentElement.scrollTo({ left: btn.offsetLeft - 16, behavior: reduced ? 'auto' : 'smooth' });
+  if (si + 1 < story.length) pre(si + 1);
 }
 $('#storyBody').textContent = story[0][2];
 // desktop: a strip of the seven photos to jump between steps (phones swipe instead)
@@ -119,15 +124,16 @@ $('#storyPrev').addEventListener('click', () => setStory(si - 1, -1));
 $('#storyNext').addEventListener('click', () => setStory(si + 1, 1));
 // swipe the photo: it follows the finger sideways, then the next step slides in. Up-and-down still scrolls the page.
 { const m = $('.story-media'); let x0 = 0, y0 = 0, dx = 0, axis = '', on = false;
-  m.addEventListener('touchstart', e => { if (e.touches.length !== 1) return; on = true; axis = ''; dx = 0; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; sImg.style.transition = 'none'; }, { passive: true });
-  m.addEventListener('touchmove', e => { if (!on) return; const t = e.touches[0]; dx = t.clientX - x0; const dy = t.clientY - y0;
+  m.addEventListener('touchstart', e => { if (e.touches.length !== 1) { if (on) { on = false; sImg.style.transition = ''; sImg.style.transform = ''; sImg.style.opacity = ''; } return; } on = true; axis = ''; dx = 0; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; sImg.style.transition = 'none'; }, { passive: true });
+  m.addEventListener('touchmove', e => { if (!on || e.touches.length > 1) return; const t = e.touches[0]; dx = t.clientX - x0; const dy = t.clientY - y0;
     if (!axis && Math.abs(dx) + Math.abs(dy) > 8) axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
     if (axis === 'x') { sImg.style.transform = `translateX(${dx * .9}px)`; sImg.style.opacity = Math.max(.35, 1 - Math.abs(dx) / 420); } }, { passive: true });
   const end = () => { if (!on) return; on = false; sImg.style.transition = '';
-    if (axis === 'x' && Math.abs(dx) > 48) { const d = dx < 0 ? 1 : -1; sImg.style.transform = `translateX(${-d * 70}px)`; sImg.style.opacity = 0; m.classList.add('swiped'); setStory(si + d, d); }
+    if (axis === 'x' && Math.abs(dx) > 48 && si + (dx < 0 ? 1 : -1) >= 0 && si + (dx < 0 ? 1 : -1) < story.length) { const d = dx < 0 ? 1 : -1; sImg.style.transform = `translateX(${-d * 70}px)`; sImg.style.opacity = 0; m.classList.add('swiped'); setStory(si + d, d); }
     else { sImg.style.transform = ''; sImg.style.opacity = ''; } };
   m.addEventListener('touchend', end); m.addEventListener('touchcancel', end); }
-story.forEach(([f]) => { if (f !== 'b1-stakes') { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = `img/${f}-${phone() ? 'sm' : 'lg'}.webp`; document.head.append(l); } });
+// fetch the next photo only once the story is close to the screen
+{ const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { o.disconnect(); pre(1); } }, { rootMargin: '600px 0px' }); o.observe($('#build')); }
 
 /* ---------- chips ---------- */
 function chips(root, onChange) {
@@ -135,7 +141,7 @@ function chips(root, onChange) {
     const b = e.target.closest('button'); if (!b || !root.contains(b)) return;
     const on = b.getAttribute('aria-pressed') !== 'true';
     if (root.hasAttribute('data-one')) $$('button', root).forEach(x => x.setAttribute('aria-pressed', 'false'));
-    b.setAttribute('aria-pressed', root.hasAttribute('data-one') ? 'true' : on);
+    b.setAttribute('aria-pressed', root.hasAttribute('data-one') && !root.closest('#req') ? 'true' : on);
     onChange?.(b);
   });
 }
@@ -176,7 +182,7 @@ function showPart(id, from3d) {
   symBox.innerHTML = SYM.map((x, i) => x.part === id ? `<button type="button" role="radio" aria-checked="false" tabindex="-1" data-i="${i}">${esc(x.t)}</button>` : '').join('');
   const f0 = $('button', symBox); if (f0) f0.tabIndex = 0;
   box.hidden = true; box.innerHTML = '';
-  if (!from3d) pad ? pad.select(id) : (padPending = id);
+  pad ? pad.select(id) : (padPending = id);
 }
 partBtns.forEach(b => b.addEventListener('click', () => showPart(b.dataset.p)));
 symBox.addEventListener('click', e => {
@@ -211,10 +217,10 @@ const GAUGE = [
 ];
 $('#gauges').innerHTML = GAUGE.map(([n, t, lo, hi, a, b, s]) => `<li><b>${n}</b><em>${t}</em><span class="bar" aria-hidden="true"><i style="--l:${(a - lo) / (hi - lo) * 100}%;--w:${(b - a) / (hi - lo) * 100}%"></i></span><small>${s}</small></li>`).join('');
 const CARE = {
-  'New pool': ['The usual rules for fresh plaster in the first month. Joe walks you through startup.', [
+  'New pool': ['The usual rules for fresh plaster in the first month. Ask Joe if yours needs something else.', [
     '<b>Brush the whole pool twice a day</b> for the first two weeks to clear plaster dust',
     '<b>Run the pump around the clock</b> for the first few days',
-    '<b>Test and balance every day</b> the first week, starting from Joe\'s startup numbers',
+    '<b>Test and balance every day</b> the first week, starting from your startup numbers',
     '<b>No automatic cleaner</b> for the first two weeks while the plaster hardens',
     '<b>Hold off on the heater</b> for about two weeks',
     '<b>Wait about a month before adding salt</b> on a salt pool',
@@ -260,7 +266,7 @@ $('#runBtn').addEventListener('click', e => { running = !running; e.currentTarge
 const padBox = $('.padbox');
 const padIO = new IntersectionObserver(([e]) => {
   if (!e.isIntersecting) return; padIO.disconnect();
-  import('./pad3d.js?v=4').then(m => m.mountPad($('#padCanvas'), { onPick: id => showPart(id, true), reduced })).then(p => {
+  import('./pad3d.js?v=5').then(m => m.mountPad($('#padCanvas'), { onPick: id => showPart(id, true), reduced })).then(p => {
     pad = p; $('#padNote').textContent = phone() ? 'Drag · pinch · tap a part' : 'Drag to turn · tap a part';
     const pz = $('#padZoom'); pz.hidden = false; pz.addEventListener('click', e => { const b = e.target.closest('button'); if (b) pad.zoomBy(+b.dataset.z); });
     if (running) pad.setRun(true);
@@ -278,13 +284,13 @@ const detailLabels = { 'New pool': 'Anything Joe should know about your yard or 
 const applies = () => !!carried && ((carried.kind === 'plan' && reqType === 'New pool') || (carried.kind === 'sym' && reqType === 'Repair'));
 function setType(t) {
   reqType = t; tabs.forEach(b => { const on = b.dataset.v === t; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; });
-  $('#fDetailL').textContent = detailLabels[t]; $('#poolMore').hidden = t !== 'New pool';
+  $('#fDetailL').textContent = detailLabels[t]; $('#poolMore').hidden = t !== 'New pool'; $('#urgWrap').hidden = t !== 'Repair';
   drawCarry();
 }
 function drawCarry() {
   const on = applies(); carry.hidden = !on; if (!on) return;
   carry.innerHTML = `<span><b>${carried.kind === 'plan' ? 'Your plan' : 'What you\'re seeing'}:</b> ${esc(carried.text)}</span><button type="button" id="dropCarry">Remove</button>`;
-  $('#dropCarry').addEventListener('click', () => { carried = null; drawCarry(); });
+  $('#dropCarry').addEventListener('click', () => { carried = null; drawCarry(); $('#reqType button[aria-checked=true]')?.focus(); });
 }
 tabs.forEach((b, i) => {
   b.addEventListener('click', () => setType(b.dataset.v));
@@ -295,24 +301,28 @@ function showForm() { reqForm.hidden = false; $('#done').hidden = true; }
 function openRequest(type, c) {
   if (c !== undefined) carried = c;                       // a new plan or symptom replaces the old one; a plain CTA keeps what's there
   setType(type); showForm();
-  $('#request').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' }); setTimeout(() => $('#fName').focus({ preventScroll: true }), reduced ? 0 : 700);
+  $('#request').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' }); setTimeout(() => (phone() ? $('#req-h') : $('#fName')).focus({ preventScroll: true }), reduced ? 0 : 700);
 }
 $$('[data-req]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openRequest(a.dataset.req); }));
 $$('a[href="#request"]:not([data-req])').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openRequest(reqType); }));
-chips($('#fWhen')); chips($('#fBudget')); chips($('#fStart'));
+chips($('#fWhen')); chips($('#fBudget')); chips($('#fStart')); chips($('#fUrgent'));
 // photos: images only, first MAX_PHOTOS, never uploaded
 const thumbs = $('#thumbs'), photoNote = $('#photoNote');
 function drawPhotos() { $$('img', thumbs).forEach(i => URL.revokeObjectURL(i.src)); thumbs.innerHTML = '';
-  photos.forEach(f => { const im = new Image(); im.alt = 'Your photo: ' + f.name; im.src = URL.createObjectURL(f); thumbs.append(im); }); }
+  photos.forEach((f, i) => { const w = document.createElement('span'); w.className = 'ph'; const im = new Image(); im.alt = 'Your photo: ' + f.name; im.src = URL.createObjectURL(f);
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'phx'; x.setAttribute('aria-label', 'Remove ' + f.name); x.textContent = '×';
+    x.addEventListener('click', () => { photos.splice(i, 1); drawPhotos(); photoNote.textContent = ''; ($('.phx', thumbs) || $('#fPhotos')).focus(); });
+    w.append(im, x); thumbs.append(w); }); }
 $('#fPhotos').addEventListener('change', e => {
-  const all = [...e.target.files], imgs = all.filter(f => /^image\//.test(f.type)), skipped = all.length - imgs.length, over = Math.max(0, imgs.length - MAX_PHOTOS);
-  photos = imgs.slice(0, MAX_PHOTOS); drawPhotos();
-  photoNote.textContent = [over && `Kept the first ${MAX_PHOTOS} photos and left out ${over}.`, skipped && `Skipped ${skipped} file${skipped > 1 ? 's' : ''} that ${skipped > 1 ? 'aren\'t photos' : 'isn\'t a photo'}.`].filter(Boolean).join(' ');
+  const all = [...e.target.files]; e.target.value = ''; if (!all.length) return;
+  const imgs = all.filter(f => /^image\//.test(f.type)), skipped = all.length - imgs.length, over = Math.max(0, photos.length + imgs.length - MAX_PHOTOS);
+  photos = [...photos, ...imgs].slice(0, MAX_PHOTOS); drawPhotos();
+  photoNote.textContent = [over && `That's the limit of ${MAX_PHOTOS} photos, so ${over} ${over > 1 ? 'were' : 'was'} left out.`, skipped && `Skipped ${skipped} file${skipped > 1 ? 's' : ''} that ${skipped > 1 ? 'aren\'t photos' : 'isn\'t a photo'}.`].filter(Boolean).join(' ');
 });
 // validation: each error sits under its own field and is tied to it for screen readers
 function setErr(input, msg) {
   let e = $('#' + input.id + 'Err'); if (!e) { e = document.createElement('p'); e.className = 'err'; e.id = input.id + 'Err'; input.after(e); }
-  e.textContent = msg || ''; input.setAttribute('aria-invalid', !!msg); msg ? input.setAttribute('aria-describedby', e.id) : input.removeAttribute('aria-describedby');
+  e.textContent = msg || ''; input.setAttribute('aria-invalid', !!msg);   // the message sits inside the field's label, so it's read with it
 }
 const phoneOk = v => { const d = v.replace(/\D/g, ''); return /^[\d\s().+-]+$/.test(v.trim()) && (d.length === 10 || (d.length === 11 && d[0] === '1')); };   // (843) 555-0123, 843.555.0123, +1 843 555 0123
 const emailOk = v => !v || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
@@ -326,7 +336,7 @@ reqForm.addEventListener('submit', e => {
   const bad = [nameI, phI, emI].find(i => i.getAttribute('aria-invalid') === 'true');
   if (bad) { bad.focus({ preventScroll: true }); bad.closest('label').scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' }); return; }
   const pool = reqType === 'New pool';
-  const rows = [['Request', reqType], applies() && [carried.kind === 'plan' ? 'Plan' : 'Seeing', carried.text], ['Name', name], ['Mobile', ph],
+  const rows = [['Request', reqType], applies() && [carried.kind === 'plan' ? 'Plan' : 'Seeing', carried.text], reqType === 'Repair' && picked($('#fUrgent')).length && ['How urgent', picked($('#fUrgent'))[0]], ['Name', name], ['Mobile', ph],
     em && ['Email', em], $('#fTown').value && ['Town', $('#fTown').value], $('#fDetail').value.trim() && ['Details', $('#fDetail').value.trim()],
     photos.length && ['Photos', `${photos.length} selected, kept on this device`], picked($('#fWhen')).length && ['Best time', picked($('#fWhen'))[0]],
     pool && picked($('#fBudget')).length && ['Budget', picked($('#fBudget'))[0]], pool && picked($('#fStart')).length && ['When', picked($('#fStart'))[0]]].filter(Boolean);
@@ -337,13 +347,13 @@ reqForm.addEventListener('submit', e => {
 $('#editReq').addEventListener('click', () => { showForm(); $('#fName').focus(); });
 $('#again').addEventListener('click', () => {
   reqForm.reset(); photos = []; drawPhotos(); photoNote.textContent = ''; ['fName', 'fPhone', 'fEmail'].forEach(id => setErr($('#' + id), ''));
-  $$('#fWhen button, #fBudget button, #fStart button').forEach(b => b.setAttribute('aria-pressed', 'false')); carried = null; setType('New pool'); showForm(); $('#fName').focus();
+  $$('#fWhen button, #fBudget button, #fStart button, #fUrgent button').forEach(b => b.setAttribute('aria-pressed', 'false')); carried = null; setType('New pool'); showForm(); $('#fName').focus();
 });
 setType('New pool');
 
 /* ---------- phone dock ---------- */
 const dock = $('#dock'); let inHero = true, inReq = false;
-let inChk = false; const dockSet = () => { const on = !inHero && !inReq && !inChk; dock.classList.toggle('on', on); dock.inert = !on; };
+let inChk = false; const dockSet = () => { const on = !inHero && !inReq && !inChk; if (!on && dock.contains(document.activeElement)) $('.brand').focus({ preventScroll: true }); dock.classList.toggle('on', on); dock.inert = !on; };
 const dockMain = $('#dockMain'), DOCK = { plan: 'Design my pool', reno: 'Quote my renovation', repair: 'Request a repair' }; let dockMode = 'plan';
 const setDock = m => { if (m !== dockMode) { dockMode = m; dockMain.textContent = DOCK[m]; } };
 const dockIO = new IntersectionObserver(es => es.forEach(e => { const m = e.target.id === 'repair' ? 'repair' : 'reno'; if (e.isIntersecting) setDock(m); else if (dockMode === m) setDock('plan'); }), { rootMargin: '-40% 0px -40% 0px' });
@@ -358,7 +368,7 @@ new IntersectionObserver(([e]) => { inChk = e.isIntersecting; dockSet(); }, { ro
 // back to top
 { const t = $('#totop'), hh = () => ($('.hero')?.offsetHeight || innerHeight) * .8;
   addEventListener('scroll', () => t.classList.toggle('on', scrollY > hh()), { passive: true });
-  const up = e => { e.preventDefault(); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); history.replaceState(null, '', location.pathname + location.search); };
+  const up = e => { e.preventDefault(); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); history.replaceState(null, '', location.pathname + location.search); $('.brand').focus({ preventScroll: true }); };
   t.addEventListener('click', up); $('#dockTop').addEventListener('click', up); }
 
 // live heartbeat-to-wave line on every section seam: the trace runs across like a monitor,
@@ -406,9 +416,9 @@ new IntersectionObserver(([e]) => { inChk = e.isIntersecting; dockSet(); }, { ro
       const g = ctx.createLinearGradient(0, 0, w, 0); g.addColorStop(0, mixc(at(0))); g.addColorStop(1, mixc(at(w))); return g; }
     return getComputedStyle(sec).backgroundColor;
   };
-  const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); it.ch.kick = w < 700 ? 0 : .08; let pv = it.sec.previousElementSibling; while (pv && !pv.offsetHeight) pv = pv.previousElementSibling; it.up = edge(pv, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
+  const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); it.ch.kick = w < 861 ? 0 : .08; let pv = it.sec.previousElementSibling; while (pv && !pv.offsetHeight) pv = pv.previousElementSibling; it.up = edge(pv, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
   const draw = (it, t) => {
-    const { ctx, w, h } = it, mid = h / 2, ph = w < 700, amp = h * (it.one ? (ph ? .2 : .36) : (ph ? .42 : .46)), k = ph ? .8 : 1,
+    const { ctx, w, h } = it, mid = h / 2, ph = w < 861, amp = h * (it.one ? (ph ? .2 : .36) : (ph ? .42 : .46)), k = ph ? .8 : 1,
       sh = t * it.sp * (ph ? .55 : 1) + (ph ? 6 : 16) * Math.sin(t * .45 + it.seed) + it.off, tt = ph ? t * .6 : t;   // phones: slower travel and roll, wider spacing, no beat kick
     ctx.clearRect(0, 0, w, h);
     const line = new Path2D(), bDn = new Path2D(), bUp = new Path2D(), O = 2; bDn.moveTo(-60, mid + O); bUp.moveTo(-60, mid - O);
@@ -425,8 +435,10 @@ new IntersectionObserver(([e]) => { inChk = e.isIntersecting; dockSet(); }, { ro
   let raf = 0; const t0 = performance.now();
   const loop = () => { raf = 0; const t = (performance.now() - t0) / 1000; let any = false; for (const it of items) if (it.on) { draw(it, t); any = true; } if (any && !reduced && !document.hidden) raf = requestAnimationFrame(loop); };
   const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
-  const io = new IntersectionObserver(es => { es.forEach(e => { const it = items.find(i => i.el === e.target); it.on = e.isIntersecting; }); kick(); }, { rootMargin: '80px' });
+  const io = new IntersectionObserver(es => { es.forEach(e => { const it = items.find(i => i.el === e.target); it.on = e.isIntersecting; if (it.on && it.stale) { it.stale = false; fit(it); } }); kick(); }, { rootMargin: '80px' });
   items.forEach(it => { fit(it); draw(it, 0); io.observe(it.el); });
-  addEventListener('resize', () => { items.forEach(it => { fit(it); draw(it, (performance.now() - t0) / 1000); }); kick(); });
+  let lw = innerWidth, rz = 0;
+  addEventListener('resize', () => { if (innerWidth === lw || rz) return; rz = requestAnimationFrame(() => { rz = 0; lw = innerWidth;
+    items.forEach(it => { if (it.on) { fit(it); draw(it, (performance.now() - t0) / 1000); } else it.stale = true; }); kick(); }); });
   document.addEventListener('visibilitychange', kick);
 }
