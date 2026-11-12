@@ -230,8 +230,9 @@ $('#runBtn').addEventListener('click', e => { running = !running; e.currentTarge
 const padBox = $('.padbox');
 const padIO = new IntersectionObserver(([e]) => {
   if (!e.isIntersecting) return; padIO.disconnect();
-  import('./pad3d.js?v=2').then(m => m.mountPad($('#padCanvas'), { onPick: id => showPart(id, true), reduced })).then(p => {
-    pad = p; $('#padNote').textContent = 'Drag to turn · tap a part';
+  import('./pad3d.js?v=3').then(m => m.mountPad($('#padCanvas'), { onPick: id => showPart(id, true), reduced })).then(p => {
+    pad = p; $('#padNote').textContent = phone() ? 'Drag · pinch · tap a part' : 'Drag to turn · tap a part';
+    const pz = $('#padZoom'); pz.hidden = false; pz.addEventListener('click', e => { const b = e.target.closest('button'); if (b) pad.zoomBy(+b.dataset.z); });
     if (running) pad.setRun(true);
     if (padPending) pad.select(padPending);
   }).catch(err => { console.error('pad', err?.stack || err); $('#padNote').textContent = '3D view not available on this device. The part buttons still work.'; $('#padCanvas').style.display = 'none'; $('#runBtn').hidden = true; });
@@ -318,11 +319,11 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
     // water: sets of real swells. Sharp crests, long flat troughs, crests pushed forward so they lean and start to curl, rolling faster than the line travels
     const w = water(s, seed);
     if (w > .001) {
-      const set = .5 + .5 * noise(s / 190 + seed + 70 + t * .08), ph = (s + 30 * Math.sin(s / 310 + seed)) / 92 * 6.2832 - t * 1.9;
-      const c1 = Math.pow(.5 + .5 * Math.sin(ph), 2.6), c2 = Math.pow(.5 + .5 * Math.sin(ph * .53 + 1.7 - t * .5), 2);
-      const hgt = w * set * (.85 * c1 + .15 * c2);
+      const set = .55 + .45 * noise(s / 210 + seed + 70 - t * .1), ph = (s + 30 * Math.sin(s / 310 + seed)) / 104 * 6.2832 - t * 2.5;   // every moving part runs forward, the way the line travels
+      const c1 = Math.pow(.5 + .5 * Math.sin(ph), 2.4);
+      const hgt = w * set * c1;
       v += hgt - w * .2;
-      lean = 22 * hgt * hgt;
+      lean = 44 * hgt * hgt * hgt;                                    // the top of the crest is thrown forward so it curls over its own face
     }
     return v;
   };
@@ -339,9 +340,9 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
   const draw = (it, t) => {
     const { ctx, w, h } = it, mid = h / 2, amp = h * (it.one ? .34 : .47), sh = t * it.sp + 16 * Math.sin(t * .45 + it.seed) + it.off, k = w < 700 ? .55 : 1;
     ctx.clearRect(0, 0, w, h);
-    const line = new Path2D(), body = new Path2D(); body.moveTo(0, mid);
-    for (let x = 0; x <= w + 1.5; x += 1.5) { let v = trace(x / k - sh, t, it.seed); if (it.one) v = Math.abs(v); const y = mid - v * amp, X = x + lean * k * (v > 0 ? 1 : 0); x ? line.lineTo(X, y) : line.moveTo(X, y); body.lineTo(X, y); }
-    body.lineTo(w + 2, mid); body.closePath();
+    const line = new Path2D(), body = new Path2D(); body.moveTo(-60, mid);
+    for (let x = -60; x <= w + 60; x += 1.5) { let v = trace(x / k - sh, t, it.seed); if (it.one) v = Math.abs(v); const y = mid - v * amp, X = x + lean * k * (v > 0 ? 1 : 0); x > -60 ? line.lineTo(X, y) : line.moveTo(X, y); body.lineTo(X, y); }
+    body.lineTo(w + 60, mid); body.closePath();
     // the trace IS the edge: lower section's colour fills what rises above the seam, upper section's fills what dips below
     if (it.dn) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, mid); ctx.clip(); ctx.fillStyle = it.dn; ctx.fill(body); ctx.restore(); }
     if (it.up) { ctx.save(); ctx.beginPath(); ctx.rect(0, mid, w, h - mid); ctx.clip(); ctx.fillStyle = it.up; ctx.fill(body); ctx.restore(); }

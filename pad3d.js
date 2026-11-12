@@ -116,8 +116,8 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
     if (!dragging) { rotY += velY; velY *= .95; if (Math.abs(velY) < .0004) velY = 0; }
     rig.rotation.y = rotY + (reduced || dragging || velY ? 0 : Math.sin(t * .22) * .05); rig.rotation.x = rotX;
     look.lerp(lookT, .08); zoom += (zoomT - zoom) * .08;
-    const narrow = cam.aspect < 1.1, d = (narrow ? 12 : 12.2) * zoom;
-    cam.position.set(look.x, look.y + (narrow ? 3.6 : 2.9) * zoom, d); cam.lookAt(look);
+    uz += (uzT - uz) * .18; const narrow = cam.aspect < 1.1, d = (narrow ? 12 : 12.2) * zoom * uz;
+    cam.position.set(look.x, look.y + (narrow ? 3.6 : 2.9) * zoom * uz, d); cam.lookAt(look);
     fan.rotation.x += run * .5;
     flows.forEach((f, i) => { f.material.opacity = run * .85; f.material.map.offset.x -= .02 * run; });
     flameM.opacity = run * (.75 + .25 * Math.sin(t * 13)); screenM.color.setRGB(.04 + run * .15, .14 + run * .45, .19 + run * .55);
@@ -129,12 +129,23 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
     ring.material.opacity = flagged ? .55 + .35 * Math.sin(t * 4) : 0; ring.scale.setScalar(1 + .06 * Math.sin(t * 4));
     renderer.render(scene, cam);
   }
-  const busy = () => dragging || velY || running || run > .01 || look.distanceTo(lookT) > .005 || Math.abs(zoom - zoomT) > .002 || flagged || sel;
+  const busy = () => dragging || velY || running || run > .01 || look.distanceTo(lookT) > .005 || Math.abs(zoom - zoomT) > .002 || Math.abs(uz - uzT) > .002 || flagged || sel;
   function loop() { raf = 0; if (!visible || document.hidden) return; draw(); if (!reduced || busy()) raf = requestAnimationFrame(loop); }
   function kick() { if (!raf) raf = requestAnimationFrame(loop); }
-  canvas.addEventListener('pointerdown', e => { dragging = true; velY = 0; sx = e.clientX; sy = e.clientY; lastT = performance.now(); moved = 0; try { canvas.setPointerCapture(e.pointerId); } catch {} kick(); });
+  // zoom: two-finger pinch on the canvas, ctrl/trackpad-pinch wheel, or the +/- buttons. The page itself never zooms from here.
+  let uz = 1, uzT = 1; const pts = new Map(); let pinch0 = 0, uz0 = 1;
+  const zoomTo = v => { uzT = Math.max(.45, Math.min(1.5, v)); kick(); };
+  const zoomBy = f => zoomTo(uzT * f);
+  const pdist = () => { const [a, b] = [...pts.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
+  canvas.addEventListener('pointerdown', e => { pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (pts.size === 2) { pinch0 = pdist(); uz0 = uzT; dragging = false; velY = 0; moved = 99; } });
+  canvas.addEventListener('pointermove', e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (pts.size === 2 && pinch0 > 0) { e.preventDefault(); zoomTo(uz0 * pinch0 / Math.max(20, pdist())); } });
+  const pend = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch0 = 0; };
+  canvas.addEventListener('pointerup', pend); canvas.addEventListener('pointercancel', pend); canvas.addEventListener('lostpointercapture', pend);
+  canvas.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); zoomBy(Math.exp(e.deltaY * .01)); }, { passive: false });
+  for (const g of ['gesturestart', 'gesturechange', 'gestureend']) canvas.addEventListener(g, e => e.preventDefault());
+  canvas.addEventListener('pointerdown', e => { if (pts.size > 1) return; dragging = true; velY = 0; sx = e.clientX; sy = e.clientY; lastT = performance.now(); moved = 0; try { canvas.setPointerCapture(e.pointerId); } catch {} kick(); });
   canvas.addEventListener('pointermove', e => {
-    if (!dragging) return; const dx = e.clientX - sx, dy = e.clientY - sy, now = performance.now(); sx = e.clientX; sy = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
+    if (!dragging || pts.size > 1) return; const dx = e.clientX - sx, dy = e.clientY - sy, now = performance.now(); sx = e.clientX; sy = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
     rotY += dx * .01; rotX = Math.max(-.25, Math.min(.35, rotX + dy * .004)); velY = dx * .01 * Math.min(1, 16 / Math.max(1, now - lastT)) * .6; lastT = now; kick();
   });
   canvas.addEventListener('pointerup', e => {
@@ -149,5 +160,5 @@ export async function mountPad(canvas, { onPick, reduced = false } = {}) {
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; kick(); }).observe(canvas);
   document.addEventListener('visibilitychange', kick);
   size(); draw(); kick();
-  return { select, setRun, flag };
+  return { select, setRun, flag, zoomBy };
 }

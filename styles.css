@@ -6,7 +6,7 @@
 @font-face{font-family:Mono;src:url(fonts/jetbrains-mono-latin-500-normal.woff2) format('woff2');font-weight:500;font-display:swap}
 :root{--ink:#06111B;--ink2:#0B1A29;--ink3:#12263A;--royal:#1D5DB5;--royal2:#2E7FD0;--sky:#5DB6E6;--foam:#F3F8FB;--line:#D6E2EA;--mute:#4A5E6E;--amber:#F2A33A;--r:18px;--wrap:1240px}
 *,*::before,*::after{box-sizing:border-box;margin:0}
-html{overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:20px}
+html{touch-action:manipulation;overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:20px}
 body{background:var(--foam);color:var(--ink);font:400 17px/1.55 Hanken,system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
 img,svg,canvas{display:block;max-width:100%}
 a{color:inherit}
@@ -485,3 +485,10 @@ input[type=file]::file-selector-button{min-height:44px;padding:0 16px;border-rad
 /* no-JS fallback: put the drawn line's baseline on the seam too */
 .pulse:not(.live){transform:translateY(calc(-50% - 5.4px))}
 @media(max-width:860px){.pulse.live{height:68px}.pulse:not(.live){transform:translateY(calc(-50% - 4px))}}
+
+/* 3D pad zoom buttons; the canvas takes the pinch itself so the page never zooms from it */
+.padzoom{position:absolute;right:12px;bottom:12px;display:grid;gap:6px;z-index:2}
+.padzoom button{width:44px;height:44px;border-radius:50%;background:rgba(6,17,27,.7);border:1.5px solid rgba(255,255,255,.22);color:#fff;font:600 22px/1 Hanken,sans-serif;display:grid;place-items:center;transition:background .2s,border-color .2s}
+.padzoom button:hover{border-color:var(--sky);background:rgba(6,17,27,.9)}
+#padCanvas{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.yard canvas,.pulse canvas{-webkit-user-select:none;user-select:none}
