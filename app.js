@@ -292,3 +292,47 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
 { const t = $('#totop'), hh = () => ($('.hero')?.offsetHeight || innerHeight) * .8;
   addEventListener('scroll', () => t.classList.toggle('on', scrollY > hh()), { passive: true });
   t.addEventListener('click', e => { e.preventDefault(); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); history.replaceState(null, '', location.pathname + location.search); }); }
+
+// live heartbeat-to-wave line on every section seam: the trace runs across like a monitor,
+// beats first, then the beats settle into rolling water. Baseline = the seam itself.
+{ const G = (x, m, s) => Math.exp(-((x - m) * (x - m)) / (2 * s * s));
+  const beat = x => .12 * G(x, .2, .045) - .16 * G(x, .36, .014) + G(x, .4, .016) - .3 * G(x, .445, .016) + .24 * G(x, .66, .06);   // P Q R S T, x in 0..1
+  const P = 860, FL = 110, EC = 330, WV = 330;            // px: flat lead-in, three beats, water
+  const trace = (u, t) => {
+    if (u < FL) return 0;
+    if (u < FL + EC) { const k = (u - FL) / EC * 3; return beat(k % 1) * (1 - .12 * Math.floor(k)); }
+    if (u < FL + EC + WV) { const k = (u - FL - EC) / WV, env = Math.sin(Math.PI * Math.min(1, k * 1.15)) ** .8 * (1 - .35 * k), ph = k * 4.2 * 6.2832 - t * 2.6;
+      return env * (.42 * Math.sin(ph) + .13 * Math.sin(2 * ph + .9)); }
+    return 0;
+  };
+  const items = $$('.pulse').map((el, i) => { const cv = document.createElement('canvas'); el.append(cv); el.classList.add('live'); return { el, cv, ctx: cv.getContext('2d'), on: false, off: i * 197, w: 0, h: 0, sec: el.parentElement, prev: el.parentElement.previousElementSibling }; });
+  // the colour a section shows along one of its edges, so humps and dips can be filled with the right side's colour
+  const mixc = t => { t = Math.max(0, Math.min(1, t)); return `rgb(${Math.round(29 + (15 - 29) * t)},${Math.round(93 + (58 - 93) * t)},${Math.round(181 + (117 - 181) * t)})`; };
+  const edge = (sec, bottom, ctx, w) => {
+    if (!sec || sec.classList.contains('hero')) return null;
+    if (sec.classList.contains('builders')) { const H = sec.offsetHeight, L = w * .866 + H * .5, at = x => ((x - w / 2) * .866 + (bottom ? H / 2 : -H / 2) * .5) / L + .5;
+      const g = ctx.createLinearGradient(0, 0, w, 0); g.addColorStop(0, mixc(at(0))); g.addColorStop(1, mixc(at(w))); return g; }
+    return getComputedStyle(sec).backgroundColor;
+  };
+  const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); it.up = edge(it.prev, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
+  const draw = (it, t) => {
+    const { ctx, w, h } = it, mid = h / 2, amp = h * .46, sh = t * 70 + it.off, k = w < 700 ? .55 : 1;
+    ctx.clearRect(0, 0, w, h);
+    const line = new Path2D(), body = new Path2D(); body.moveTo(0, mid);
+    for (let x = 0; x <= w + 1.5; x += 1.5) { let v = trace(((x / k - sh) % P + P) % P, t); if (it.one) v = Math.abs(v); const y = mid - v * amp; x ? line.lineTo(x, y) : line.moveTo(x, y); body.lineTo(x, y); }
+    body.lineTo(w + 2, mid); body.closePath();
+    // the trace IS the edge: lower section's colour fills what rises above the seam, upper section's fills what dips below
+    if (it.dn) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, mid); ctx.clip(); ctx.fillStyle = it.dn; ctx.fill(body); ctx.restore(); }
+    if (it.up) { ctx.save(); ctx.beginPath(); ctx.rect(0, mid, w, h - mid); ctx.clip(); ctx.fillStyle = it.up; ctx.fill(body); ctx.restore(); }
+    ctx.lineJoin = ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(93,182,230,.28)'; ctx.lineWidth = 6; ctx.stroke(line);
+    ctx.strokeStyle = '#7cc9f2'; ctx.lineWidth = 2; ctx.stroke(line);
+  };
+  let raf = 0; const t0 = performance.now();
+  const loop = () => { raf = 0; const t = (performance.now() - t0) / 1000; let any = false; for (const it of items) if (it.on) { draw(it, t); any = true; } if (any && !reduced && !document.hidden) raf = requestAnimationFrame(loop); };
+  const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+  const io = new IntersectionObserver(es => { es.forEach(e => { const it = items.find(i => i.el === e.target); it.on = e.isIntersecting; }); kick(); }, { rootMargin: '80px' });
+  items.forEach(it => { fit(it); draw(it, 0); io.observe(it.el); });
+  addEventListener('resize', () => { items.forEach(it => { fit(it); draw(it, (performance.now() - t0) / 1000); }); kick(); });
+  document.addEventListener('visibilitychange', kick);
+}
