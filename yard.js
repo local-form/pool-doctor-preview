@@ -4,7 +4,8 @@ const VS = 'attribute vec2 a; void main(){ gl_Position = vec4(a, 0., 1.); }';
 const FS = `#extension GL_OES_standard_derivatives : enable
 precision highp float;
 uniform vec2 uRes, uC; uniform float uTime, uScale;
-uniform float uL, uW, uSA, uSB, uM, uSpa, uShelf, uWall, uFire, uNight;
+uniform float uL, uW, uSA, uSB, uM, uSpa, uShelf, uWall, uFire, uNight, uDeck, uPeb;
+uniform vec3 uFloor;
 uniform sampler2D tG, tP, tPl, tS;
 const vec2 TL = vec2(-.62, .78);            // towards the sun, on the ground plane
 const vec3 SUN = vec3(-.5, .63, .6);
@@ -37,6 +38,12 @@ float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
   return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y); }
 float fbm(vec2 p){ float s = 0., a = .5; for (int i = 0; i < 4; i++) { s += a * vn(p); p = p * 2.03 + 7.1; a *= .5; } return s; }
+vec3 deckCol(vec2 p, float k){
+  if (k < .5) return texture2D(tP, p / 9.).rgb * vec3(1.05, 1., .93);
+  if (k < 1.5) { vec3 c = texture2D(tP, p / 15. + .37).rgb; return mix(vec3(dot(c, vec3(.33))), c, .45) * vec3(1.22, 1.15, 1.02); }
+  vec3 c = mix(texture2D(tPl, p / 6.).rgb, vec3(.78), .35) * vec3(.84, .83, .8);
+  vec2 j = abs(fract(p / 8. + .5) - .5) * 8.; return c * (1. - .35 * smoothstep(.07, .02, min(j.x, j.y)));
+}
 float cn(vec2 p){ vec2 i = floor(p), f = fract(p); float d = 1.;
   for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) { vec2 g = vec2(x, y); vec2 o = vec2(h21(i + g), h21(i + g + 17.3)); o = .5 + .5 * sin(uTime * .8 + 6.2831 * o); d = min(d, length(g + o - f)); }
   return d; }
@@ -58,7 +65,7 @@ void main(){
   // deck: a paver rectangle round the pool, plus a round fire-pit patio
   float dDeck = min(sdBox(p - vec2(0., -1.6), vec2(uL * .5 + 6.5, uW * .5 + 7.6), 1.5), d - 5.);
   dDeck = smin(dDeck, length(p - fireC()) - 6.2 * uFire + .02, 1.6);
-  vec3 pave = texture2D(tP, p / 9.).rgb * vec3(1.05, 1., .93);
+  vec3 pave = mix(deckCol(p, floor(uDeck)), deckCol(p, ceil(uDeck)), fract(uDeck));
   pave *= mix(.8, 1., smoothstep(-.7, -.5, dDeck));                    // soldier course edge
   col *= 1. - .3 * smoothstep(1.4, 0., dDeck) * step(0., dDeck);        // lawn contact shadow
   col = mix(col, pave, smoothstep(fw, -fw, dDeck));
@@ -100,7 +107,9 @@ void main(){
   depth = mix(depth, .9, shelf); depth = mix(depth, 3.3, inSpa);
   vec2 e = vec2(.06, 0.); vec2 n2 = vec2(wave(p + e) - wave(p - e), wave(p + e.yx) - wave(p - e.yx)) / (2. * e.x) * .12;
   vec2 fp = p + n2 * (.4 + depth * .45);
-  vec3 floorC = mix(mix(texture2D(tPl, fp / 5.).rgb, vec3(.86), .55) * vec3(.93, .97, 1.), vec3(.86, .8, .7), shelf * .5);
+  vec3 floorC = mix(texture2D(tPl, fp / 5.).rgb, vec3(.86), .55);
+  floorC *= mix(1., .55 + .9 * h21(floor(fp * 16.)), uPeb * .6);
+  floorC = mix(floorC * uFloor, vec3(.86, .8, .7), shelf * .5);
   float fsh = smoothstep(-.6, .6, allD(p + TL * (.6 + depth * .32)));   // the pool wall shades the floor
   float c = pow(1. - cn(fp * 1.05), 6.) * .8 + pow(1. - cn(fp * 1.7 + 3.1), 7.) * .45;
   vec3 lit = floorC * (.5 + .62 * (1. - fsh)) + vec3(.9, 1., 1.) * c * (1. - fsh * .7) * .32;
@@ -156,7 +165,7 @@ export function mountYard(canvas, opts = {}) {
   gl.useProgram(pr);
   gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
   const al = gl.getAttribLocation(pr, 'a'); gl.enableVertexAttribArray(al); gl.vertexAttribPointer(al, 2, gl.FLOAT, false, 0, 0);
-  const U = {}; ['uRes', 'uC', 'uTime', 'uScale', 'uL', 'uW', 'uSA', 'uSB', 'uM', 'uSpa', 'uShelf', 'uWall', 'uFire', 'uNight', 'tG', 'tP', 'tPl', 'tS'].forEach(n => U[n] = gl.getUniformLocation(pr, n));
+  const U = {}; ['uRes', 'uC', 'uTime', 'uScale', 'uL', 'uW', 'uSA', 'uSB', 'uM', 'uSpa', 'uShelf', 'uWall', 'uFire', 'uNight', 'uDeck', 'uPeb', 'uFloor', 'tG', 'tP', 'tPl', 'tS'].forEach(n => U[n] = gl.getUniformLocation(pr, n));
   const base = opts.tex || new URL('./tex/', import.meta.url).href;
   const tex = (name, unit) => new Promise(res => { const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([128, 128, 128, 255]));
@@ -166,11 +175,14 @@ export function mountYard(canvas, opts = {}) {
   [['tG', 0], ['tP', 1], ['tPl', 2], ['tS', 3]].forEach(([n, u]) => gl.uniform1i(U[n], u));
   const ready = Promise.all([tex('grass-col', 0), tex('paving-col', 1), tex('plaster-col', 2), tex('slate-col', 3)]);
 
-  const cur = { L: 32, W: 16, spa: 0, shelf: 0, wall: 0, fire: 0, night: 0, m: 1 }, tgt = { ...cur };
+  const cur = { L: 32, W: 16, spa: 0, shelf: 0, wall: 0, fire: 0, night: 0, m: 1, deck: 0, peb: 0, fr: .93, fg: .97, fb: 1 }, tgt = { ...cur };
+  const FIN = { 'White plaster': [.93, .97, 1, 0], 'Pebble blue': [.52, .6, .66, 1], Midnight: [.2, .23, .3, .6] }, DECK = ['Pavers', 'Travertine', 'Concrete'];
+  let held = false;
   let sa = 0, sb = 0, time = 0, raf = 0, last = 0, visible = true, dirty = true;
   const view = { w: 1, h: 1, dpr: 1, cx: 0, cy: 0, s: 10 };
   function set(p) {
     tgt.L = p.len; tgt.W = p.wid; const ex = new Set(p.extras || []);
+    const f = FIN[p.finish] || FIN['White plaster']; [tgt.fr, tgt.fg, tgt.fb, tgt.peb] = f; tgt.deck = Math.max(0, DECK.indexOf(p.deck));
     tgt.spa = +ex.has('Spa'); tgt.shelf = +ex.has('Sun shelf'); tgt.wall = +ex.has('Water wall'); tgt.fire = +ex.has('Fire pit'); tgt.night = +ex.has('Lights');
     const id = Math.max(0, SHAPES.indexOf(p.shape));
     if (id !== sb) { sa = cur.m > .5 ? sb : sa; sb = id; cur.m = 0; }
@@ -183,8 +195,9 @@ export function mountYard(canvas, opts = {}) {
   }
   function place() {
     const a = opts.area ? opts.area() : { x: 0, y: 0, w: view.w / view.dpr, h: view.h / view.dpr }, pad = opts.pad || [34, 30];
-    const s = Math.min(a.w / (.6 * cur.L + pad[0]), a.h / (.6 * cur.W + pad[1]));
+    const s = held ? view.s : Math.min(a.w / (.6 * cur.L + pad[0]), a.h / (.6 * cur.W + pad[1]));
     view.s = s; view.cx = a.x + a.w / 2 + (opts.shiftX || 0) * s; view.cy = a.y + a.h / 2 - 1.5 * s;   // css px, from top-left
+    if (opts.grip) opts.grip.style.transform = `translate(${view.cx + cur.L * s / 2}px,${view.cy + cur.W * s / 2}px)`;
     if (opts.labels) {
       const { L, W } = opts.labels, k = s;
       L.style.cssText = `left:${view.cx - cur.L * k / 2}px;top:${view.cy + (cur.W / 2 + 9.6) * k}px;width:${cur.L * k}px`;
@@ -197,6 +210,7 @@ export function mountYard(canvas, opts = {}) {
     gl.uniform1f(U.uScale, view.s * view.dpr); gl.uniform1f(U.uTime, time);
     gl.uniform1f(U.uL, cur.L); gl.uniform1f(U.uW, cur.W); gl.uniform1f(U.uSA, sa); gl.uniform1f(U.uSB, sb); gl.uniform1f(U.uM, cur.m);
     gl.uniform1f(U.uSpa, cur.spa); gl.uniform1f(U.uShelf, cur.shelf); gl.uniform1f(U.uWall, cur.wall); gl.uniform1f(U.uFire, cur.fire); gl.uniform1f(U.uNight, cur.night);
+    gl.uniform1f(U.uDeck, cur.deck); gl.uniform1f(U.uPeb, cur.peb); gl.uniform3f(U.uFloor, cur.fr, cur.fg, cur.fb);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   const ease = (k, v, dt, sp) => { cur[k] += (tgt[k] - cur[k]) * Math.min(1, dt * sp); if (Math.abs(tgt[k] - cur[k]) < .002) cur[k] = tgt[k]; };
@@ -204,7 +218,7 @@ export function mountYard(canvas, opts = {}) {
     raf = 0; if (!visible || document.hidden) return;
     const dt = Math.min(.05, (now - (last || now)) / 1000); last = now;
     if (!opts.reduced) time += dt;
-    ['L', 'W'].forEach(k => ease(k, 0, dt, 9)); ['spa', 'shelf', 'wall', 'fire'].forEach(k => ease(k, 0, dt, 5)); ease('night', 0, dt, 3);
+    ['L', 'W'].forEach(k => ease(k, 0, dt, 9)); ['spa', 'shelf', 'wall', 'fire'].forEach(k => ease(k, 0, dt, 5)); ease('night', 0, dt, 3); ['deck', 'peb', 'fr', 'fg', 'fb'].forEach(k => ease(k, 0, dt, 4));
     cur.m = Math.min(1, cur.m + dt * 2.2);
     draw(); dirty = false;
     if (!opts.reduced || Object.keys(tgt).some(k => k !== 'm' && cur[k] !== tgt[k]) || cur.m < 1) raf = requestAnimationFrame(loop);
@@ -216,6 +230,7 @@ export function mountYard(canvas, opts = {}) {
     setVisible(v) { visible = v; if (v) start(); },
     still(p, tm = 4) { Object.assign(cur, { L: p.len, W: p.wid }); set(p); Object.keys(tgt).forEach(k => cur[k] = tgt[k]); cur.m = 1; time = tm; draw(); },
     // feet -> css px inside the canvas, for the drag handle
+    hold(v) { held = v; if (!v) start(); }, get origin() { return [view.cx, view.cy, view.s]; },
     toScreen(x, y) { return [view.cx + x * view.s, view.cy - y * view.s]; }, get scale() { return view.s; }, get dims() { return { L: cur.L, W: cur.W }; }
   };
 }

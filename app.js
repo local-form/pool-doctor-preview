@@ -20,7 +20,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 /* ---------- hero: design your pool from above ---------- */
 const hero = $('.hero'), cv = $('#yard'), poster = $('#poster');
 poster.addEventListener('error', () => poster.remove());
-const plan = { shape: 'Rectangle', len: 32, wid: 16, extras: [] };
+const plan = { shape: 'Rectangle', len: 32, wid: 16, extras: [], finish: 'White plaster', deck: 'Pavers' };
 const lenI = $('#len'), widI = $('#wid');
 const fill = i => i.style.setProperty('--p', ((i.value - i.min) / (i.max - i.min) * 100) + '%');
 let yard = null;
@@ -30,6 +30,7 @@ function readPlan() {
 }
 function planText() {
   const p = plan, bits = [`${p.shape} ${p.len}×${p.wid} ft`];
+  bits.push(`${p.finish} finish`, `${p.deck} deck`);
   if (p.extras.length) bits.push(p.extras.map(e => e === 'Lights' ? 'LED lighting' : e).join(', '));
   return bits.join(' · ');
 }
@@ -50,10 +51,23 @@ $$('#designer .chips').forEach(c => chips(c, b => {
 }));
 [lenI, widI].forEach(i => i.addEventListener('input', updatePlan));
 updatePlan();
+const grip = $('#grip'), clampI = (i, v) => Math.max(+i.min, Math.min(+i.max, Math.round(v)));
+grip.addEventListener('pointerdown', e => { if (!yard) return; e.preventDefault(); grip.setPointerCapture(e.pointerId); grip.classList.add('drag'); hero.classList.add('sized'); yard.hold(true); });
+grip.addEventListener('pointermove', e => {
+  if (!grip.classList.contains('drag')) return;
+  const r = cv.getBoundingClientRect(), [cx, cy, s] = yard.origin;
+  lenI.value = clampI(lenI, 2 * (e.clientX - r.left - cx) / s); widI.value = clampI(widI, 2 * (e.clientY - r.top - cy) / s); updatePlan();
+});
+const gripUp = () => { if (!grip.classList.contains('drag')) return; grip.classList.remove('drag'); yard.hold(false); };
+grip.addEventListener('pointerup', gripUp); grip.addEventListener('pointercancel', gripUp);
+grip.addEventListener('keydown', e => {
+  const k = e.key, dl = k === 'ArrowRight' ? 1 : k === 'ArrowLeft' ? -1 : 0, dw = k === 'ArrowDown' ? 1 : k === 'ArrowUp' ? -1 : 0;
+  if (!dl && !dw) return; e.preventDefault(); lenI.value = clampI(lenI, +lenI.value + dl); widI.value = clampI(widI, +widI.value + dw); updatePlan();
+});
 $('#heroSend').addEventListener('click', () => { readPlan(); openRequest('New pool', { kind: 'plan', text: planText() }); });
-import('./yard.js?v=1').then(({ mountYard }) => {
+import('./yard.js?v=2').then(({ mountYard }) => {
   const copy = $('.hero-copy');
-  yard = mountYard(cv, { dpr: phone() ? 1.5 : 1.25, reduced, still: q.has('still'), labels: { L: $('#dimL'), W: $('#dimW') },
+  yard = mountYard(cv, { dpr: phone() ? 1.5 : 1.25, reduced, still: q.has('still'), labels: { L: $('#dimL'), W: $('#dimW') }, grip: $('#grip'),
     pad: phone() ? [18, 30] : [34, 30],
     area: () => { const r = cv.getBoundingClientRect(); if (phone()) return { x: 0, y: 64, w: r.width, h: r.height - 72 };
       const left = copy.getBoundingClientRect().right + 24; return { x: left, y: 80, w: r.width - left - 32, h: r.height - 110 }; } });
@@ -113,56 +127,57 @@ const PARTS = {
   plumbing: ['Plumbing & valves', 'The pipes and valves between the pool and the pad, and the ones under the deck.', 'Common trouble: an air leak on the suction side (bubbles in the pump), a cracked fitting, a valve in the wrong position, or a leak under the deck.'],
 };
 const SYM = [
-  { t: 'Pump hums but won\'t start', p: ['pump'], c: ['<b>Start capacitor</b> has failed (very common, quick fix)', '<b>Impeller jammed</b> by debris', '<b>Motor</b> seized or burned out'] },
-  { t: 'Pump is loud or screeching', p: ['pump'], c: ['<b>Motor bearings</b> wearing out', '<b>Starving for water</b>: low pool level or a clogged basket'] },
-  { t: 'Bubbles in the pump basket', p: ['pump', 'plumbing'], c: ['<b>Air leak on the suction side</b>: lid O-ring, union or fitting', '<b>Water level</b> below the skimmer'] },
-  { t: 'Water leaking at the equipment', p: ['plumbing', 'pump'], c: ['<b>Pump shaft seal</b> leaking under the motor', '<b>Cracked union or fitting</b> on the pad'] },
-  { t: 'Weak returns, low flow', p: ['pump', 'filter'], c: ['<b>Clogged pump basket or impeller</b>', '<b>Dirty filter</b> or a valve half closed'] },
-  { t: 'Filter pressure is high', p: ['filter'], c: ['<b>Filter needs cleaning</b> or new media', '<b>Return line restricted</b> or a valve closed'] },
-  { t: 'Water won\'t clear', p: ['filter', 'salt'], c: ['<b>Filter not doing its job</b>: worn media or broken laterals', '<b>Not enough chlorine</b>: salt cell down or run time too short'] },
-  { t: 'Heater won\'t fire', p: ['heater'], c: ['<b>Low flow</b> tripping the pressure switch', '<b>Igniter or flame sensor</b> dirty or failed', '<b>Gas supply</b> or a tripped breaker'], warn: 'Smell gas? Turn the heater off, stay away from it and call your gas company first.' },
-  { t: 'Salt system says check cell', p: ['salt'], c: ['<b>Scale</b> on the cell plates', '<b>Salt level</b> low or the reading is off', '<b>Flow switch</b> not seeing flow'] },
-  { t: 'Pool is losing water', p: ['plumbing'], c: ['<b>Leak in the plumbing</b> or at the equipment', '<b>Leak in the shell</b>, a fitting or a light niche', 'Tip: a bucket test tells evaporation from a leak'] },
-  { t: 'Timer or automation not working', p: ['panel'], c: ['<b>Tripped breaker</b> or blown fuse', '<b>Relay or board</b> failed', '<b>Lost connection</b> to the app or remote'] },
-  { t: 'Pool light out or tripping power', p: ['panel'], c: ['<b>Bulb or fixture</b> failed', '<b>Water in the light</b> tripping the GFCI'], warn: 'If a pool light trips the power, keep everyone out of the water and leave the breaker off until it\'s checked.' },
+  { part: 'pump', t: 'Hums but won\'t start', c: ['<b>Start capacitor</b> has failed (very common, quick fix)', '<b>Impeller jammed</b> by debris', '<b>Motor</b> seized or burned out'] },
+  { part: 'pump', t: 'Loud or screeching', c: ['<b>Motor bearings</b> wearing out', '<b>Starving for water</b>: low pool level or a clogged basket'] },
+  { part: 'pump', t: 'Bubbles in the pump basket', c: ['<b>Air leak on the suction side</b>: lid O-ring, union or fitting', '<b>Water level</b> below the skimmer'] },
+  { part: 'pump', t: 'Weak returns, low flow', c: ['<b>Clogged pump basket or impeller</b>', '<b>Dirty filter</b> or a valve half closed'] },
+  { part: 'filter', t: 'Pressure gauge is high', c: ['<b>Filter needs cleaning</b> or new media', '<b>Return line restricted</b> or a valve closed'] },
+  { part: 'filter', t: 'Water won\'t clear', c: ['<b>Filter not doing its job</b>: worn media or broken laterals', '<b>Not enough chlorine</b>: salt cell down or run time too short'] },
+  { part: 'heater', t: 'Won\'t fire', c: ['<b>Low flow</b> tripping the pressure switch', '<b>Igniter or flame sensor</b> dirty or failed', '<b>Gas supply</b> or a tripped breaker'], warn: 'Smell gas? Turn the heater off, stay away from it and call your gas company first.' },
+  { part: 'heater', t: 'Starts, then shuts off', c: ['<b>Flow drops</b> and the pressure switch cuts it out', '<b>Flame sensor</b> dirty', '<b>High-limit switch</b> tripping'], warn: 'Smell gas? Turn the heater off, stay away from it and call your gas company first.' },
+  { part: 'salt', t: 'Says "check cell"', c: ['<b>Scale</b> on the cell plates', '<b>Salt level</b> low or the reading is off', '<b>Flow switch</b> not seeing flow'] },
+  { part: 'salt', t: 'Chlorine stays low', c: ['<b>Cell scaled</b> or near the end of its life', '<b>Salt level</b> low', '<b>Run time</b> or output set too low'] },
+  { part: 'panel', t: 'Timer or app not working', c: ['<b>Tripped breaker</b> or blown fuse', '<b>Relay or board</b> failed', '<b>Lost connection</b> to the app or remote'] },
+  { part: 'panel', t: 'Pool light out or tripping power', c: ['<b>Bulb or fixture</b> failed', '<b>Water in the light</b> tripping the GFCI'], warn: 'If a pool light trips the power, keep everyone out of the water and leave the breaker off until it\'s checked.' },
+  { part: 'plumbing', t: 'Water leaking at the equipment', c: ['<b>Pump shaft seal</b> leaking under the motor', '<b>Cracked union or fitting</b> on the pad'] },
+  { part: 'plumbing', t: 'Pool keeps losing water', c: ['<b>Leak in the plumbing</b> or at the equipment', '<b>Leak in the shell</b>, a fitting or a light niche', 'Tip: a bucket test tells evaporation from a leak'] },
 ];
-const symBox = $('#sym');
-symBox.innerHTML = SYM.map((s, i) => `<button type="button" aria-pressed="false" data-i="${i}">${esc(s.t)}</button>`).join('');
-let pad = null, padPending = null, running = false;
+const symBox = $('#sym'), box = $('#report');
+let pad = null, padPending = null, running = false, curPart = 'pump';
 const partBtns = $$('#parts button');
-function partCard(id) {
+function showPart(id, from3d) {
+  if (!PARTS[id]) return; curPart = id;
   partBtns.forEach(b => b.setAttribute('aria-pressed', b.dataset.p === id));
-  const P = PARTS[id]; if (!P) return;
-  $('#partCard').innerHTML = `<h3>${P[0]}</h3><p>${P[1]}</p><p class="fine">${P[2]}</p>`;
+  $('#partLine').textContent = PARTS[id][1];
+  symBox.innerHTML = SYM.map((x, i) => x.part === id ? `<button type="button" role="radio" aria-checked="false" data-i="${i}">${esc(x.t)}</button>` : '').join('');
+  box.hidden = true; box.innerHTML = '';
+  if (!from3d) pad ? pad.select(id) : (padPending = id);
 }
-function pickPart(id, from3d) { partCard(id); if (!from3d) pad ? pad.select(id) : (padPending = id); }
-partBtns.forEach(b => b.addEventListener('click', () => pickPart(b.dataset.p)));
-function symptoms() { return $$('button[aria-pressed=true]', symBox).map(b => SYM[+b.dataset.i]); }
-function report() {
-  const list = symptoms(), box = $('#report');
-  const flagged = new Set(list.flatMap(s => s.p));
-  partBtns.forEach(b => b.classList.toggle('flag', flagged.has(b.dataset.p)));
-  if (!list.length) { box.innerHTML = '<p class="empty">Pick a symptom to see the usual causes.</p>'; pad?.flag(null); return; }
-  const first = list[list.length - 1].p[0];
-  pad ? pad.flag(first) : (padPending = first); partCard(first);
-  const warns = [...new Set(list.map(s => s.warn).filter(Boolean))];
-  const smsBody = encodeURIComponent('Hi Joe, pool problem: ' + list.map(s => s.t).join('; ') + '. Photo attached.');
-  box.innerHTML = `<h3>Usual causes</h3><ul>${list.flatMap(s => s.c).map(c => `<li>${c}</li>`).join('')}</ul>
-    ${warns.map(w => `<p class="warn">${esc(w)}</p>`).join('')}
-    <p class="fine">General guide only. Joe confirms what's wrong before anything gets replaced.</p>
-    <div class="cta"><a class="btn btn-p" href="tel:+18437373165">Call Joe</a><a class="btn btn-s" href="sms:+18437373165?&body=${smsBody}">Text Joe a photo</a><button type="button" class="btn btn-s" id="repReq">Request a repair</button></div>`;
-  $('#repReq').addEventListener('click', () => openRequest('Repair', { kind: 'sym', text: list.map(s => s.t).join(' · ') }));
-}
-chips(symBox, report);
+partBtns.forEach(b => b.addEventListener('click', () => showPart(b.dataset.p)));
+symBox.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  $$('button', symBox).forEach(x => x.setAttribute('aria-checked', x === b));
+  const x = SYM[+b.dataset.i], label = `${PARTS[x.part][0]}: ${x.t}`;
+  pad ? pad.flag(x.part) : (padPending = x.part);
+  const sms = encodeURIComponent(`Hi Joe, pool problem: ${label}. Photo attached.`);
+  box.innerHTML = `<h3>Usual causes</h3><ul>${x.c.map(c => `<li>${c}</li>`).join('')}</ul>
+    ${x.warn ? `<p class="warn">${esc(x.warn)}</p>` : ''}
+    <div class="cta"><a class="btn btn-p" href="tel:+18437373165">Call Joe</a><a class="btn btn-s" href="sms:+18437373165?&body=${sms}">Text a photo</a><button type="button" class="btn btn-s" id="repReq">Request a repair</button></div>
+    <p class="fine">General guide only. Joe confirms what's wrong before anything gets replaced.</p>`;
+  box.hidden = false;
+  $('#repReq').addEventListener('click', () => openRequest('Repair', { kind: 'sym', text: label }));
+  if (phone()) box.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
+});
+showPart('pump');
 $('#runBtn').addEventListener('click', e => { running = !running; e.currentTarget.setAttribute('aria-pressed', running); pad?.setRun(running); });
 const padBox = $('.padbox');
 const padIO = new IntersectionObserver(([e]) => {
   if (!e.isIntersecting) return; padIO.disconnect();
-  import('./pad3d.js?v=1').then(m => m.mountPad($('#padCanvas'), { onPick: id => pickPart(id, true), reduced })).then(p => {
+  import('./pad3d.js?v=1').then(m => m.mountPad($('#padCanvas'), { onPick: id => showPart(id, true), reduced })).then(p => {
     pad = p; $('#padNote').textContent = 'Drag to turn · tap a part';
     if (running) pad.setRun(true);
-    if (padPending) { symptoms().length ? pad.flag(padPending) : pad.select(padPending); }
-  }).catch(err => { console.error('pad', err?.stack || err); $('#padNote').textContent = '3D view not available on this device. The part buttons still work.'; $('#padCanvas').style.display = 'none'; });
+    if (padPending) pad.select(padPending);
+  }).catch(err => { console.error('pad', err?.stack || err); $('#padNote').textContent = '3D view not available on this device. The part buttons still work.'; $('#padCanvas').style.display = 'none'; $('#runBtn').hidden = true; });
 }, { rootMargin: '400px 0px' });
 padIO.observe(padBox);
 
