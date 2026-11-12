@@ -21,19 +21,37 @@ float shapeD(vec2 p, float id){
   if (id < 3.5) return sdBox(p, vec2(L, W) * .5, 1.6);
   return sdBox(p, vec2(L, W) * .5, .45);
 }
-vec2 spaC(){ return vec2(uL * .5 + 1.2, uW * .5 - 3.); }
+vec2 spaPos(float id){ return id > .5 && id < 1.5 ? vec2(uL * .52 + 4.5, uW * .06) : vec2(uL * .5 + 4.5, max(uW * .5 - 3.7, 0.)); }
+vec2 spaC(){ return mix(spaPos(uSA), spaPos(uSB), uM); }
 float poolD(vec2 p){ float d = shapeD(p, uSB); if (uM < .999) d = mix(shapeD(p, uSA), d, uM); return d; }
-float spaD(vec2 p){ return length(p - spaC()) - 3.4 * uSpa + .02; }
+float spaD(vec2 p){ return length(p - spaC()) - 3.2 * uSpa + .02 + (1. - smoothstep(0., .25, uSpa)) * 6.; }
 float allD(vec2 p){ return min(poolD(p), spaD(p)); }
 float wallD(vec2 p){ return sdBox(p - vec2(0., uW * .5 + 2.4), vec2(uL * .38, .85), .1) + (1. - uWall) * 1.2; }
-vec2 fireC(){ return vec2(-uL * .5 - 9.5, -uW * .5 - 4.5); }
-float chairD(vec2 p, out float cush){
-  float d = 1e3; cush = 1e3;
-  for (int i = 0; i < 2; i++) { vec2 q = p - vec2(uL * .1 + float(i) * 3.2, -uW * .5 - 5.4);
-    d = min(d, sdBox(q, vec2(1.1, 3.3), .3)); cush = min(cush, sdBox(q - vec2(0., -.1), vec2(.9, 3.), .45)); }
+vec2 fireC(){ return vec2(-uL * .5 - 11., -uW * .5 - 2.2); }
+float deckD(vec2 p){ float x0 = -uL * .5 - 6.5 - 11.5 * uFire, x1 = uL * .5 + 6.5 + 5.5 * uSpa, y0 = -uW * .5 - 9.6, y1 = uW * .5 + 6.6;
+  return sdBox(p - vec2(x0 + x1, y0 + y1) * .5, vec2(x1 - x0, y1 - y0) * .5, 1.2); }
+mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
+// Adirondack chairs round the fire pit; back = fanned slats, seat, two flat arms
+float adiD(vec2 p, out float slat){
+  float d = 1e3; slat = 0.;
+  for (int i = 0; i < 3; i++) { float a = 1.35 + float(i) * 1.75; vec2 c = fireC() + vec2(cos(a), sin(a)) * 4.;
+    vec2 q = rot(-a + 1.5708) * (p - c);                       // +y points at the fire
+    float seat = sdBox(q, vec2(.95, .85), .15);
+    float arms = min(sdBox(q - vec2(-1.12, .1), vec2(.2, 1.15), .1), sdBox(q - vec2(1.12, .1), vec2(.2, 1.15), .1));
+    float back = max(sdBox(q - vec2(0., -1.45), vec2(1.1, .62), .3), abs(q.x) - (.95 + (-.85 - q.y) * .35));
+    float di = min(min(seat, arms), back); if (di < d) { d = di; slat = step(.5, fract(q.x * 2.6 + .25)) * step(q.y, -.8); } }
   return d;
 }
-vec2 umbC(){ return vec2(uL * .1 + 7.6, -uW * .5 - 5.6); }
+vec2 loungeC(float i){ return vec2(uL * .08 + i * 3.4, -uW * .5 - 5.5); }
+float chairD(vec2 p, out float cush){
+  float d = 1e3; cush = 1e3;
+  for (int i = 0; i < 2; i++) { vec2 q = p - loungeC(float(i));
+    d = min(d, sdBox(q, vec2(1.1, 3.3), .22)); cush = min(cush, sdBox(q - vec2(0., -.15), vec2(.88, 2.95), .4)); }
+  return d;
+}
+vec2 tableC(){ return loungeC(0.) + vec2(1.7, -2.4); }
+vec2 umbC(){ return loungeC(1.) + vec2(4.1, -.6); }
+vec2 potC(float i){ return i < .5 ? vec2(-uL * .5 - 4.9 - 11.5 * uFire, uW * .5 + 4.9) : vec2(uL * .5 + 4.9 + 5.5 * uSpa, uW * .5 + 4.9); }
 float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
   return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y); }
@@ -62,9 +80,8 @@ void main(){
   grass *= .9 + .2 * fbm(p * .06) + .045 * step(.5, fract((p.x + p.y * .15) / 7.));
   vec3 col = grass;
   float d = allD(p);
-  // deck: a paver rectangle round the pool, plus a round fire-pit patio
-  float dDeck = min(sdBox(p - vec2(0., -1.6), vec2(uL * .5 + 6.5, uW * .5 + 7.6), 1.5), d - 5.);
-  dDeck = smin(dDeck, length(p - fireC()) - 6.2 * uFire + .02, 1.6);
+  // deck: one clean paver rectangle that grows to take the spa and the fire pit
+  float dDeck = deckD(p);
   vec3 pave = mix(deckCol(p, floor(uDeck)), deckCol(p, ceil(uDeck)), fract(uDeck));
   pave *= mix(.8, 1., smoothstep(-.7, -.5, dDeck));                    // soldier course edge
   col *= 1. - .3 * smoothstep(1.4, 0., dDeck) * step(0., dDeck);        // lawn contact shadow
@@ -75,8 +92,12 @@ void main(){
   float cush; float sh = 0.;
   sh = max(sh, smoothstep(fw * 3., -fw * 3., wallD(p + TL * 3.4)) * uWall);
   sh = max(sh, smoothstep(.15, -.15, chairD(p + TL * 1.1, cush)) * .8);
-  sh = max(sh, smoothstep(.4, -.4, length(p + TL * 7. - umbC()) - 2.9) * .7);
+  sh = max(sh, smoothstep(.4, -.4, length(p + TL * 4.2 - umbC()) - 2.9) * .55);
   sh = max(sh, smoothstep(.2, -.2, length(p + TL * .8 - fireC()) - 2.35) * uFire * .7);
+  float slat; if (uFire > .01) sh = max(sh, smoothstep(.15, -.15, adiD(p + TL * 1.2, slat)) * .75 * uFire);
+  sh = max(sh, smoothstep(.15, -.15, length(p + TL * 1.3 - tableC()) - .55) * .7);
+  for (int i = 0; i < 2; i++) sh = max(sh, smoothstep(.4, -.4, length(p + TL * 1.8 - potC(float(i))) - 1.5) * .6);
+  if (uSpa > .01) sh = max(sh, smoothstep(.2, -.2, spaD(p + TL * 1.1) - .55) * (1. - smoothstep(-.1, .1, -spaD(p) + .55)) * .5);
   col *= 1. - .48 * sh * day;
   // raised stone wall with three bronze scuppers
   float dw = wallD(p);
@@ -91,10 +112,31 @@ void main(){
     float bed = fr - 1.5 * uFire; vec3 rock = vec3(.09, .08, .075) * (.6 + .8 * vn(fq * 4.));
     ember = smoothstep(1.2, .2, fr) * smoothstep(.45, .8, vn(fq * 3. + vec2(0., -t * 1.6))) * (.35 + .65 * vn(vec2(t * 3., fr)));
     col = mix(col, rock, smoothstep(fw, -fw, bed)); }
-  // loungers
+  // loungers: teak frame with slats, cushion with seams, pillow, one with a striped towel
   float dc = chairD(p, cush);
-  col = mix(col, vec3(.36, .22, .14) * (.85 + .15 * step(.5, fract(p.y * 2.4))), smoothstep(fw, -fw, dc));
-  col = mix(col, vec3(.93, .91, .86) * (1. - .12 * smoothstep(-.4, 0., cush)), smoothstep(fw, -fw, cush));
+  vec3 teak = vec3(.42, .26, .15) * (.78 + .22 * step(.32, fract(p.y * 2.6))) * (.9 + .2 * vn(p * vec2(1., 9.)));
+  col = mix(col, teak, smoothstep(fw, -fw, dc));
+  for (int i = 0; i < 2; i++) { vec2 q = p - loungeC(float(i));
+    float seam = smoothstep(.05, 0., abs(q.y + 1.1)) + smoothstep(.05, 0., abs(q.y - 1.)) ;
+    float raised = smoothstep(-1.2, -2.9, q.y);                               // backrest tilted up to the sun
+    vec3 cu = vec3(.94, .92, .87) * (1. - .14 * smoothstep(-.35, 0., cush)) * (1. - .2 * seam) * (1. + .08 * raised);
+    if (i == 1) { float tw = sdBox(q - vec2(0., .6), vec2(.82, .95), .05); cu = mix(cu, mix(vec3(.12, .27, .5), vec3(.95), step(.5, fract(q.x * 2.2))), smoothstep(fw, -fw, tw)); }
+    col = mix(col, cu, smoothstep(fw, -fw, cush) * step(abs(p.x - loungeC(float(i)).x), 1.5));
+    float pil = sdBox(q - vec2(0., -2.45), vec2(.72, .38), .3);
+    col = mix(col, vec3(.98, .97, .94) * (1. - .15 * smoothstep(-.25, 0., pil)), smoothstep(fw, -fw, pil)); }
+  // side table with a drink
+  float tb = length(p - tableC()) - .55;
+  col = mix(col, teak * 1.1, smoothstep(fw, -fw, tb));
+  col = mix(col, vec3(.85, .93, .95), smoothstep(fw, -fw, length(p - tableC() - vec2(.15, .1)) - .16));
+  // Adirondack chairs round the fire pit
+  if (uFire > .01) { float ad = adiD(p, slat) + (1. - uFire) * 3.;
+    col = mix(col, vec3(.95, .94, .9) * (.86 + .14 * slat), smoothstep(fw, -fw, ad)); }
+  // planters at the back corners
+  for (int i = 0; i < 2; i++) { vec2 q = p - potC(float(i)); float pr = length(q);
+    col = mix(col, vec3(.2, .2, .21) * (.85 + .3 * smoothstep(1.5, 1.2, pr)), smoothstep(fw, -fw, pr - 1.5));
+    float leaf = fbm(q * 1.6 + float(i) * 9.); float fol = pr - 1.25 - .35 * (leaf - .5);
+    vec3 lc = vec3(.13, .3, .1) * (.6 + .9 * leaf) * (1. + .35 * dot(normalize(q + .001), TL) * smoothstep(0., 1.3, pr));
+    col = mix(col, lc, smoothstep(fw, -fw, fol)); }
   // coping (travertine bullnose) round pool and spa
   vec2 g = vec2(dFdx(d), dFdy(d)); vec2 en = length(g) > 0. ? normalize(g) : vec2(0.);
   vec3 cop = texture2D(tP, p / 3.).rgb * vec3(1.13, 1.08, 1.) * (.93 + .14 * dot(en, TL) * smoothstep(.0, .5, d));
@@ -130,7 +172,13 @@ void main(){
   if (uSpa > .01) { float bub = smoothstep(.75, .95, vn((p - spaC()) * 3. + vec2(0., t * 2.))) * inSpa;
     wat = mix(wat, vec3(.85, .97, 1.), bub * .35); }
   col = mix(col, wat, smoothstep(fw, -fw, d));
-  if (uSpa > .01) col = mix(col, cop * .95, smoothstep(fw, -fw, abs(sd) - .32));
+  if (uSpa > .01) { float wallR = abs(sd - .3) - .3;                       // raised spa wall
+    vec2 sq = p - spaC(); vec3 sw = texture2D(tS, p / 2.).rgb * .9 * (.9 + .2 * dot(normalize(sq), TL));
+    col = mix(col, mix(sw, cop, smoothstep(.12, .2, abs(sd - .3))), smoothstep(fw, -fw, wallR) * step(.2, uSpa));
+    // sheet of water spilling from the spa to the pool
+    float spill = step(abs(sq.y), .75) * smoothstep(-3.05, -3.2, sq.x) * step(-4.55, sq.x) * step(.9, uSpa);
+    float st = .6 + .4 * sin(sq.x * 14. + t * 12. + sq.y * 6.);
+    col = mix(col, mix(vec3(.55, .82, .92), vec3(.95, 1., 1.), st), spill * .9); }
   // water falling from the scuppers
   if (uWall > .01) for (int i = 0; i < 3; i++) { float x = (float(i) - 1.) * uL * .22; vec2 q = p - vec2(x, uW * .5 + .2);
     float sm = smoothstep(.32, .12, abs(q.x)) * smoothstep(1.4, 1.1, q.y) * smoothstep(-1.4, -.9, q.y);
@@ -138,9 +186,12 @@ void main(){
     col = mix(col, vec3(.9, .97, 1.), sm * fl * uWall * .85);
     col = mix(col, vec3(.28, .2, .14), smoothstep(fw, -fw, sdBox(p - vec2(x, uW * .5 + 1.55), vec2(.32, .22), .05)) * uWall); }
   // umbrella canopy over the loungers
-  vec2 uq = p - umbC(); float ud = length(uq) - 2.9; float ang = atan(uq.y, uq.x);
-  float pan = abs(fract(ang * 8. / 6.2831) - .5);
-  vec3 umb = vec3(.11, .25, .48) * (.82 + .3 * pan) * (1. + .25 * dot(normalize(uq + .001), TL) * smoothstep(0., 2.9, length(uq)));
+  vec2 uq = p - umbC(); float ur = length(uq), ang = atan(uq.y, uq.x);
+  float pan = abs(fract(ang * 8. / 6.2831) - .5);                         // 0 on a rib, .5 mid-panel
+  float ud = ur - 2.9 + .18 * (1. - pan * 2.) * (1. - pan * 2.);           // canopy sags between ribs
+  vec3 umb = vec3(.11, .25, .48) * (.8 + .35 * pan) * (1. + .28 * dot(normalize(uq + .001), TL) * smoothstep(0., 2.9, ur));
+  umb = mix(umb, umb * .7, smoothstep(.04, 0., pan) * smoothstep(.3, .6, ur));
+  umb = mix(umb, vec3(.92, .9, .85), smoothstep(.22, .17, ur));
   col = mix(col, umb, smoothstep(fw, -fw, ud));
   // light: dusk tint at night, then the glows
   vec3 nightTint = vec3(.13, .17, .3);
@@ -195,13 +246,14 @@ export function mountYard(canvas, opts = {}) {
   }
   function place() {
     const a = opts.area ? opts.area() : { x: 0, y: 0, w: view.w / view.dpr, h: view.h / view.dpr }, pad = opts.pad || [34, 30];
-    const s = held ? view.s : Math.min(a.w / (.6 * cur.L + pad[0]), a.h / (.6 * cur.W + pad[1]));
-    view.s = s; view.cx = a.x + a.w / 2 + (opts.shiftX || 0) * s; view.cy = a.y + a.h / 2 - 1.5 * s;   // css px, from top-left
+    const ext = 5.5 * cur.spa + 11.5 * cur.fire;
+    const s = held ? view.s : Math.min(a.w / (.6 * cur.L + pad[0] + ext * (a.w < 600 ? 1.5 : .8)), a.h / (.6 * cur.W + pad[1]), a.w / (cur.L + 15 + ext));
+    view.s = s; view.cx = a.x + a.w / 2 - (5.5 * cur.spa - 11.5 * cur.fire) / 2 * s; view.cy = a.y + a.h / 2 - 1.5 * s;   // css px, from top-left
     if (opts.grip) opts.grip.style.transform = `translate(${view.cx + cur.L * s / 2}px,${view.cy + cur.W * s / 2}px)`;
     if (opts.labels) {
       const { L, W } = opts.labels, k = s;
       L.style.cssText = `left:${view.cx - cur.L * k / 2}px;top:${view.cy + (cur.W / 2 + 9.6) * k}px;width:${cur.L * k}px`;
-      W.style.cssText = `left:${view.cx + (cur.L / 2 + 7.4) * k}px;top:${view.cy - cur.W * k / 2}px;height:${cur.W * k}px`;
+      W.style.cssText = `left:${view.cx + (cur.L / 2 + 7.6 + 5.5 * cur.spa) * k}px;top:${view.cy - cur.W * k / 2}px;height:${cur.W * k}px`;
     }
   }
   function draw() {

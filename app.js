@@ -65,7 +65,7 @@ grip.addEventListener('keydown', e => {
   if (!dl && !dw) return; e.preventDefault(); lenI.value = clampI(lenI, +lenI.value + dl); widI.value = clampI(widI, +widI.value + dw); updatePlan();
 });
 $('#heroSend').addEventListener('click', () => { readPlan(); openRequest('New pool', { kind: 'plan', text: planText() }); });
-import('./yard.js?v=2').then(({ mountYard }) => {
+import('./yard.js?v=3').then(({ mountYard }) => {
   const copy = $('.hero-copy');
   yard = mountYard(cv, { dpr: phone() ? 1.5 : 1.25, reduced, still: q.has('still'), labels: { L: $('#dimL'), W: $('#dimW') }, grip: $('#grip'),
     pad: phone() ? [18, 30] : [34, 30],

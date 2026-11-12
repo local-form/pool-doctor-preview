@@ -388,7 +388,9 @@ input[type=file]::file-selector-button{min-height:44px;padding:0 16px;border-rad
 
 /* heartbeat-to-wave dividers (the card's own line), with a monitor sweep running along them */
 .sec,.builders,.doors{position:relative}
-.pulse{position:absolute;left:0;right:0;top:0;height:54px;transform:translateY(-50%);z-index:4;pointer-events:none}
+.pulse{position:absolute;left:0;right:0;top:clamp(36px,4.5vw,64px);height:54px;transform:translateY(-50%);z-index:4;pointer-events:none}
+.builders>.pulse{top:clamp(30px,3.5vw,48px)}
+.doors{padding-top:clamp(72px,8vw,112px)!important}.doors>.pulse{top:clamp(36px,4vw,56px)}
 .pl{position:absolute;inset:0;display:flex;align-items:center;color:rgba(93,182,230,.42)}
 .light .pl,.light+.pulse .pl{color:rgba(29,93,181,.3)}
 .pl i{flex:var(--a);height:2.2px;background:currentColor;transform:translateY(5.4px)}
@@ -422,7 +424,7 @@ input[type=file]::file-selector-button{min-height:44px;padding:0 16px;border-rad
   .part-line{font-size:14px;margin:10px 0 16px;min-height:0}
   .sym{grid-template-columns:1fr}
   .sym button{min-height:48px}
-  .pulse{height:40px}.pl i{height:1.8px;transform:translateY(4px)}
+  .pulse{height:40px;top:36px}.builders>.pulse{top:30px}.doors>.pulse{top:36px}.pl i{height:1.8px;transform:translateY(4px)}
   .look{gap:10px}
   .chips.sw button{min-height:54px;font-size:11px}
 }
@@ -434,5 +436,4 @@ input[type=file]::file-selector-button{min-height:44px;padding:0 16px;border-rad
   .chips.tiles button{min-height:48px;gap:3px}.chips.sw button{min-height:46px;gap:4px}.chips.sw button i{width:20px;height:20px}
   .actions .btn{min-height:48px}
 }
-.doors>.pulse{transform:translateY(-6px)}
 @media(max-width:860px){.dim-w{display:none}}
