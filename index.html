@@ -4,486 +4,298 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Pool Doctor · pool care, repair and new pools · Example site by Local Form</title>
-<meta name="description" content="Pool Doctor is a fictional pool company: an example site by Local Form. Diagnose a pool problem, see an example price range and book a simulated visit.">
-<meta name="theme-color" content="#061A22">
-<meta property="og:title" content="Pool Doctor · an example site by Local Form">
-<meta property="og:description" content="Drag the water from green to clear, diagnose a pool problem and book a simulated visit. A fictional company.">
-<meta property="og:image" content="https://preview.localform.online/pool-doctor-preview/og.jpg?v=1">
-<meta property="og:url" content="https://preview.localform.online/pool-doctor-preview/">
+<title>The Pool Doctor · New pools, renovations and repairs in Charleston, SC</title>
+<meta name="description" content="Joe Penna, licensed SC swimming pool contractor. New pool builds, renovations and repairs across Charleston, Sullivan's Island, Isle of Palms, James Island and Summerville.">
+<meta name="theme-color" content="#06111B">
+<meta property="og:title" content="The Pool Doctor · Charleston, SC">
+<meta property="og:description" content="New pools, built by the doctor. Plan yours, or describe a problem and Joe points you the right way.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://preview.localform.online/pool-doctor-preview/">
+<meta property="og:image" content="https://preview.localform.online/pool-doctor-preview/og.jpg">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="preload" href="fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/geist-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=15">
-<script type="module" src="app.js?v=15"></script>
+<link rel="preload" href="fonts/montserrat-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css?v=2">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"HomeAndConstructionBusiness","name":"The Pool Doctor","telephone":"+1-843-737-3165","email":"thepooldoc@yahoo.com","founder":{"@type":"Person","name":"Joseph Penna"},"areaServed":["Charleston, SC","Sullivan's Island, SC","Isle of Palms, SC","James Island, SC","Summerville, SC"],"openingHours":"Mo-Fr 07:00-19:00","sameAs":["https://www.instagram.com/the_pooldoctor/"]}</script>
 </head>
 <body>
-<a class="skip" href="#diagnose">Skip to the Health Check</a>
-<div class="sr-only" id="sr" aria-live="polite" aria-atomic="true"></div>
-
-<header class="top" id="topbar">
-  <a class="brand" href="#top" aria-label="Pool Doctor, back to top">
-    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><defs><clipPath id="mk"><circle cx="16" cy="16" r="14.5"/></clipPath></defs><circle cx="16" cy="16" r="14.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path clip-path="url(#mk)" d="M0 17c4-3.2 8-3.2 12 0s8 3.2 12 0 6-2.6 8-1.4V32H0Z" fill="currentColor" opacity=".9"/></svg>
-    <span class="word">Pool Doctor</span>
-  </a>
-  <nav class="nav" id="nav" aria-label="Sections">
-    <a href="#diagnose">Diagnose</a><a href="#care">Care</a><a href="#repair">Repairs</a><a href="#build">Build</a><a href="#design">Design</a><a href="#area">Area</a>
-  </nav>
-  <a class="btn btn--solid btn--sm book-top" href="#book">Book</a>
-  <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menu"><span></span><span></span></button>
+<a class="skip" href="#main">Skip to content</a>
+<div class="pv">Concept preview by <a href="https://localform.online">Local Form</a></div>
+<header class="top" id="top">
+  <a class="brand" href="#main" aria-label="The Pool Doctor, home"><span class="disc"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg></span><span class="word"><b>The<br>Pool<br>Doctor</b><small>Swimming pool service &amp; repair</small></span></a>
+  <nav class="nav" aria-label="Sections"><a href="#build">New pools</a><a href="#renovate">Renovations</a><a href="#repair">Repairs</a><a href="#builders">Builders</a><a href="#reviews">Reviews</a></nav>
+  <a class="call" href="tel:+18437373165"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-phone"/></svg><span>(843) 737-3165</span><b class="sr">Call Joe</b></a>
 </header>
 
-<main>
-<!-- ============ HERO ============ -->
-<section class="hero" id="top" aria-label="Pool Doctor: before and after">
-  <img class="hero-poster" id="hero-poster" src="hero-poster.webp" alt="" fetchpriority="high" width="1600" height="1000">
-  <canvas class="hero-canvas" id="water" aria-hidden="true"></canvas>
-  <div class="hero-shade" aria-hidden="true"></div>
-  <div class="hero-tags mono" aria-hidden="true"><span>Before · day 1</span><span>After · day 3</span></div>
-  <div class="split" id="split" role="slider" tabindex="0" aria-label="Water treatment, before and after" aria-valuemin="0" aria-valuemax="100" aria-valuenow="55" aria-valuetext="55% treated">
-    <span class="knob" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span>
-  </div>
+<main id="main">
+<section class="hero" aria-labelledby="hero-h">
+  <canvas id="pool" aria-hidden="true"></canvas>
+  <picture><source media="(max-width: 860px)" srcset="hero-poster-m.webp"><img class="hero-poster" id="poster" src="hero-poster.webp" alt="" aria-hidden="true" fetchpriority="high"></picture>
+  <div class="shade" aria-hidden="true"></div>
   <div class="hero-copy">
-    <p class="eyebrow mono">Essex County, NJ<span class="ex"> · Example site<span class="by"> by Local Form</span></span></p>
-    <h1 class="reveal-lines"><span class="ln"><span>Green on Friday.</span></span><span class="ln"><span><em>Swimming</em> by Monday.</span></span></h1>
-    <p class="hero-desc">Pool cleaning, repairs and weekly care in Essex County, NJ.</p>
-    <p class="season-note mono" id="season-line"></p>
+    <p class="eyebrow"><i></i><span>Charleston, SC &middot; Licensed SC pool contractor</span></p>
+    <h1 id="hero-h">New pools, built by <em>the doctor.</em></h1>
+    <p class="lede">Joe has spent ten years fixing Charleston's pools, other builders' problem builds included. That's who should build yours.</p>
     <div class="actions">
-      <a class="btn btn--light" href="#diagnose" id="hero-diagnose">Diagnose my pool</a>
-      <a class="btn btn--outline-light" href="#book">Book a visit</a>
+      <a class="btn btn-p" href="#plan">Plan my pool<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      <a class="btn btn-s" href="#repair">Something's wrong with my pool</a>
     </div>
   </div>
-  <p class="hero-read mono" aria-hidden="true"><span>pH 7.4</span><span>Cl 2.0 ppm</span><span>Clear</span></p>
-  <button type="button" class="night-btn mono" id="night-btn" aria-pressed="false" hidden><span class="nb-dot" aria-hidden="true"></span><span id="night-label">Pool lights</span></button>
-  <p class="hero-note mono" id="water-note" hidden>Still image · live water needs WebGL</p>
-  <p class="hero-credit mono">Fictional company · example site by Local Form</p>
+  <div class="build-scrub">
+    <p class="mono"><span>Drag to build it</span><button type="button" class="play" id="play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>Watch it build</button><b id="stName" aria-live="polite"></b></p>
+    <div class="ekg" id="ekg">
+      <svg viewBox="0 0 700 64" preserveAspectRatio="none" aria-hidden="true"><path id="ekgBase" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="2" vector-effect="non-scaling-stroke"/><path id="ekgDone" fill="none" stroke="#5DB6E6" stroke-width="3" vector-effect="non-scaling-stroke"/></svg>
+      <div class="knob" id="knob" role="slider" tabindex="0" aria-label="Build stage" aria-valuemin="1" aria-valuemax="7" aria-valuenow="7" aria-valuetext="Lights on"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg></div>
+    </div>
+    <div class="stops mono" id="stops"><span>Stakes</span><span>Dig</span><span>Steel</span><span>Shell</span><span>Stone</span><span>Water</span><span>Lights</span></div>
+  </div>
 </section>
 
-<!-- ============ TWO PATHS ============ -->
-<nav class="paths" id="paths" aria-label="Where to start">
-  <div class="wrap paths-in">
-    <a class="path" href="#diagnose"><span class="mono label">I have a pool</span><strong>Care for my pool</strong><span class="path-links">Health Check · Care plans · Repairs · Book a visit</span></a>
-    <a class="path" href="#build"><span class="mono label">I want a pool</span><strong>Build a new pool</strong><span class="path-links">How it’s built · Design &amp; price · Free consult</span></a>
+<section class="doors" aria-label="What do you need?">
+  <svg class="pulse-edge" viewBox="-180 -4 513 77" aria-hidden="true"><path class="linep" d="M325.30 43.59C323.62 44.92 322.17 46.07 319.12 46.07C316.08 46.07 314.63 44.92 312.95 43.59C311.16 42.17 309.14 40.57 305.24 40.57C301.34 40.57 299.32 42.17 297.53 43.59C295.85 44.92 294.40 46.07 291.36 46.07C288.32 46.07 286.87 44.92 285.19 43.59C283.40 42.17 281.37 40.57 277.48 40.57C273.58 40.57 271.55 42.17 269.77 43.59C268.09 44.92 266.64 46.07 263.60 46.07C260.55 46.07 259.10 44.92 257.42 43.59C255.64 42.17 253.62 40.57 249.73 40.57L249.73 40.56C247.53 40.56 245.44 39.54 244.00 37.76C242.54 35.96 241.91 33.64 242.24 31.25C242.76 27.46 245.76 24.58 249.38 24.41C253.94 24.19 256.11 28.77 257.03 31.68C257.23 32.34 257.90 32.73 258.57 32.61C259.32 32.47 259.81 31.76 259.67 31.02C259.29 28.97 258.18 24.87 255.14 20.89C250.12 14.30 241.37 11.48 233.37 13.86C226.48 15.92 221.81 21.38 220.89 28.46C219.77 37.02 215.64 40.83 207.50 40.83C204.14 40.83 201.05 39.03 199.23 36.01C198.71 35.15 197.84 34.63 196.88 34.63L196.88 34.63C195.93 34.63 195.05 35.15 194.54 36.01C192.72 39.03 189.63 40.83 186.27 40.83C182.91 40.83 179.82 39.03 178.00 36.01C177.49 35.15 176.61 34.63 175.66 34.63C174.70 34.63 173.82 35.15 173.31 36.01C171.67 38.73 168.99 40.47 166.01 40.78L166.01 40.77C162.99 40.77 161.43 41.87 160.04 42.85C158.81 43.72 157.74 44.47 155.51 44.47C153.28 44.47 152.21 43.72 150.98 42.85C149.60 41.87 148.03 40.77 145.01 40.77C142.00 40.77 140.43 41.87 139.05 42.85C137.81 43.72 136.75 44.47 134.51 44.47C132.28 44.47 131.22 43.72 129.98 42.85C128.60 41.87 127.03 40.77 124.02 40.77C121.00 40.77 119.43 41.87 118.05 42.85C116.82 43.72 115.75 44.47 113.52 44.47C111.29 44.47 110.22 43.72 108.99 42.85C107.61 41.87 106.04 40.77 103.02 40.77C100.01 40.77 98.44 41.87 97.06 42.85C95.82 43.72 94.76 44.47 92.53 44.47C90.29 44.47 89.23 43.72 87.99 42.85C86.72 41.95 85.29 40.94 82.72 40.79C82.66 40.78 82.60 40.78 82.54 40.78L82.41 40.78C82.28 40.77 82.16 40.77 82.03 40.77L82.03 40.78L73.98 40.78L71.39 36.98C71.12 36.58 70.67 36.37 70.20 36.42C69.74 36.47 69.34 36.78 69.15 37.23L65.96 44.78L61.12 31.45C60.92 30.88 60.38 30.52 59.80 30.57C59.22 30.62 58.75 31.07 58.63 31.67L57.08 39.57L54.97 39.57C54.36 39.57 53.84 40.01 53.70 40.64L49.82 58.35L45.19 1.29C45.13 0.59 44.58 0.04 43.92 0.02C43.26 0.00 42.69 0.51 42.59 1.21L37.14 41.95L33.51 34.04C33.29 33.56 32.84 33.26 32.35 33.26C32.35 33.26 32.34 33.26 32.33 33.26C31.85 33.26 31.40 33.54 31.18 34.01L27.87 40.78L17.06 40.78L8.50 40.78L5.91 36.98C5.64 36.58 5.19 36.37 4.72 36.42C4.26 36.47 3.86 36.78 3.67 37.23L0.48 44.78L-4.36 31.45C-4.57 30.88 -5.11 30.52 -5.68 30.57C-6.26 30.62 -6.74 31.07 -6.85 31.67L-8.41 39.57L-10.51 39.57C-11.12 39.57 -11.65 40.01 -11.78 40.64L-15.67 58.35L-20.30 1.29C-20.35 0.59 -20.90 0.04 -21.56 0.02C-22.23 0.00 -22.80 0.51 -22.89 1.21L-28.34 41.95L-31.97 34.04C-32.19 33.56 -32.64 33.26 -33.13 33.26C-33.62 33.25 -34.08 33.54 -34.31 34.01L-37.61 40.78L-48.42 40.78L-56.98 40.78L-59.57 36.98C-59.84 36.58 -60.30 36.37 -60.76 36.42C-61.22 36.47 -61.62 36.78 -61.82 37.23L-65.00 44.78L-69.84 31.45C-70.05 30.88 -70.59 30.52 -71.16 30.57C-71.74 30.62 -72.22 31.07 -72.34 31.67L-73.89 39.57L-75.99 39.57C-76.60 39.57 -77.13 40.01 -77.27 40.64L-81.15 58.35L-85.78 1.29C-85.84 0.59 -86.38 0.04 -87.04 0.02C-87.71 0.00 -88.28 0.51 -88.37 1.21L-93.83 41.95L-97.46 34.04C-97.67 33.56 -98.12 33.26 -98.61 33.26C-99.11 33.25 -99.56 33.54 -99.79 34.01L-103.09 40.78L-113.91 40.78L-122.46 40.78L-125.05 36.98C-125.33 36.58 -125.78 36.37 -126.24 36.42C-126.70 36.47 -127.11 36.78 -127.30 37.23L-130.49 44.78L-135.32 31.45C-135.53 30.88 -136.07 30.52 -136.65 30.57C-137.22 30.62 -137.70 31.07 -137.82 31.67L-139.37 39.57L-141.48 39.57C-142.08 39.57 -142.61 40.01 -142.75 40.64L-146.63 58.35L-151.26 1.29C-151.32 0.59 -151.86 0.04 -152.52 0.02C-153.19 0.00 -153.76 0.51 -153.85 1.21L-159.31 41.95L-162.94 34.04C-163.15 33.56 -163.60 33.26 -164.09 33.26C-164.10 33.26 -164.11 33.26 -164.11 33.26C-164.60 33.26 -165.04 33.54 -165.27 34.01L-168.57 40.78L-179.39 40.78C-180.11 40.78 -180.69 41.40 -180.69 42.17C-180.69 42.94 -180.11 43.56 -179.39 43.56L-167.78 43.56C-167.29 43.56 -166.85 43.27 -166.62 42.81L-164.15 37.74L-159.79 47.24C-159.54 47.79 -158.98 48.10 -158.41 48.00C-157.85 47.90 -157.40 47.43 -157.32 46.82L-152.88 13.64L-148.53 67.29C-148.47 67.97 -147.96 68.51 -147.32 68.56C-147.29 68.56 -147.26 68.56 -147.22 68.56C-146.62 68.56 -146.09 68.12 -145.95 67.49L-140.44 42.35L-138.31 42.35C-137.69 42.35 -137.16 41.89 -137.03 41.25L-136.17 36.84L-131.80 48.89C-131.61 49.41 -131.14 49.77 -130.61 49.78C-130.09 49.80 -129.60 49.47 -129.39 48.96L-125.84 40.56L-124.18 42.99C-123.94 43.35 -123.54 43.56 -123.13 43.56L-113.91 43.56L-102.30 43.56C-101.81 43.56 -101.36 43.27 -101.14 42.81L-98.66 37.74L-94.31 47.24C-94.05 47.79 -93.50 48.10 -92.93 48.00C-92.36 47.90 -91.92 47.43 -91.84 46.82L-87.40 13.64L-83.04 67.29C-82.99 67.97 -82.48 68.51 -81.84 68.56C-81.81 68.56 -81.77 68.56 -81.74 68.56C-81.14 68.56 -80.61 68.12 -80.47 67.49L-74.96 42.35L-72.83 42.35C-72.21 42.35 -71.68 41.89 -71.55 41.25L-70.68 36.84L-66.31 48.89C-66.12 49.41 -65.66 49.77 -65.13 49.78C-64.60 49.80 -64.12 49.47 -63.91 48.96L-60.36 40.56L-58.70 42.99C-58.45 43.35 -58.06 43.56 -57.64 43.56L-48.42 43.56L-36.82 43.56C-36.33 43.56 -35.88 43.27 -35.66 42.81L-33.18 37.74L-28.82 47.24C-28.57 47.79 -28.01 48.10 -27.45 48.00C-26.88 47.90 -26.44 47.43 -26.36 46.82L-21.92 13.64L-17.56 67.29C-17.51 67.97 -17.00 68.51 -16.35 68.56C-16.32 68.56 -16.29 68.56 -16.26 68.56C-15.66 68.56 -15.13 68.12 -14.99 67.49L-9.48 42.35L-7.35 42.35C-6.73 42.35 -6.19 41.89 -6.07 41.25L-5.20 36.84L-0.83 48.89C-0.64 49.41 -0.18 49.77 0.35 49.78C0.88 49.80 1.36 49.47 1.58 48.96L5.12 40.56L6.78 42.99C7.03 43.35 7.42 43.56 7.84 43.56L17.06 43.56L28.67 43.56C29.15 43.56 29.60 43.27 29.82 42.81L32.30 37.74L36.66 47.24C36.91 47.79 37.47 48.10 38.03 48.00C38.60 47.90 39.04 47.43 39.12 46.82L43.57 13.64L47.92 67.29C47.98 67.97 48.49 68.51 49.13 68.56C49.16 68.56 49.19 68.56 49.22 68.56C49.82 68.56 50.35 68.12 50.49 67.49L56.00 42.35L58.14 42.35C58.75 42.35 59.29 41.89 59.41 41.25L60.28 36.84L64.65 48.89C64.84 49.41 65.31 49.77 65.83 49.78C66.36 49.80 66.84 49.47 67.06 48.96L70.61 40.56L72.26 42.99C72.51 43.35 72.90 43.56 73.32 43.56L82.54 43.56C82.55 43.56 82.56 43.56 82.57 43.56C84.44 43.67 85.43 44.37 86.56 45.16C87.94 46.14 89.51 47.24 92.53 47.24C95.54 47.24 97.11 46.14 98.49 45.16C99.72 44.29 100.79 43.54 103.02 43.54C105.26 43.54 106.32 44.29 107.55 45.16C108.94 46.14 110.51 47.24 113.52 47.24C116.54 47.24 118.10 46.14 119.49 45.16C120.72 44.29 121.78 43.54 124.02 43.54C126.25 43.54 127.32 44.29 128.55 45.16C129.93 46.14 131.50 47.24 134.51 47.24C137.53 47.24 139.10 46.14 140.48 45.16C141.71 44.29 142.78 43.54 145.01 43.54C147.25 43.54 148.31 44.29 149.54 45.16C150.93 46.14 152.50 47.24 155.51 47.24C158.53 47.24 160.09 46.14 161.48 45.16C162.71 44.29 163.77 43.54 166.01 43.54L166.01 43.52C169.86 43.20 173.35 41.00 175.46 37.48C175.51 37.40 175.57 37.37 175.66 37.36C175.74 37.36 175.80 37.40 175.85 37.48C178.14 41.29 182.03 43.56 186.27 43.56C190.50 43.56 194.40 41.29 196.69 37.48C196.74 37.40 196.80 37.36 196.88 37.36C196.97 37.37 197.03 37.40 197.08 37.48C199.37 41.29 203.26 43.56 207.50 43.56C216.92 43.56 222.13 38.74 223.42 28.84C224.20 22.86 228.18 18.25 234.06 16.49C240.99 14.43 248.53 16.78 252.95 22.35C251.81 21.85 250.57 21.62 249.26 21.68C244.43 21.92 240.41 25.77 239.71 30.85C239.28 34.00 240.14 37.17 242.06 39.54C243.99 41.92 246.77 43.28 249.71 43.29L249.71 43.32C252.76 43.32 254.21 44.47 255.89 45.80C257.67 47.22 259.70 48.82 263.60 48.82C267.49 48.82 269.52 47.22 271.31 45.80C272.98 44.47 274.43 43.32 277.48 43.32C280.52 43.32 281.97 44.47 283.65 45.80C285.44 47.22 287.46 48.82 291.36 48.82C295.26 48.82 297.28 47.22 299.07 45.80C300.75 44.47 302.20 43.32 305.24 43.32C308.28 43.32 309.73 44.47 311.41 45.80C313.20 47.22 315.23 48.82 319.12 48.82C323.02 48.82 325.05 47.22 326.83 45.80C328.51 44.47 329.96 43.32 333.01 43.32L333.01 40.57C329.11 40.57 327.08 42.17 325.30 43.59M234.01 24.44C237.41 20.99 242.71 21.33 242.76 21.33L242.94 18.61C242.68 18.59 236.50 18.16 232.26 22.45C229.68 25.06 228.41 28.80 228.50 33.56C228.60 39.16 225.80 43.01 220.17 44.99L220.98 47.59C227.70 45.21 231.18 40.35 231.06 33.51C230.99 29.56 231.98 26.51 234.01 24.44M236.58 34.87L234.06 34.39C232.89 41.40 238.51 45.88 238.75 46.07L240.26 43.87C240.07 43.72 235.69 40.19 236.58 34.87"/></svg>
+  <div class="wrap doors-grid">
+    <a class="door" href="#plan" data-reveal><span class="mono">01</span><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-build"/></svg><b>Build a new pool</b><span>Plan it here, then Joe walks your yard.</span><i aria-hidden="true">&rarr;</i></a>
+    <a class="door" href="#renovate" data-reveal><span class="mono">02</span><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-reno"/></svg><b>Renovate</b><span>Plaster, liners, coping, pavers and decks.</span><i aria-hidden="true">&rarr;</i></a>
+    <a class="door" href="#repair" data-reveal><span class="mono">03</span><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-fix"/></svg><b>Fix a problem</b><span>Pumps, filters, heaters, salt cells, leaks.</span><i aria-hidden="true">&rarr;</i></a>
   </div>
-</nav>
+</section>
 
-<!-- ============ 01 DIAGNOSE ============ -->
-<section class="sec sec--bone" id="diagnose" aria-labelledby="diagnose-h">
+<section class="sec light" id="build" aria-labelledby="build-h">
   <div class="wrap">
     <header class="sec-head">
-      <p class="marker mono">01 — Diagnose</p>
-      <h2 id="diagnose-h" data-reveal>The Pool Health <em>Check</em>.</h2>
-      <p class="lede" data-reveal>Tap what you see. Add readings if you have a test kit. You get a likely cause, whether it’s safe to swim, an example price and how soon we’d come.</p>
-      <span class="waterline" aria-hidden="true"></span>
+      <p class="marker mono" data-reveal><span>01</span>The build</p>
+      <h2 id="build-h" data-reveal>Stake to swim, one of Joe's own.</h2>
+      <p class="lede" data-reveal>This is a pool Joe built, photographed as it went. Tap through it: every step happens in your yard too.</p>
     </header>
-    <div class="diag">
-      <div class="diag-in">
-        <fieldset class="field">
-          <legend class="mono label">What do you see?</legend>
-          <div class="sym-grid" id="symptoms"></div>
-        </fieldset>
-        <fieldset class="field readings">
-          <legend class="mono label">Readings <span class="opt">optional</span></legend>
-          <div class="reading">
-            <label for="r-ph">pH</label>
-            <input id="r-ph" type="number" inputmode="decimal" step="0.1" min="6" max="9" placeholder="7.4" autocomplete="off">
-            <div class="gauge" id="g-ph" aria-hidden="true"></div>
-            <p class="fine mono" id="g-ph-t">Healthy 7.2–7.8</p>
-          </div>
-          <div class="reading">
-            <label for="r-cl">Free chlorine, ppm</label>
-            <input id="r-cl" type="number" inputmode="decimal" step="0.1" min="0" max="10" placeholder="2.0" autocomplete="off">
-            <div class="gauge" id="g-cl" aria-hidden="true"></div>
-            <p class="fine mono" id="g-cl-t">Healthy 1–3 ppm</p>
-          </div>
-        </fieldset>
-        <figure class="photo diag-photo" data-reveal><img src="img/hand-water-sm.webp" srcset="img/hand-water-sm.webp 800w, img/hand-water-lg.webp 1600w" sizes="(min-width: 1000px) 46vw, 90vw" alt="A hand reaching into green-tinged pool water at the edge" loading="lazy" width="800" height="533"><figcaption class="mono">Example photography</figcaption></figure>
+    <div class="story" data-reveal>
+      <div class="story-media">
+        <img id="storyImg" src="img/b1-stakes-lg.webp" srcset="img/b1-stakes-sm.webp 600w, img/b1-stakes-lg.webp 1000w" sizes="(max-width: 860px) 100vw, 56vw" alt="The backyard lawn marked out with wooden stakes" width="1000" height="1000">
+        <span class="story-count mono" id="storyCount">01 / 07</span>
       </div>
-      <a class="see-report btn btn--solid" id="see-report" href="#report" hidden>See your report <span class="mono" id="see-report-r"></span></a>
-      <article class="report" id="report" aria-labelledby="report-h" tabindex="-1">
-        <p class="report-top mono"><span>Report</span><span id="report-date"></span></p>
-        <div id="report-body"></div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 02 WATER LAB ============ -->
-<section class="sec sec--deep" id="lab" aria-labelledby="lab-h">
-  <div class="wrap lab">
-    <header class="sec-head">
-      <p class="marker mono">02 — The water lab</p>
-      <h2 id="lab-h" data-reveal>Three numbers decide the <em>colour</em>.</h2>
-      <p class="lede" data-reveal>An illustration, not a test: pH, chlorine and temperature are three of the readings a technician takes on site. Move them and watch the water react.</p>
-    </header>
-    <div class="lab-grid">
-      <figure class="lab-view">
-        <canvas id="lab-canvas" aria-hidden="true"></canvas>
-        <svg class="lab-fallback" id="lab-fallback" viewBox="0 0 400 300" aria-hidden="true" hidden><rect width="400" height="300" id="lab-fb-water" fill="#2E8FA8"/><path d="M0 60h400M0 120h400M0 180h400M0 240h400" stroke="#ffffff22"/><circle cx="200" cy="150" r="60" fill="none" stroke="#F3EFE7" stroke-dasharray="2 6"/></svg>
-        <figcaption class="mono"><span id="lab-verdict" aria-live="polite">Balanced</span><span id="lab-read">pH 7.4 · Cl 2.0 ppm · 80°F</span></figcaption>
-        <p class="fine">Simulation for illustration. It doesn’t replace a water test.</p>
-      </figure>
-      <div class="lab-ctl">
-        <div class="slider"><label for="l-ph"><span>pH</span><output id="l-ph-o" class="mono">7.4</output></label><input type="range" id="l-ph" min="6.8" max="8.2" step="0.1" value="7.4"><p class="fine mono">Healthy 7.2–7.8</p></div>
-        <div class="slider"><label for="l-cl"><span>Free chlorine</span><output id="l-cl-o" class="mono">2.0 ppm</output></label><input type="range" id="l-cl" min="0" max="6" step="0.1" value="2"><p class="fine mono">Healthy 1–3 ppm</p></div>
-        <div class="slider"><label for="l-t"><span>Water temperature</span><output id="l-t-o" class="mono">80°F</output></label><input type="range" id="l-t" min="60" max="95" step="1" value="80"><p class="fine mono">Algae grows faster above 85°F</p></div>
-        <p class="lab-say" id="lab-say">Clear water, comfortable on eyes. Chlorine has room to work.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 03 CARE ============ -->
-<section class="sec sec--bone sec--tight" id="care" aria-labelledby="care-h">
-  <div class="wrap">
-    <header class="sec-head sec-head--split">
-      <div>
-        <p class="marker mono">03 — Care</p>
-        <h2 id="care-h" data-reveal>Weekly care, written down.</h2>
-      </div>
-      <div>
-        <p class="lede" data-reveal>Every visit follows the same checklist, ticked off on site. Monthly example prices.</p>
-        <div class="seg" role="radiogroup" aria-label="Visit frequency" id="freq">
-          <label><input type="radio" name="freq" value="weekly" checked><span>Weekly</span></label>
-          <label><input type="radio" name="freq" value="biweekly"><span>Every other week</span></label>
-        </div>
-      </div>
-    </header>
-    <div class="tiers" id="tiers"></div>
-    <div class="care-photos">
-      <figure class="photo" data-reveal><img src="img/coping-sm.webp" srcset="img/coping-sm.webp 600w, img/coping-lg.webp 1200w" sizes="(min-width: 900px) 30vw, 90vw" alt="A clean stone pool edge meeting pale blue water" loading="lazy" width="600" height="750"><figcaption class="mono">Example photography</figcaption></figure>
-      <figure class="photo photo--wide" data-reveal><img src="img/steps-shadow-sm.webp" srcset="img/steps-shadow-sm.webp 800w, img/steps-shadow-lg.webp 1600w" sizes="(min-width: 900px) 60vw, 90vw" alt="Pool steps in clear water with a crisp afternoon shadow" loading="lazy" width="800" height="533"><figcaption class="mono">Example photography</figcaption></figure>
-    </div>
-    <aside class="season-card" id="season-card" aria-labelledby="season-h">
-      <figure class="photo"><img src="img/leaves-sm.webp" srcset="img/leaves-sm.webp 600w, img/leaves-lg.webp 1200w" sizes="(min-width: 900px) 24vw, 90vw" alt="Autumn leaves floating on dark water" loading="lazy" width="600" height="750"><figcaption class="mono">Example photography</figcaption></figure>
-      <div>
-        <p class="mono label" id="season-tag">Closing season</p>
-        <h3 id="season-h">Openings and closings</h3>
-        <p id="season-copy">A closing before the first frost: water lowered, lines blown out, heater winterized, cover fitted. Example range $250–$450, included in Worry-free.</p>
-        <button class="btn btn--line" type="button" id="season-book">Book a closing</button>
-      </div>
-    </aside>
-  </div>
-</section>
-
-<!-- ============ 04 REPAIR ============ -->
-<section class="sec sec--deep" id="repair" aria-labelledby="repair-h">
-  <div class="wrap">
-    <header class="sec-head">
-      <p class="marker mono">04 — Repair</p>
-      <h2 id="repair-h" data-reveal>Find the part that needs <em>repair</em>.</h2>
-      <p class="lede" data-reveal>Tap a part of a typical equipment pad to see how it usually fails, what that sounds like, and an example repair range.</p>
-    </header>
-    <div class="pad">
-      <div class="pad-view" id="pad-view">
-        <canvas id="pad-canvas" aria-hidden="true"></canvas>
-        <div class="pad-hot" id="pad-hot"></div>
-        <div class="pad-svg" id="pad-svg" hidden></div>
-        <p class="pad-note mono" id="pad-note">3D pad loading…</p>
-      </div>
-      <div class="pad-side">
-        <div class="part-list" id="part-list" role="group" aria-label="Equipment parts"></div>
-        <article class="part" id="part" aria-live="polite"></article>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 05 BUILD ============ -->
-<section class="sec sec--stone sec--story" id="build" aria-labelledby="build-h">
-  <div class="wrap">
-    <header class="sec-head">
-      <p class="marker mono">05 — Build</p>
-      <h2 id="build-h" data-reveal>Dirt to <em>dive</em>, in six stages.</h2>
-      <p class="lede" data-reveal>Pick a stage to watch it built. An example timeline for a gunite pool: about six weeks, give or take permits and weather.</p>
-      <span class="waterline" aria-hidden="true"></span>
-    </header>
-    <div class="bwrap" id="btrack">
-      <div class="bvis">
-        <p class="bday mono"><span id="b-day">Day 01 of 42</span><a href="#design" class="b-yours" id="b-yours">Your design: 32 × 16 ft rectangle · sport</a></p>
-        <svg viewBox="0 0 1000 520" class="bsvg" role="img" aria-labelledby="b-stage">
-          <defs>
-            <pattern id="rebar" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M0 11h22M11 0v22" stroke="#5D6B72" stroke-width="2"/></pattern>
-            <pattern id="soil" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#7F5A41"/><circle cx="7" cy="9" r="1.4" fill="#6B4934"/><circle cx="27" cy="23" r="1.1" fill="#94705A"/><circle cx="17" cy="33" r="1.6" fill="#6B4934"/><circle cx="35" cy="6" r=".9" fill="#94705A"/></pattern>
-            <pattern id="crete" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#B4AFA5"/><circle cx="3" cy="4" r=".8" fill="#9C978D"/><circle cx="9" cy="9" r=".6" fill="#C9C4BA"/></pattern>
-            <pattern id="tiles" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#0F5A73"/><path d="M0 0h14v14" fill="none" stroke="#ffffff40"/></pattern>
-            <linearGradient id="wat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FD3E0"/><stop offset="1" stop-color="#0F6E8C"/></linearGradient>
-            <linearGradient id="strata" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>
-            <clipPath id="hole"><path d="M150 200 L850 200 L850 300 Q850 330 820 345 L640 420 Q600 440 560 440 L190 440 Q150 440 150 400 Z"/></clipPath>
-          </defs>
-          <rect x="0" y="200" width="1000" height="320" fill="url(#soil)"/>
-          <rect x="0" y="200" width="1000" height="320" fill="url(#strata)"/>
-          <path d="M0 290h1000M0 380h1000" stroke="#00000018"/>
-          <path d="M0 199h1000" stroke="#55703F" stroke-width="6"/>
-          <path id="b-hole" fill="#3A2618"/>
-          <path id="b-pile" fill="#6B4934"/>
-          <g id="b-steel" clip-path="url(#hole)"><path d="M150 200 L850 200 L850 300 Q850 330 820 345 L640 420 Q600 440 560 440 L190 440 Q150 440 150 400 Z" fill="url(#rebar)"/></g>
-          <g id="b-stamp" transform="translate(600 300) rotate(-6)"><rect x="-118" y="-26" width="236" height="52" fill="none" stroke="#E3A048" stroke-width="2"/><text text-anchor="middle" y="6" font-family="Geist Mono, monospace" font-size="16" letter-spacing="2" fill="#E3A048">STEEL INSPECTED</text></g>
-          <path id="b-shell" d="M150 200 L850 200 L850 300 Q850 330 820 345 L640 420 Q600 440 560 440 L190 440 Q150 440 150 400 Z" fill="none" stroke="url(#crete)" stroke-width="28"/>
-          <path id="b-plaster" d="M150 200 L850 200 L850 300 Q850 330 820 345 L640 420 Q600 440 560 440 L190 440 Q150 440 150 400 Z" fill="#F1F2EE" stroke="#E2E4DE" stroke-width="2"/>
-          <rect id="b-tile" x="150" y="200" width="700" height="16" fill="url(#tiles)"/>
-          <g id="b-coping"><rect x="112" y="186" width="54" height="16" rx="2" fill="#D9D2C4"/><rect x="834" y="186" width="54" height="16" rx="2" fill="#D9D2C4"/><path d="M0 195h112M888 195h112" stroke="#D9D2C4" stroke-width="10"/></g>
-          <g clip-path="url(#hole)"><rect id="b-water" x="150" width="700" fill="url(#wat)" opacity=".92"/><path id="b-surface" fill="none" stroke="#ffffffb0" stroke-width="2.5"/></g>
-          <g id="b-swim"><path d="M790 120v100M822 120v100M790 150h32M790 182h32" stroke="#C9D4D6" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M30 186h84l22-34" fill="none" stroke="#F3EFE7" stroke-width="8" stroke-linecap="round"/><path d="M30 196v-10M110 196v-10" stroke="#F3EFE7" stroke-width="4"/></g>
-        </svg>
-      </div>
-      <div class="bside">
-        <ol class="bsteps" aria-label="Build stages">
-          <li><button type="button">Dig</button></li><li><button type="button">Steel</button></li><li><button type="button">Gunite</button></li><li><button type="button">Plaster &amp; tile</button></li><li><button type="button">Fill</button></li><li><button type="button">Swim</button></li>
+      <div class="story-side">
+        <ol class="story-steps" id="storySteps">
+          <li><button type="button" aria-pressed="true" data-i="0"><span class="mono">01</span>Layout</button></li>
+          <li><button type="button" aria-pressed="false" data-i="1"><span class="mono">02</span>Forms</button></li>
+          <li><button type="button" aria-pressed="false" data-i="2"><span class="mono">03</span>Dig</button></li>
+          <li><button type="button" aria-pressed="false" data-i="3"><span class="mono">04</span>Steel</button></li>
+          <li><button type="button" aria-pressed="false" data-i="4"><span class="mono">05</span>Gunite</button></li>
+          <li><button type="button" aria-pressed="false" data-i="5"><span class="mono">06</span>Plumbing</button></li>
+          <li><button type="button" aria-pressed="false" data-i="6"><span class="mono">07</span>Finished</button></li>
         </ol>
-        <p class="bstage" id="b-stage" aria-live="polite">Dig</p>
-        <p class="bsay" id="b-say">The shape we drew together is staked out and dug. Spoil leaves the same week.</p>
-        <div class="bnav"><button type="button" class="btn btn--line btn--sm" id="b-prev" disabled>Previous</button><button type="button" class="btn btn--solid btn--sm" id="b-next">Next stage</button><button type="button" class="btn btn--line btn--sm" id="b-play">Play all</button></div>
-        <div class="bscrub"><label for="b-scrub"><span class="mono label">Scrub the timeline</span><output id="b-scrub-o" class="mono">Day 01</output></label><input type="range" id="b-scrub" min="0" max="1000" step="1" value="2" aria-label="Build progress, day 1 to day 42"></div>
-        <div class="bphotos" id="bphotos"></div>
+        <div class="story-text" aria-live="polite"><h3 id="storyTitle">Layout</h3><p id="storyBody"></p></div>
+        <div class="story-nav"><button type="button" class="round" id="storyPrev" aria-label="Previous step"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-left"/></svg></button><button type="button" class="round" id="storyNext" aria-label="Next step"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button><a class="btn btn-p sm" href="#plan">Plan yours</a></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ CONFIGURATOR ============ -->
-<section class="sec sec--bone" id="design" aria-labelledby="design-h">
+<section class="sec dark" id="plan" aria-labelledby="plan-h">
   <div class="wrap">
     <header class="sec-head">
-      <p class="marker mono">05b — Design</p>
-      <h2 id="design-h" data-reveal>Draw yours. Price it.</h2>
-      <p class="lede" data-reveal>A rough plan and an example range before the design consult. Real quotes follow a site visit.</p>
+      <p class="marker mono" data-reveal><span>02</span>Plan your pool</p>
+      <h2 id="plan-h" data-reveal>Sketch it now. Joe prices it with you.</h2>
+      <p class="lede" data-reveal>Pick what you're picturing. It takes about a minute, and Joe gets the whole plan before he calls you back.</p>
     </header>
-    <div class="cfg" id="cfg">
-      <div class="cfg-ctl">
-        <fieldset class="field"><legend class="mono label">Shape</legend><div class="chips" id="cfg-shape"></div></fieldset>
-        <div class="field slider"><label for="cfg-len"><span class="mono label">Size</span><output id="cfg-len-out" class="mono"></output></label><input type="range" id="cfg-len" min="24" max="48" step="1" value="32"></div>
-        <fieldset class="field"><legend class="mono label">Depth profile</legend><div class="chips" id="cfg-depth"></div></fieldset>
-        <fieldset class="field"><legend class="mono label">Interior</legend><div class="chips" id="cfg-interior"></div></fieldset>
-        <fieldset class="field"><legend class="mono label">Extras</legend><div class="chips" id="cfg-extras"></div></fieldset>
-        <p class="fine cfg-why" id="cfg-why" aria-live="polite"></p>
+    <div class="planner">
+      <div class="plan-view" id="planView">
+        <svg id="planSvg" viewBox="0 0 600 420" role="img" aria-label="Top-down plan of your pool"></svg>
+        <div class="plan-read mono"><span id="planDims">32 &times; 16 ft</span><span id="planGal">about 19,100 gallons</span></div>
       </div>
-      <div class="cfg-out">
-        <div class="cfg-stick">
-          <div class="plan" id="cfg-plan"></div>
-          <div class="cfg-pricebar"><p class="mono label">Example range</p><p class="quote-price"><span id="cfg-price" aria-live="polite">$77k–$95k</span></p></div>
+      <form class="plan-form" id="planForm" novalidate>
+        <fieldset class="pick"><legend><span class="mono">A</span>Pool type</legend>
+          <div class="chips" data-k="type" data-one>
+            <button type="button" data-v="Concrete (gunite)" aria-pressed="true">Concrete (gunite)</button><button type="button" data-v="Vinyl liner" aria-pressed="false">Vinyl liner</button><button type="button" data-v="Fiberglass" aria-pressed="false">Fiberglass</button><button type="button" data-v="Not sure yet" aria-pressed="false">Not sure yet</button>
+          </div></fieldset>
+        <fieldset class="pick"><legend><span class="mono">B</span>Shape</legend>
+          <div class="chips" data-k="shape" data-one>
+            <button type="button" data-v="Rectangle" aria-pressed="true">Rectangle</button><button type="button" data-v="Freeform" aria-pressed="false">Freeform</button><button type="button" data-v="L-shape" aria-pressed="false">L-shape</button><button type="button" data-v="Plunge" aria-pressed="false">Plunge</button><button type="button" data-v="Lap" aria-pressed="false">Lap</button>
+          </div></fieldset>
+        <fieldset class="pick"><legend><span class="mono">C</span>Size</legend>
+          <label class="range"><span>Length <output id="lenOut">32 ft</output></span><input type="range" id="len" min="10" max="50" step="1" value="32"></label>
+          <label class="range"><span>Width <output id="widOut">16 ft</output></span><input type="range" id="wid" min="6" max="25" step="1" value="16"></label>
+        </fieldset>
+        <fieldset class="pick"><legend><span class="mono">D</span>Extras <small>pick any</small></legend>
+          <div class="chips" data-k="extras">
+            <button type="button" data-v="Spa" aria-pressed="false">Spa</button><button type="button" data-v="Sun shelf" aria-pressed="false">Sun shelf</button><button type="button" data-v="Scuppers" aria-pressed="false">Scuppers / water feature</button><button type="button" data-v="Raised stone wall" aria-pressed="false">Raised stone wall</button><button type="button" data-v="LED lighting" aria-pressed="false">LED lighting</button><button type="button" data-v="Heater" aria-pressed="false">Heater</button><button type="button" data-v="Salt system" aria-pressed="false">Salt system</button><button type="button" data-v="Automation" aria-pressed="false">Automation</button><button type="button" data-v="Fire pit" aria-pressed="false">Fire pit</button><button type="button" data-v="New deck or pavers" aria-pressed="false">New deck or pavers</button>
+          </div></fieldset>
+        <fieldset class="pick"><legend><span class="mono">E</span>Your yard</legend>
+          <p class="q">Can a small digger get to the back?</p>
+          <div class="chips" data-k="access" data-one><button type="button" data-v="Wide access" aria-pressed="false">Yes, wide access</button><button type="button" data-v="Narrow gate" aria-pressed="false">Narrow gate</button><button type="button" data-v="Not sure" aria-pressed="false">Not sure</button></div>
+          <p class="q">The ground is</p>
+          <div class="chips" data-k="ground" data-one><button type="button" data-v="Flat" aria-pressed="false">Flat</button><button type="button" data-v="Some slope" aria-pressed="false">Some slope</button><button type="button" data-v="Steep" aria-pressed="false">Steep</button></div>
+          <p class="q">Is there an old pool to replace?</p>
+          <div class="chips" data-k="old" data-one><button type="button" data-v="No old pool" aria-pressed="false">No</button><button type="button" data-v="Old pool to replace" aria-pressed="false">Yes</button></div>
+        </fieldset>
+        <fieldset class="pick"><legend><span class="mono">F</span>Budget you have in mind</legend>
+          <div class="chips" data-k="budget" data-one><button type="button" data-v="Under $50k" aria-pressed="false">Under $50k</button><button type="button" data-v="$50k to $80k" aria-pressed="false">$50k&ndash;$80k</button><button type="button" data-v="$80k to $120k" aria-pressed="false">$80k&ndash;$120k</button><button type="button" data-v="$120k+" aria-pressed="false">$120k+</button><button type="button" data-v="Not sure yet" aria-pressed="false">Not sure yet</button></div>
+          <p class="fine">Your number, not a price from us. It helps Joe suggest what fits.</p></fieldset>
+        <fieldset class="pick"><legend><span class="mono">G</span>When and where</legend>
+          <div class="chips" data-k="when" data-one><button type="button" data-v="As soon as possible" aria-pressed="false">As soon as possible</button><button type="button" data-v="Within 6 months" aria-pressed="false">Within 6 months</button><button type="button" data-v="Next year" aria-pressed="false">Next year</button><button type="button" data-v="Just exploring" aria-pressed="false">Just exploring</button></div>
+          <div class="chips" data-k="town" data-one><button type="button" data-v="Charleston" aria-pressed="false">Charleston</button><button type="button" data-v="Sullivan's Island" aria-pressed="false">Sullivan's Island</button><button type="button" data-v="Isle of Palms" aria-pressed="false">Isle of Palms</button><button type="button" data-v="James Island" aria-pressed="false">James Island</button><button type="button" data-v="Summerville" aria-pressed="false">Summerville</button><button type="button" data-v="Somewhere else" aria-pressed="false">Somewhere else</button></div>
+        </fieldset>
+        <div class="plan-send"><p id="planSummary" class="mono"></p><button type="button" class="btn btn-p" id="planSend">Send this plan to Joe<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="sec light" id="renovate" aria-labelledby="reno-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="marker mono" data-reveal><span>03</span>Renovation</p>
+      <h2 id="reno-h" data-reveal>Same pool. New life.</h2>
+      <p class="lede" data-reveal>Plaster, liners and the stone and decking around them. Here's a liner Joe replaced, from his own feed.</p>
+    </header>
+    <div class="ba" data-reveal>
+      <figure><img src="img/r-liner-before-lg.webp" srcset="img/r-liner-before-sm.webp 600w, img/r-liner-before-lg.webp 1000w" sizes="(max-width: 860px) 100vw, 45vw" alt="An empty vinyl-liner pool with the old liner torn out" loading="lazy" width="1000" height="1000"><figcaption class="mono">Before &middot; liner day</figcaption></figure>
+      <figure><img src="img/r-liner-after-lg.webp" srcset="img/r-liner-after-sm.webp 600w, img/r-liner-after-lg.webp 1000w" sizes="(max-width: 860px) 100vw, 45vw" alt="The same pool with a new blue patterned liner and steps" loading="lazy" width="1000" height="1000"><figcaption class="mono">After &middot; new liner</figcaption></figure>
+    </div>
+    <div class="reno-grid">
+      <article class="reno" data-reveal><img src="img/r-coping-sm.webp" alt="Freshly set travertine coping along a pool edge" loading="lazy" width="600" height="600"><div><h3>Coping &amp; patios</h3><p>Travertine coping and patio sets.</p></div></article>
+      <article class="reno" data-reveal><img src="img/r-firepit-sm.webp" alt="A round stone fire pit with a copper rim beside a pool" loading="lazy" width="600" height="600"><div><h3>Fire features</h3><p>A fire pit built to match the pool.</p></div></article>
+      <article class="reno" data-reveal><img src="img/r-deck-sm.webp" alt="A pool with a refreshed patterned concrete deck" loading="lazy" width="600" height="600"><div><h3>Decks &amp; pavers</h3><p>Bringing a tired deck back to life.</p></div></article>
+    </div>
+    <div class="center"><a class="btn btn-p" href="#request" data-req="Renovation">Quote my renovation<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+  </div>
+</section>
+
+<section class="sec dark" id="repair" aria-labelledby="repair-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="marker mono" data-reveal><span>04</span>Something's wrong?</p>
+      <h2 id="repair-h" data-reveal>Tell the doctor where it hurts.</h2>
+      <p class="lede" data-reveal>Joe can usually tell what's wrong over the phone. Tap what you're seeing and he'll know where to start.</p>
+    </header>
+    <div class="clinic">
+      <div class="checker">
+        <p class="q">What's happening? <small>tap all that apply</small></p>
+        <div class="sym" id="sym"></div>
+        <div class="report" id="report" aria-live="polite">
+          <p class="empty">Pick a symptom to see the usual causes.</p>
         </div>
-        <div class="quote">
-          <details class="moves"><summary>What moves the price</summary><ul class="spec" id="cfg-parts"></ul><p class="fine">Also: access for machines, soil and rock, drainage, permits and the town’s inspection schedule.</p></details>
-          <div class="fin">
-            <p class="mono label">Financing, example</p>
-            <div class="chips" id="cfg-term" role="radiogroup" aria-label="Loan term"></div>
-            <p class="fin-pay"><span id="cfg-monthly">$0/mo</span></p>
-            <p class="fine" id="cfg-fin-note"></p>
-            <p class="fine"><strong>Example only. Not an offer of credit.</strong> Real terms come from a lender.</p>
-          </div>
-          <button class="btn btn--solid" type="button" id="cfg-consult">Request a design consult</button>
+      </div>
+      <div class="padbox">
+        <div class="pad-view"><canvas id="padCanvas" aria-label="An equipment pad in 3D: pump, filter, salt cell, heater and automation panel. Drag to turn, tap a part."></canvas><p class="pad-note mono" id="padNote">Loading the equipment pad&hellip;</p></div>
+        <div class="pad-bar">
+          <div class="parts" id="parts" role="group" aria-label="Parts"><button type="button" data-p="pump" aria-pressed="false">Pump</button><button type="button" data-p="filter" aria-pressed="false">Filter</button><button type="button" data-p="salt" aria-pressed="false">Salt cell</button><button type="button" data-p="heater" aria-pressed="false">Heater</button><button type="button" data-p="panel" aria-pressed="false">Automation</button><button type="button" data-p="plumbing" aria-pressed="false">Plumbing</button></div>
+          <button type="button" class="switch" id="runBtn" aria-pressed="false"><i></i><span>System on</span></button>
         </div>
+        <div class="part-card" id="partCard" aria-live="polite"><p class="empty">Drag to turn the pad. Tap a part to see how it usually fails.</p></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ 06 BEFORE & AFTER ============ -->
-<section class="sec sec--deep sec--story" id="cases" aria-labelledby="cases-h">
-  <div class="wrap">
-    <header class="sec-head">
-      <p class="marker mono">06 — Before and after</p>
-      <h2 id="cases-h" data-reveal>Three pools, <em>three</em> fixes.</h2>
-      <p class="lede" data-reveal>Three example cases from fictional pools. The day counts are typical, not promises.</p>
-    </header>
-  </div>
-  <div class="wrap case-nav" aria-hidden="false"><p class="mono label" id="case-count">01 / 03</p><div><button type="button" class="case-btn" id="case-prev" aria-label="Previous case" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button><button type="button" class="case-btn" id="case-next" aria-label="Next case"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button></div></div>
-  <div class="cases" id="case-list" tabindex="0" aria-label="Before and after cases, scroll sideways">
-    <article class="case"><div class="case-view"><canvas data-case="green" aria-hidden="true"></canvas><span class="case-fb case-fb--green" aria-hidden="true"></span></div><p class="mono label">Green-to-clean · day 1 → day 3</p><h3>The pool that sat through a heatwave.</h3><p>Shocked, brushed and filtered round the clock; the floor was back on day two.</p></article>
-    <article class="case"><div class="case-view"><canvas data-case="cloudy" aria-hidden="true"></canvas><span class="case-fb case-fb--cloudy" aria-hidden="true"></span></div><p class="mono label">Cloudy water · day 1 → day 2</p><h3>Milky after a pool party.</h3><p>A clogged filter and high pH. Clean sand, balanced water, clear by the next evening.</p></article>
-    <article class="case"><div class="case-view"><canvas data-case="black" aria-hidden="true"></canvas><span class="case-fb case-fb--black" aria-hidden="true"></span></div><p class="mono label">Black algae · day 1 → day 6</p><h3>Spots that came back every June.</h3><p>Brushed out by hand, treated at the roots, and a filter that finally kept up.</p></article>
-  </div>
-</section>
-
-<!-- ============ 07 REVIEWS ============ -->
-<section class="sec sec--bone" id="reviews" aria-labelledby="reviews-h">
-  <div class="wrap reviews">
-    <header class="sec-head">
-      <p class="marker mono">07 — Reviews</p>
-      <h2 id="reviews-h" data-reveal>Example customer <em>reviews</em>.</h2>
-      <p class="mono label rev-sub" data-reveal>Written for this demo · fictional customers and towns</p>
-    </header>
-    <div class="rev-grid">
-      <figure class="photo rev-photo" data-reveal><img src="img/shadow-pebble-sm.webp" srcset="img/shadow-pebble-sm.webp 800w, img/shadow-pebble-lg.webp 1600w" sizes="(min-width: 900px) 40vw, 90vw" alt="A person's shadow across a pebble-finish pool floor" loading="lazy" width="800" height="450"><figcaption class="mono">Example photography</figcaption></figure>
-      <blockquote class="rev" data-reveal><p>It was green on a Thursday night. Their report said not to swim and why; by Sunday the kids were in.</p><footer class="mono">Dana R. · Green-to-clean · Montclair</footer></blockquote>
-      <blockquote class="rev" data-reveal><p>The checklist after every visit is the thing. I know exactly what was done.</p><footer class="mono">Marcus T. · Complete plan · West Orange</footer></blockquote>
-      <blockquote class="rev" data-reveal><p>They named the pump bearing from my description before they arrived, and had the part on the truck.</p><footer class="mono">Priya S. · Pump repair · Livingston</footer></blockquote>
-      <blockquote class="rev" data-reveal><p>Forty-four days, dig to swim. The day counter on the site was honest.</p><footer class="mono">The Okafors · New pool · Verona</footer></blockquote>
-      <blockquote class="rev" data-reveal><p>Closing took an hour and a half, heater winterized, cover tight.</p><footer class="mono">Glen W. · Closing · Glen Ridge</footer></blockquote>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 08 TRUST ============ -->
-<section class="sec sec--stone" id="trust" aria-labelledby="trust-h">
-  <div class="wrap credits">
-    <p class="marker mono">08 — Credentials</p>
-    <h2 id="trust-h" class="h3">The fine print, up front.</h2>
-    <dl class="credit-list">
-      <div><dt class="mono">Registration</dt><dd>NJ Home Improvement Contractor registration <span class="ph">number shown on a real site</span></dd></div>
-      <div><dt class="mono">Insurance</dt><dd>Insured · general liability &amp; workers’ comp</dd></div>
-      <div><dt class="mono">Crew</dt><dd>Certified Pool Operator on every crew <span class="ph">example credential</span></dd></div>
-      <div><dt class="mono">Guarantee</dt><dd>5-day workmanship guarantee on repairs · structural warranty on new pools <span class="ph">example terms</span></dd></div>
-    </dl>
-  </div>
-</section>
-
-<!-- ============ 09 AREA ============ -->
-<section class="sec sec--bone" id="area" aria-labelledby="area-h">
-  <div class="wrap">
-    <header class="sec-head">
-      <p class="marker mono">09 — Area</p>
-      <h2 id="area-h" data-reveal>Three routes, six days.</h2>
-      <p class="lede" data-reveal>An illustrative service area in Essex County. Trucks run a zone on fixed days, so visits land on time.</p>
-    </header>
-    <div class="area">
-      <div class="map" id="map"></div>
-      <div class="area-side">
-        <ul class="routes" id="routes"></ul>
-        <form class="zip" id="zip-form" novalidate>
-          <label for="zip-in" class="mono label">Check your zip</label>
-          <div class="zip-row"><input id="zip-in" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="07042" aria-describedby="zip-out"><button class="btn btn--line" type="submit">Check</button></div>
-          <p class="zip-out" id="zip-out" aria-live="polite"></p>
-        </form>
-        <figure class="photo" data-reveal><img src="img/aerial-sm.webp" srcset="img/aerial-sm.webp 600w, img/aerial-lg.webp 1200w" sizes="(min-width: 900px) 30vw, 90vw" alt="A rectangular pool and deck seen from above" loading="lazy" width="600" height="750"><figcaption class="mono">Example photography</figcaption></figure>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 10 BOOK ============ -->
-<section class="sec sec--bone sec--book sec--tight" id="book" aria-labelledby="book-h">
-  <div class="wrap">
-    <header class="sec-head">
-      <p class="marker mono">10 — Book</p>
-      <h2 id="book-h" data-reveal>Book a <em>visit</em>.</h2>
-      <p class="lede" data-reveal>Three short steps. A simulated booking: nothing is sent, stored or charged.</p>
-      <span class="waterline" aria-hidden="true"></span>
-    </header>
-    <div class="book" id="book-ui">
-      <ol class="stepnav mono" id="stepnav" aria-label="Booking steps"></ol>
-      <div class="book-main">
-        <form id="bk" novalidate>
-          <fieldset class="step" data-step="0">
-            <legend class="sr-only">Service and details</legend>
-            <h3 tabindex="-1">What do you need?</h3>
-            <div class="opts" id="need-list"></div>
-            <div class="need-detail" id="need-detail"></div>
-            <p class="notice" id="need-notice" hidden></p>
-            <div class="grp" id="pool-fields" hidden>
-              <p class="grp-h">Your pool</p>
-              <p class="mono label">Type</p><div class="chips" id="pool-type"></div>
-              <p class="mono label">Shape and approximate size</p><div class="chips" id="pool-shape"></div>
-              <div class="field slider"><label for="pool-len"><span class="mono label">Length</span><output id="pool-len-o" class="mono"></output></label><input type="range" id="pool-len" min="10" max="75" step="1" value="32"></div>
-              <div class="pool-outline" id="pool-outline" aria-hidden="true"></div>
-              <p class="mono label">Equipment</p><div class="chips" id="pool-eq"></div>
-            </div>
-            <div class="grp" id="prop-fields" hidden>
-              <p class="grp-h">Your property</p>
-              <p class="mono label">Is there a pool there now?</p>
-              <div class="chips" role="radiogroup" aria-label="Existing pool" id="prop-existing">
-                <label class="chip chip--sm"><input type="radio" name="prop-existing" value="no" checked><span>No, it’s a new build</span></label>
-                <label class="chip chip--sm"><input type="radio" name="prop-existing" value="yes"><span>Yes, replacing an old pool</span></label>
-              </div>
-              <div id="prop-old" hidden><p class="mono label">The old pool</p><div class="chips" id="prop-old-type"></div></div>
-              <p class="mono label">Access for machines</p>
-              <div class="chips" role="radiogroup" aria-label="Access" id="prop-access">
-                <label class="chip chip--sm"><input type="radio" name="prop-access" value="side" checked><span>Side yard, 8 ft or wider</span></label>
-                <label class="chip chip--sm"><input type="radio" name="prop-access" value="tight"><span>Tight, under 8 ft</span></label>
-                <label class="chip chip--sm"><input type="radio" name="prop-access" value="unsure"><span>Not sure</span></label>
-              </div>
-              <p class="mono label">The yard</p>
-              <div class="chips" role="radiogroup" aria-label="Slope" id="prop-slope">
-                <label class="chip chip--sm"><input type="radio" name="prop-slope" value="flat" checked><span>Mostly flat</span></label>
-                <label class="chip chip--sm"><input type="radio" name="prop-slope" value="sloped"><span>Sloped</span></label>
-              </div>
-            </div>
-            <details class="grp photos-dt" id="photos-dt">
-              <summary>Add photos <span class="opt">optional</span></summary>
-              <p class="fine" id="photo-hint">They stay on this page: in this example nothing is uploaded.</p>
-              <div class="photo-btns" id="photo-btns"></div>
-              <input type="file" id="photo-in" accept="image/*" multiple hidden>
-              <ul class="thumbs" id="thumbs"></ul>
-              <p class="notice" id="photo-notice" hidden></p>
-            </details>
-          </fieldset>
-          <fieldset class="step" data-step="1" hidden>
-            <legend class="sr-only">Where and when</legend>
-            <h3 tabindex="-1">Where and when?</h3>
-            <div class="field"><label for="bk-zip">Zip code</label>
-            <input id="bk-zip" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="07042" aria-describedby="bk-zip-out err-zip">
-            <p class="zip-out" id="bk-zip-out"></p>
-            <p class="err" id="err-zip"></p></div>
-            <p class="mono label" id="when-meta"></p>
-            <div class="days" id="days" role="radiogroup" aria-label="Day"></div>
-            <div class="times" id="times" role="radiogroup" aria-label="Arrival time"></div>
-            <p class="notice" id="time-notice" hidden></p>
-          </fieldset>
-          <fieldset class="step" data-step="2" hidden>
-            <legend class="sr-only">Contact and review</legend>
-            <h3 tabindex="-1">Your details</h3>
-            <div class="field"><label for="f-name">First name</label><input id="f-name" type="text" autocomplete="given-name" aria-describedby="err-name"><p class="err" id="err-name"></p></div>
-            <div class="field"><label for="f-mobile">Mobile <span class="opt">optional</span></label><input id="f-mobile" type="tel" autocomplete="tel" inputmode="tel" aria-describedby="err-mobile"><p class="err" id="err-mobile"></p></div>
-            <div class="field"><label for="f-notes">Notes for the technician <span class="opt">optional</span></label><textarea id="f-notes" rows="3"></textarea></div>
-            <button type="button" class="btn btn--line" id="sample">Use sample details</button>
-            <h3 class="review-h" id="review-h">Review</h3>
-            <p class="notice" id="review-notice" hidden></p>
-            <dl class="review" id="review-list"></dl>
-            <div class="bill" id="review-bill"></div>
-          </fieldset>
-          <div class="book-nav">
-            <button type="button" class="btn btn--line" id="back">Back</button>
-            <button type="submit" class="btn btn--solid" id="next">Next</button>
-          </div>
-        </form>
-        <section class="done" id="done" hidden aria-labelledby="done-h">
-          <h3 id="done-h" tabindex="-1">Visit requested <span class="mono">(simulated)</span></h3>
-          <p class="done-strong">No visit was booked and nothing was sent.</p>
-          <dl class="review" id="done-list"></dl>
-          <div class="bill" id="done-bill"></div>
-          <div class="done-actions">
-            <a class="btn btn--line" id="ics" download="pool-doctor-example.ics" href="#">Download a sample calendar file</a>
-            <button type="button" class="btn btn--solid" id="restart">Start a new booking</button>
-          </div>
-          <p class="fine">On a real site the office would confirm by text. This example stores nothing: reload and it’s gone.</p>
-        </section>
-      </div>
-      <aside class="book-bar" id="book-bar" aria-label="Visit summary">
-        <p class="mono label">Your visit</p>
-        <p class="bb-visit" id="bb-visit">Choose what you need</p>
-        <p class="bb-range" id="bb-range" aria-live="polite"></p>
-        <p class="bb-meta mono" id="bb-meta"></p>
-      </aside>
-    </div>
-  </div>
-</section>
-
-<!-- ============ FAQ ============ -->
-<section class="sec sec--bone" id="faq" aria-labelledby="faq-h">
-  <div class="wrap faq">
-    <header class="sec-head"><p class="marker mono">11 — Questions</p><h2 id="faq-h" data-reveal>Asked every season.</h2></header>
-    <div class="qa">
-      <details><summary>When should I book an opening or a closing?</summary><p>Openings go fast from late April; book in March for May. Close after the water stays under about 65°F, usually mid-October in Essex County, before the first hard frost.</p></details>
-      <details><summary>My pool is green. Can it be saved without draining?</summary><p>Almost always. A green-to-clean visit shocks, brushes and filters it back over two to four days. Draining is a last resort and can damage a pool.</p></details>
-      <details><summary>Do care plans need a contract?</summary><p>In this example, no: plans run month to month and pause in winter. A real company sets its own terms.</p></details>
-      <details><summary>How long does a new gunite pool take?</summary><p>As an example, about six to ten weeks from dig to swim, depending on permits, weather and curing time. A real builder gives a dated schedule in the contract.</p></details>
-      <details><summary>Who handles permits?</summary><p>The builder files the plans and books the town’s inspections, including the steel inspection before concrete.</p></details>
-      <details><summary>Why add photos to a quote?</summary><p>A photo of the water and the equipment pad lets the technician bring the right parts the first time. In this example photos never leave your phone.</p></details>
-    </div>
-  </div>
-</section>
-
-<!-- ============ LOCAL FORM ============ -->
-<section class="sec sec--deep lf" id="localform" aria-labelledby="lf-h">
-  <div class="wrap lf-in">
-    <figure class="photo"><img src="img/night-pool-sm.webp" srcset="img/night-pool-sm.webp 800w, img/night-pool-lg.webp 1600w" sizes="(min-width: 900px) 40vw, 90vw" alt="A lit pool glowing in the dark" loading="lazy" width="800" height="533"><figcaption class="mono">Example photography</figcaption></figure>
+<section class="builders" id="builders" aria-labelledby="builders-h">
+  <div class="wrap builders-in">
     <div>
-      <p class="marker mono">Local Form</p>
-      <h2 id="lf-h">Bring this experience to <em>your</em> business.</h2>
-      <p class="lede">Local Form builds websites for local businesses that answer the customer’s real question and turn it into a booked job.</p>
-      <a class="btn btn--light" href="https://localform.online/#contact">Talk to Local Form</a>
+      <p class="marker mono" data-reveal><span>05</span>For builders &amp; contractors</p>
+      <h2 id="builders-h" data-reveal>Problem build? Call the doctor.</h2>
+    </div>
+    <div data-reveal>
+      <p>Joe is a licensed SC swimming pool contractor, and other contractors call him when an existing build has a problem. He also manages renovation and build projects from start to finish. If it has to do with a pool, he handles it.</p>
+      <a class="btn btn-w" href="#request" data-req="Contractor help">Contractor request<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<section class="sec light" id="reviews" aria-labelledby="rev-h">
+  <div class="wrap">
+    <header class="sec-head row">
+      <div><p class="marker mono" data-reveal><span>06</span>Reviews</p><h2 id="rev-h" data-reveal>What Charleston says about Joe.</h2></div>
+      <p class="score" data-reveal><b>4.5</b><span class="stars" aria-hidden="true"></span><span class="mono">on Google</span></p>
+    </header>
+    <div class="revs">
+      <blockquote class="rev" data-reveal><p>Joseph diagnosed and repaired my pool pump extremely quickly. He took care of the warranty claim&hellip; Instead he called and told me the job was done!!! You can't beat service like that.</p><footer class="mono">Mark G. &middot; Google</footer></blockquote>
+      <blockquote class="rev" data-reveal><p>Joseph from The Pool Doctor did an excellent job coordinating our pool makeover. He designed a plan and helped pick out pavers for our new deck.</p><footer class="mono">Hannah S. &middot; Google</footer></blockquote>
+      <blockquote class="rev" data-reveal><p>Joseph has fixed several things on my pool over the past year or so. He is professional, punctual, knowledgeable and experienced.</p><footer class="mono">Lisa H. &middot; Google</footer></blockquote>
+      <blockquote class="rev" data-reveal><p>I called Joseph on Friday afternoon about having my pool pump repaired or replaced&hellip; He came on time, and replaced my pump Saturday morning.</p><footer class="mono">Gregory S. &middot; Google</footer></blockquote>
+      <blockquote class="rev" data-reveal><p>Joe knows his stuff. We needed a new heater for our spa. Joe suggested several and gave us his advice.</p><footer class="mono">Chris &middot; Google</footer></blockquote>
+      <blockquote class="rev" data-reveal><p>Joe was conscientious, knowledgeable, prompt, professional, and honest&hellip; I would recommend him to anyone needing a true pool professional.</p><footer class="mono">M H. &middot; Google</footer></blockquote>
+    </div>
+  </div>
+</section>
+
+<section class="sec dark joe" aria-labelledby="joe-h">
+  <div class="wrap joe-in">
+    <figure class="joe-img" data-reveal><img src="img/j-marsh-lg.webp" srcset="img/j-marsh-sm.webp 600w, img/j-marsh-lg.webp 1000w" sizes="(max-width: 860px) 100vw, 44vw" alt="A boardwalk across the salt marsh, Joe's view from a job" loading="lazy" width="720" height="720"><figcaption class="mono">&ldquo;My corner office&rdquo; &middot; from Joe's Instagram</figcaption></figure>
+    <div>
+      <p class="marker mono" data-reveal><span>07</span>Meet Joe</p>
+      <blockquote class="big" id="joe-h" data-reveal>&ldquo;I am The Pool Doctor. I am what it says. If you have a problem, I am the answer.&rdquo;</blockquote>
+      <dl class="facts" data-reveal>
+        <div><dt class="mono">Owner</dt><dd>Joseph Penna, on every job</dd></div>
+        <div><dt class="mono">Experience</dt><dd>10 years in Charleston pools</dd></div>
+        <div><dt class="mono">Licence</dt><dd>SC swimming pool contractor</dd></div>
+        <div><dt class="mono">Does</dt><dd>Builds, renovations, project management and repairs. No weekly cleaning.</dd></div>
+      </dl>
+      <a class="link" href="https://www.instagram.com/the_pooldoctor/" rel="noopener">See his work on Instagram &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec light" id="area" aria-labelledby="area-h">
+  <div class="wrap area-in">
+    <div>
+      <p class="marker mono" data-reveal><span>08</span>Where &amp; when</p>
+      <h2 id="area-h" data-reveal>Joe comes to you.</h2>
+      <ul class="towns" data-reveal><li>Charleston</li><li>Sullivan's Island</li><li>Isle of Palms</li><li>James Island</li><li>Summerville</li></ul>
+    </div>
+    <div class="hours" data-reveal>
+      <table><caption class="mono">Hours</caption>
+        <tr><th scope="row">Monday &ndash; Friday</th><td>7am &ndash; 7pm</td></tr>
+        <tr><th scope="row">Saturday &amp; Sunday</th><td>Emergencies only</td></tr>
+      </table>
+      <a class="btn btn-p" href="tel:+18437373165"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-phone"/></svg>Call (843) 737-3165</a>
+      <p class="fine">Mobile service, no storefront. Hours from Joe; call to confirm.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec dark" id="request" aria-labelledby="req-h">
+  <div class="wrap req-in">
+    <header class="sec-head">
+      <p class="marker mono" data-reveal><span>09</span>Request</p>
+      <h2 id="req-h" data-reveal>Get Joe on it.</h2>
+      <p class="lede" data-reveal>Tell him what you need. He calls or texts you back, usually the same day.</p>
+    </header>
+    <form class="req" id="req" novalidate>
+      <fieldset><legend class="sr">What do you need?</legend>
+        <div class="tabs" id="reqType" role="radiogroup" aria-label="What do you need?">
+          <button type="button" role="radio" aria-checked="true" data-v="New pool">New pool</button><button type="button" role="radio" aria-checked="false" data-v="Renovation">Renovation</button><button type="button" role="radio" aria-checked="false" data-v="Repair">Repair</button><button type="button" role="radio" aria-checked="false" data-v="Contractor help">Contractor help</button>
+        </div></fieldset>
+      <div class="carry" id="carry" hidden></div>
+      <div class="fields">
+        <label><span>Your name</span><input id="fName" name="name" autocomplete="name" required></label>
+        <label><span>Mobile</span><input id="fPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required></label>
+        <label><span>Email <small>optional</small></span><input id="fEmail" name="email" type="email" autocomplete="email"></label>
+        <label><span>Town</span><select id="fTown" name="town"><option value="">Choose&hellip;</option><option>Charleston</option><option>Sullivan's Island</option><option>Isle of Palms</option><option>James Island</option><option>Summerville</option><option>Somewhere else</option></select></label>
+        <label class="wide"><span id="fDetailL">Anything Joe should know?</span><textarea id="fDetail" name="detail" rows="3"></textarea></label>
+        <label class="wide file"><span>Photos <small>optional, stay on your phone in this preview</small></span><input id="fPhotos" type="file" accept="image/*" multiple></label>
+        <div class="thumbs wide" id="thumbs"></div>
+        <fieldset class="wide"><legend>Best time to reach you</legend><div class="chips" id="fWhen" data-one><button type="button" data-v="Morning" aria-pressed="false">Morning</button><button type="button" data-v="Afternoon" aria-pressed="false">Afternoon</button><button type="button" data-v="Evening" aria-pressed="false">Evening</button></div></fieldset>
+      </div>
+      <p class="err" id="reqErr" role="alert"></p>
+      <button class="btn btn-p big" type="submit" id="reqBtn">Send my request<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <p class="fine">Preview only: nothing is sent from this page. On the live site, requests go straight to Joe.</p>
+    </form>
+    <div class="done" id="done" hidden tabindex="-1">
+      <p class="marker mono"><span>&#10003;</span>Request ready</p>
+      <h3 id="doneTitle"></h3>
+      <div id="doneBody"></div>
+      <p class="fine">Preview only: nothing was sent. On the live site Joe gets this and calls or texts you back.</p>
+      <button type="button" class="btn btn-s" id="again">Start a new request</button>
+    </div>
+  </div>
+</section>
+
+<section class="sec light" id="faq" aria-labelledby="faq-h">
+  <div class="wrap faq-in">
+    <h2 id="faq-h" data-reveal>Questions</h2>
+    <div class="faq">
+      <details data-reveal><summary>What does a new pool cost?</summary><p>It depends on the size, the build type, the extras and your yard. Sketch yours in the planner above with the budget you have in mind, and Joe prices it with you.</p></details>
+      <details data-reveal><summary>Can you really tell what's wrong over the phone?</summary><p>Often, yes. That's Joe's specialty: describe it (or text a photo) and he'll point you the right way, whether it's a quick fix you can do or a visit.</p></details>
+      <details data-reveal><summary>Do you clean pools?</summary><p>No. The Pool Doctor builds, renovates and repairs. For weekly cleaning, ask Joe who he'd recommend.</p></details>
+      <details data-reveal><summary>Do you work with other contractors?</summary><p>Yes. Joe is a licensed SC swimming pool contractor and helps other builders with problem builds.</p></details>
+      <details data-reveal><summary>Do you work weekends?</summary><p>Emergencies only. Weekdays 7am to 7pm.</p></details>
     </div>
   </div>
 </section>
@@ -491,16 +303,25 @@
 
 <footer class="foot">
   <div class="wrap foot-in">
-    <div class="foot-brand">
-      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path clip-path="url(#mk)" d="M0 17c4-3.2 8-3.2 12 0s8 3.2 12 0 6-2.6 8-1.4V32H0Z" fill="currentColor" opacity=".9"/></svg>
-      <p class="word">Pool Doctor</p>
-    </div>
-    <div class="foot-text">
-      <p><strong>Pool Doctor is a fictional company.</strong> This is an example site by <a href="https://localform.online">Local Form</a>. Prices, reviews, credentials, routes and the service area are invented examples. Nothing on this page is sent or stored. Not affiliated with any real business called Pool Doctor.</p>
-      <p>Photos: example photography from Unsplash (Annie Spratt, Yusuf Onuk, Jorch Alon, Hydra 4x, Chris Lawton, RETRATO INMOBILIARIO, Autumn Studio, Brianna Lengacher, Johannes Hahn, Drew Dau, Heng Chiu, Erwan Hesry, Hasan Almasi). Not Pool Doctor’s work.</p>
-      <p class="mono">noindex example · <a href="https://localform.online">localform.online</a></p>
-    </div>
+    <div class="foot-brand"><span class="disc"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg></span><p><b>The Pool Doctor</b><br>Joseph Penna, owner<br>Charleston, SC</p></div>
+    <p><a href="tel:+18437373165">(843) 737-3165</a><br><a href="mailto:thepooldoc@yahoo.com">thepooldoc@yahoo.com</a><br><a href="https://www.instagram.com/the_pooldoctor/" rel="noopener">Instagram @the_pooldoctor</a></p>
+    <p>Mon&ndash;Fri 7am&ndash;7pm<br>Weekends: emergencies only<br>Licensed SC swimming pool contractor</p>
   </div>
+  <p class="credit">Concept preview by <a href="https://localform.online">Local Form</a> &middot; Photos from The Pool Doctor's Instagram &middot; Reviews from Google</p>
 </footer>
+
+<div class="dock" id="dock"><a class="btn btn-p" href="#plan">Plan my pool</a><a class="btn btn-s" href="tel:+18437373165" aria-label="Call Joe"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-phone"/></svg>Call</a></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 100 100"><path fill="currentColor" d="M84.00 39.86L84.00 60.25L60.78 60.25L60.78 79.36C60.64 79.35 60.49 79.35 60.35 79.35C59.11 79.35 57.87 79.58 56.68 80.04C55.33 80.56 54.23 81.22 53.05 82.20L45.67 82.20C46.00 81.55 46.28 80.85 46.47 80.12C46.52 79.94 46.60 79.63 46.66 79.41C46.88 78.55 46.85 75.60 46.67 74.79C45.77 70.88 43.59 68.00 40.20 66.23C39.92 66.08 39.58 65.92 39.21 65.77L39.21 60.25L16.00 60.25L16.00 39.86L39.21 39.86L39.21 17.91L60.78 17.91L60.78 39.86L84.00 39.86M69.83 93.42C70.13 93.66 70.52 93.79 70.93 93.79C71.59 93.79 72.21 93.44 72.55 92.86C72.62 92.76 72.67 92.64 72.71 92.53C71.72 92.93 70.83 93.21 69.83 93.42M72.63 91.14C72.00 91.45 71.44 91.71 71.28 91.76C71.17 91.80 71.16 91.83 71.23 91.86C71.29 91.88 71.42 91.86 71.52 91.81C71.62 91.77 71.79 91.69 71.89 91.66C72.14 91.56 72.42 91.44 72.70 91.31C72.68 91.26 72.66 91.20 72.63 91.14M71.05 91.96C71.02 92.01 70.97 92.04 70.93 92.04C70.88 92.04 70.85 92.01 70.85 91.96C70.85 91.91 70.90 91.88 70.97 91.88C71.04 91.88 71.07 91.91 71.05 91.96M70.97 91.88C70.90 91.88 70.85 91.91 70.85 91.96C70.85 92.01 70.88 92.04 70.93 92.04C70.97 92.04 71.02 92.01 71.05 91.96C71.07 91.91 71.04 91.88 70.97 91.88C70.90 91.88 70.85 91.91 70.85 91.96C70.85 92.01 70.88 92.04 70.93 92.04C70.97 92.04 71.02 92.01 71.05 91.96C71.07 91.91 71.04 91.88 70.97 91.88C70.90 91.88 70.85 91.91 70.85 91.96C70.85 92.01 70.88 92.04 70.93 92.04C70.97 92.04 71.02 92.01 71.05 91.96C71.07 91.91 71.04 91.88 70.97 91.88C70.90 91.88 70.85 91.91 70.85 91.96C70.85 92.01 70.88 92.04 70.93 92.04C70.97 92.04 71.02 92.01 71.05 91.96C71.07 91.91 71.04 91.88 70.97 91.88C70.90 91.88 70.85 91.91 70.85 91.96C70.85 92.01 70.88 92.04 70.93 92.04C70.97 92.04 71.02 92.01 71.05 91.96C71.07 91.91 71.04 91.88 70.97 91.88M69.83 93.42C70.13 93.66 70.52 93.79 70.93 93.79C71.59 93.79 72.21 93.44 72.55 92.86C72.62 92.76 72.67 92.64 72.71 92.53C71.72 92.93 70.82 93.21 69.83 93.42M72.63 91.14C72.00 91.45 71.44 91.71 71.28 91.76C71.17 91.80 71.16 91.83 71.23 91.86C71.29 91.88 71.42 91.86 71.52 91.81C71.63 91.76 71.79 91.69 71.89 91.66C72.14 91.56 72.42 91.44 72.70 91.31C72.68 91.26 72.66 91.20 72.63 91.14M70.97 91.88C70.90 91.88 70.85 91.91 70.85 91.96C70.85 92.01 70.88 92.04 70.93 92.04C70.97 92.04 71.02 92.01 71.05 91.96C71.07 91.91 71.04 91.88 70.97 91.88C70.90 91.88 70.85 91.91 70.85 91.96C70.85 92.01 70.88 92.04 70.93 92.04C70.97 92.04 71.02 92.01 71.05 91.96C71.07 91.91 71.04 91.88 70.97 91.88C70.90 91.88 70.85 91.91 70.85 91.96C70.85 92.01 70.88 92.04 70.93 92.04C70.97 92.04 71.02 92.01 71.05 91.96C71.07 91.91 71.04 91.88 70.97 91.88C70.90 91.88 70.85 91.91 70.85 91.96C70.85 92.01 70.88 92.04 70.93 92.04C70.97 92.04 71.02 92.01 71.05 91.96C71.07 91.91 71.04 91.88 70.97 91.88M71.05 91.96C71.02 92.01 70.97 92.04 70.93 92.04C70.88 92.04 70.85 92.01 70.85 91.96C70.85 91.91 70.90 91.88 70.97 91.88C71.04 91.88 71.07 91.91 71.05 91.96M72.71 92.53C72.67 92.64 72.62 92.76 72.55 92.86C72.21 93.44 71.59 93.79 70.93 93.79C70.52 93.79 70.13 93.66 69.83 93.43C70.83 93.21 71.72 92.93 72.71 92.53M72.70 91.31C72.42 91.44 72.14 91.56 71.89 91.66C71.79 91.69 71.62 91.76 71.52 91.81C71.42 91.86 71.29 91.88 71.23 91.86C71.16 91.83 71.17 91.80 71.28 91.76C71.44 91.71 72.00 91.45 72.63 91.14C72.66 91.20 72.68 91.26 72.70 91.31M69.83 93.42C70.13 93.66 70.52 93.79 70.93 93.79C71.59 93.79 72.21 93.44 72.55 92.86C72.62 92.76 72.67 92.64 72.71 92.53C71.72 92.93 70.83 93.21 69.83 93.42M72.63 91.14C72.00 91.45 71.44 91.71 71.28 91.76C71.17 91.80 71.16 91.83 71.23 91.86C71.29 91.88 71.42 91.86 71.52 91.81C71.62 91.77 71.79 91.69 71.89 91.66C72.14 91.56 72.42 91.44 72.70 91.31C72.68 91.26 72.66 91.20 72.63 91.14M99.23 54.66C99.21 54.81 99.15 55.23 99.10 55.59C98.84 57.60 98.62 58.84 98.09 61.06C97.51 63.54 96.42 66.74 95.42 68.94C95.28 69.26 95.09 69.68 95.00 69.87C94.01 72.18 91.44 76.48 89.63 78.85C87.19 82.06 83.85 85.46 80.99 87.65C78.85 89.29 76.67 90.65 74.48 91.72C73.84 92.04 73.26 92.30 72.71 92.53L72.71 92.53C72.67 92.64 72.62 92.76 72.55 92.86C72.21 93.44 71.59 93.79 70.93 93.79C70.52 93.79 70.13 93.66 69.83 93.42C69.67 93.46 69.50 93.49 69.33 93.53C68.59 93.67 65.75 93.67 65.16 93.53C63.63 93.16 62.58 92.61 61.83 91.78C61.07 90.96 60.74 90.04 60.80 88.95C60.88 87.21 62.38 85.93 64.02 86.20C65.30 86.41 66.13 87.27 66.24 88.53L66.29 89.03L66.52 88.65C66.89 88.02 67.03 87.50 67.03 86.66C67.03 85.33 66.62 84.33 65.65 83.30C64.99 82.59 64.42 82.17 63.66 81.82C62.74 81.41 61.77 81.17 60.78 81.12C59.62 81.06 58.45 81.24 57.31 81.68C56.91 81.84 56.53 82.01 56.16 82.20C55.21 82.70 54.36 83.34 53.37 84.26C52.41 85.17 51.43 86.02 50.87 86.42C49.26 87.61 47.31 88.48 45.49 88.83C45.26 88.88 44.87 88.95 44.65 88.99C44.10 89.10 41.38 89.09 40.74 88.99C39.81 88.83 38.91 88.59 38.08 88.27C37.32 87.97 36.22 87.44 35.98 87.25C35.78 87.09 35.79 87.29 36.03 87.76C36.63 88.94 38.22 90.74 39.73 91.95C42.56 94.23 47.39 96.16 51.62 96.71C53.44 96.95 54.11 96.99 56.45 96.99C57.81 96.99 58.80 97.02 58.63 97.05C57.09 97.34 52.92 97.44 50.90 97.23C48.99 97.03 48.25 96.90 46.66 96.49C44.80 96.02 43.45 95.53 41.90 94.76C38.46 93.08 35.52 90.35 34.22 87.63C33.05 85.20 32.86 83.16 33.63 81.31C34.34 79.60 35.74 78.61 37.47 78.61C38.21 78.61 38.71 78.72 39.21 79.01C39.29 79.05 39.38 79.10 39.46 79.16C40.42 79.80 40.85 80.68 40.79 81.87C40.79 81.98 40.78 82.09 40.76 82.20C40.59 83.22 39.90 84.14 38.91 84.62C38.13 85.01 38.51 85.14 39.73 84.90C41.26 84.61 42.64 83.62 43.62 82.20C44.13 81.46 44.53 80.60 44.77 79.67C44.82 79.49 44.90 79.18 44.96 78.97C45.09 78.44 45.09 75.77 44.96 75.18C44.18 71.79 42.30 69.31 39.39 67.78C39.33 67.75 39.27 67.72 39.21 67.69C38.47 67.33 37.32 66.91 36.61 66.75C34.69 66.31 32.65 66.34 30.23 66.82C29.26 67.02 28.83 67.14 26.78 67.77C24.89 68.35 23.75 68.55 21.96 68.60C20.00 68.66 18.77 68.50 17.08 67.95C15.05 67.29 13.32 66.24 11.78 64.73C10.45 63.42 9.35 61.85 8.43 59.94C7.95 58.95 7.73 58.43 7.25 57.11C7.10 56.72 6.67 55.23 6.60 54.89C6.58 54.78 6.51 54.43 6.44 54.11C5.99 52.01 5.84 50.43 5.84 47.83C5.84 46.67 5.88 45.41 5.93 45.02C6.12 43.27 6.18 42.85 6.32 42.01C6.52 40.88 6.81 39.50 7.02 38.74C7.11 38.42 7.25 37.89 7.34 37.56C7.75 36.03 8.57 33.80 9.50 31.71C9.92 30.75 11.07 28.48 11.54 27.65C12.70 25.64 14.75 22.72 16.37 20.79C19.52 17.03 24.50 12.91 28.67 10.63C29.01 10.44 29.47 10.19 29.69 10.07C32.21 8.68 35.33 7.40 38.15 6.60C40.27 6.00 42.90 5.43 44.71 5.19C45.03 5.14 45.44 5.09 45.61 5.06C47.50 4.80 52.01 4.69 53.88 4.86C57.71 5.22 58.43 5.33 61.53 6.08C63.04 6.44 65.51 7.23 67.03 7.83C69.04 8.63 72.21 10.19 73.97 11.25C77.97 13.65 81.24 16.35 84.65 20.04C85.04 20.47 85.35 20.76 85.32 20.69C85.29 20.61 85.25 20.55 85.22 20.55C85.19 20.55 85.10 20.44 85.02 20.30C84.82 19.96 83.93 18.96 82.99 18.02C79.22 14.25 75.29 11.47 70.27 9.00C66.62 7.21 64.01 6.30 59.42 5.21C57.70 4.81 55.08 4.47 52.43 4.31C50.91 4.22 47.49 4.27 46.19 4.40C45.12 4.51 44.11 4.63 43.62 4.71C43.38 4.75 42.95 4.82 42.64 4.87C40.41 5.22 36.66 6.23 34.41 7.08C32.72 7.71 30.32 8.82 28.87 9.63C27.18 10.57 26.66 10.89 25.24 11.83C21.19 14.53 17.80 17.61 14.77 21.37C13.53 22.90 12.18 24.79 11.55 25.84C11.43 26.05 11.15 26.50 10.93 26.86C10.71 27.22 10.53 27.52 10.53 27.53C10.53 27.55 10.29 27.98 10.00 28.49C9.71 28.99 9.40 29.55 9.32 29.72C9.24 29.89 8.98 30.46 8.73 30.97C8.49 31.49 8.17 32.17 8.03 32.49C7.90 32.81 7.70 33.25 7.61 33.47C7.51 33.69 7.39 33.98 7.34 34.13C7.28 34.28 7.20 34.48 7.17 34.56C6.96 35.06 6.39 36.76 6.08 37.80C5.69 39.14 5.73 38.97 5.42 40.32C5.25 41.04 4.91 43.06 4.75 44.32C4.60 45.47 4.44 47.95 4.44 49.12C4.45 50.64 4.64 52.82 4.91 54.34C5.06 55.22 5.08 55.32 5.15 55.65C5.56 57.52 6.22 59.44 7.14 61.44C7.29 61.75 7.41 62.02 7.41 62.03C7.41 62.04 7.66 62.51 7.96 63.05C9.89 66.50 12.14 68.88 15.33 70.81C15.80 71.09 17.08 71.74 18.03 72.16C18.43 72.35 19.93 72.84 20.08 72.84C20.15 72.84 20.20 72.87 20.20 72.92C20.20 73.01 19.99 73.01 19.69 72.92C19.56 72.89 19.22 72.81 18.92 72.76C18.33 72.66 17.45 72.43 16.81 72.23C12.68 70.90 8.97 67.37 6.48 62.38C6.15 61.72 5.76 60.87 5.62 60.51C5.48 60.14 5.33 59.78 5.29 59.69C5.21 59.49 4.81 58.24 4.68 57.78C4.62 57.58 4.55 57.34 4.52 57.23C4.34 56.67 4.08 55.46 3.89 54.23C3.85 53.92 3.79 53.58 3.77 53.45C3.51 51.88 3.40 47.26 3.58 45.56C3.71 44.30 3.82 43.40 3.89 43.03C3.93 42.84 4.00 42.41 4.05 42.09C4.23 40.95 4.37 40.31 4.76 38.66C5.22 36.75 6.05 34.15 6.59 32.92C6.64 32.79 6.76 32.50 6.85 32.27C6.95 32.03 7.09 31.70 7.17 31.52C7.31 31.21 7.84 30.07 8.09 29.53C8.16 29.38 8.39 28.96 8.59 28.60C8.80 28.24 8.97 27.94 8.97 27.93C8.97 27.91 9.21 27.47 9.51 26.95C9.81 26.43 10.06 25.98 10.06 25.95C10.06 25.86 11.83 23.28 12.56 22.31C13.54 21.00 15.11 19.08 15.98 18.13C16.35 17.73 16.80 17.24 16.96 17.06C17.37 16.60 20.20 14.09 21.30 13.21C23.20 11.68 25.60 10.04 27.27 9.12C29.49 7.89 31.65 6.84 33.28 6.19C35.62 5.25 37.68 4.59 39.56 4.17C39.96 4.08 40.46 3.96 40.65 3.92C41.38 3.76 41.64 3.70 42.06 3.63C43.45 3.37 44.22 3.26 45.33 3.16C45.79 3.11 46.54 3.04 47.01 2.98C48.29 2.84 53.18 2.87 54.70 3.03C57.08 3.28 57.45 3.33 59.40 3.70C60.75 3.95 62.01 4.26 63.32 4.65C64.07 4.87 66.64 5.71 66.83 5.80C66.92 5.83 67.50 6.06 68.12 6.31C72.05 7.85 76.16 10.23 79.81 13.08C83.56 16.01 87.39 20.12 89.96 23.97C91.85 26.81 93.87 30.66 94.91 33.43C95.72 35.60 96.30 37.45 96.68 39.09C96.78 39.48 96.88 39.93 96.92 40.10C97.30 41.73 97.63 43.92 97.85 46.34C97.95 47.44 97.96 52.06 97.86 53.11C97.60 55.71 97.59 55.82 97.34 57.39C96.84 60.52 95.89 63.93 94.67 67.00C94.09 68.45 93.97 68.71 93.23 70.19C92.03 72.58 91.53 73.45 90.26 75.38C87.94 78.86 85.45 81.80 82.61 84.38C81.16 85.69 80.69 86.08 79.44 87.01C77.87 88.18 76.41 89.13 74.72 90.10C74.41 90.28 73.46 90.75 72.63 91.14C72.66 91.20 72.68 91.26 72.70 91.31C74.46 90.52 76.79 89.16 78.70 87.79C84.94 83.33 90.07 77.19 93.56 69.99C94.76 67.51 95.39 65.92 96.15 63.40C96.60 61.92 97.15 59.68 97.39 58.32C97.44 58.04 97.51 57.66 97.55 57.47C97.68 56.76 97.90 55.05 98.01 53.84C98.30 50.76 98.24 46.97 97.85 44.24C97.81 43.94 97.74 43.43 97.69 43.11C97.65 42.79 97.58 42.36 97.54 42.17C97.50 41.98 97.40 41.41 97.31 40.92C96.89 38.59 95.99 35.56 94.98 33.03C93.35 28.95 91.28 25.26 88.70 21.82C85.87 18.05 82.35 14.53 78.72 11.83C75.95 9.77 72.00 7.50 69.02 6.24C68.63 6.07 68.19 5.89 68.04 5.83C66.48 5.16 64.66 4.53 62.75 4.00C62.62 3.96 62.39 3.90 62.24 3.86C61.67 3.70 60.11 3.32 59.34 3.15C57.88 2.84 55.63 2.53 53.61 2.36C52.16 2.23 47.33 2.23 46.00 2.36C42.67 2.67 40.99 2.95 38.08 3.69C35.99 4.22 33.45 5.06 31.97 5.72C31.76 5.81 31.58 5.88 31.57 5.88C31.45 5.88 28.81 7.16 27.56 7.83C26.10 8.60 23.71 10.10 22.27 11.14C21.37 11.79 19.04 13.68 18.64 14.07C18.62 14.10 18.15 14.52 17.59 15.02C16.08 16.37 15.41 17.09 13.01 19.90C12.37 20.65 10.29 23.40 9.77 24.18C8.53 26.05 6.71 29.39 5.75 31.56C5.68 31.71 5.56 31.99 5.47 32.18C5.38 32.37 5.15 32.95 4.95 33.47C4.75 33.98 4.55 34.47 4.51 34.56C4.48 34.65 4.34 35.03 4.21 35.42C4.07 35.81 3.93 36.21 3.89 36.32C3.75 36.70 3.20 38.72 2.97 39.67C2.62 41.11 2.52 41.65 2.18 43.85C1.93 45.45 1.78 47.00 1.78 48.10C1.78 48.86 1.76 49.03 1.70 48.88C1.64 48.74 1.64 48.19 1.71 47.01C1.82 44.88 1.97 43.52 2.31 41.55C2.50 40.38 3.01 38.02 3.23 37.25C3.29 37.02 3.39 36.68 3.44 36.51C3.49 36.34 3.58 36.04 3.64 35.85C3.70 35.65 3.78 35.39 3.81 35.26C3.88 35.02 4.15 34.25 4.59 33.04C4.73 32.67 4.89 32.22 4.96 32.03C5.03 31.84 5.16 31.50 5.26 31.29C5.36 31.07 5.52 30.70 5.61 30.46C5.97 29.56 6.81 27.83 7.41 26.76C8.31 25.15 8.49 24.85 9.65 23.10C11.37 20.52 12.40 19.21 14.61 16.82C16.62 14.65 18.35 13.05 21.02 10.93C22.15 10.03 24.54 8.48 26.53 7.34C27.72 6.66 30.10 5.46 30.85 5.17C31.06 5.08 31.38 4.95 31.55 4.87C32.59 4.40 35.30 3.44 37.02 2.93C38.63 2.46 41.22 1.91 43.15 1.63C44.54 1.43 46.27 1.26 47.87 1.17C48.93 1.11 53.64 1.20 54.78 1.31C56.86 1.51 57.80 1.64 59.54 1.97C59.73 2.01 60.08 2.08 60.32 2.12C61.72 2.38 65.16 3.42 66.99 4.12C67.29 4.24 67.82 4.44 68.16 4.57C68.50 4.70 69.00 4.91 69.25 5.02C69.51 5.14 69.88 5.30 70.07 5.38C70.70 5.64 73.36 7.01 74.52 7.67C77.41 9.32 79.22 10.59 82.01 12.94C83.26 13.99 85.00 15.64 86.31 17.01C89.52 20.39 92.02 23.97 94.17 28.28C94.68 29.28 95.14 30.24 95.20 30.39C95.26 30.54 95.41 30.88 95.53 31.15C95.65 31.42 95.75 31.66 95.75 31.67C95.75 31.69 95.85 31.92 95.97 32.20C96.10 32.47 96.25 32.84 96.32 33.04C96.39 33.23 96.55 33.69 96.69 34.05C97.31 35.71 97.92 37.80 98.32 39.59C98.37 39.83 98.44 40.16 98.48 40.34C98.54 40.63 98.81 42.04 98.90 42.64C99.20 44.47 99.49 48.06 99.49 49.93C99.49 50.86 99.32 54.01 99.23 54.66M38.48 95.24C38.41 95.21 37.98 94.99 37.53 94.76C35.44 93.72 33.52 92.18 31.98 90.32C30.82 88.92 29.96 87.17 29.48 85.25C29.27 84.39 29.24 84.14 29.24 83.14C29.23 81.16 29.55 80.03 30.53 78.60C31.46 77.21 32.84 76.20 34.33 75.79C34.71 75.68 35.86 75.58 36.27 75.62C36.46 75.64 36.68 75.65 36.76 75.65C36.84 75.65 36.91 75.69 36.91 75.73C36.91 75.77 36.77 75.81 36.62 75.81C36.02 75.82 34.94 76.15 34.18 76.56C32.53 77.46 31.33 78.93 30.71 80.80C30.37 81.86 30.32 82.20 30.32 83.49C30.33 84.96 30.53 86.06 31.02 87.28C31.34 88.07 32.18 89.53 32.80 90.37C33.32 91.08 35.23 92.98 35.97 93.53C36.61 94.01 38.05 94.91 38.45 95.09C38.59 95.15 38.70 95.22 38.70 95.25C38.70 95.33 38.65 95.33 38.48 95.24M31.47 92.18C29.40 90.50 27.60 87.92 26.83 85.55C26.61 84.84 26.47 84.16 26.36 83.11C26.17 81.32 26.55 79.38 27.40 77.77C27.87 76.88 28.31 76.29 29.05 75.58C29.94 74.73 30.74 74.35 32.42 73.98C32.67 73.93 32.69 73.93 32.69 73.99C32.69 74.02 32.57 74.10 32.43 74.16C31.36 74.61 30.77 75.00 29.94 75.80C28.45 77.22 27.61 79.07 27.30 81.67C27.13 83.08 27.40 85.13 27.95 86.54C28.77 88.64 29.86 90.23 31.76 92.14C32.18 92.56 32.53 92.93 32.53 92.95C32.53 93.01 32.09 92.68 31.47 92.18M26.25 90.16C26.13 90.27 24.23 87.96 23.80 87.18C23.32 86.31 23.18 86.03 22.98 85.52C22.61 84.62 22.41 83.93 22.23 83.03C22.09 82.30 22.07 81.99 22.10 80.81C22.14 79.07 22.34 78.22 23.06 76.74C23.86 75.09 25.19 73.84 26.64 73.34C27.35 73.10 28.40 72.93 28.39 73.05C28.39 73.08 28.14 73.23 27.83 73.37C27.12 73.69 26.51 74.14 25.73 74.91C24.67 75.97 23.85 77.37 23.50 78.73C23.41 79.07 23.29 79.53 23.23 79.75C23.16 80.01 23.13 80.64 23.13 81.70C23.14 83.42 23.26 84.24 23.72 85.65C24.15 86.96 25.13 88.76 25.95 89.71C26.14 89.94 26.27 90.13 26.25 90.16M99.85 46.19C99.72 44.61 99.70 44.49 99.33 42.21C99.01 40.23 98.65 38.62 98.00 36.32C97.60 34.89 97.55 34.76 96.96 33.23C96.59 32.28 96.52 32.11 96.22 31.45C96.13 31.25 96.06 31.07 96.06 31.05C96.06 31.03 95.98 30.83 95.87 30.60C95.77 30.38 95.61 30.01 95.51 29.80C95.05 28.77 94.15 26.97 93.64 26.09C93.33 25.55 93.01 25.01 92.94 24.87C92.66 24.39 90.73 21.53 90.18 20.79C88.46 18.46 85.63 15.39 83.50 13.54C83.13 13.22 82.71 12.85 82.56 12.71C82.20 12.39 80.92 11.37 79.91 10.59C78.57 9.57 75.87 7.81 74.40 7.01C74.10 6.85 73.68 6.62 73.47 6.50C72.68 6.07 70.06 4.79 69.96 4.79C69.94 4.79 69.74 4.70 69.51 4.60C68.17 3.99 65.47 2.99 64.02 2.56C61.57 1.84 59.90 1.47 57.66 1.13C57.38 1.08 57.02 1.03 56.85 1.00C54.66 0.65 49.38 0.47 46.89 0.66C45.36 0.77 44.05 0.89 43.62 0.96C43.38 1.00 42.71 1.11 42.13 1.20C40.67 1.42 38.56 1.87 37.29 2.21C35.49 2.71 34.45 3.03 33.08 3.54C32.71 3.67 32.27 3.83 32.08 3.90C30.29 4.52 26.55 6.36 24.26 7.73C22.49 8.80 19.91 10.62 18.45 11.85C16.63 13.36 13.70 16.24 12.20 17.98C11.38 18.92 9.81 20.88 9.22 21.68C8.37 22.86 6.81 25.34 5.93 26.95C5.45 27.82 3.97 30.87 3.97 30.98C3.97 31.00 3.90 31.17 3.82 31.36C3.73 31.56 3.59 31.87 3.50 32.06C3.42 32.26 3.35 32.45 3.35 32.49C3.35 32.53 3.32 32.63 3.28 32.70C3.21 32.83 2.90 33.64 2.57 34.56C2.43 34.94 2.03 36.21 1.85 36.82C1.80 37.00 1.72 37.28 1.67 37.45C1.58 37.72 1.34 38.69 1.08 39.79C0.84 40.85 0.49 42.83 0.31 44.24C0.26 44.58 0.18 45.20 0.13 45.60C0.00 46.62 0.00 52.75 0.13 53.91C0.45 56.75 0.53 57.28 0.99 59.57C1.35 61.38 1.35 61.37 1.59 62.26C2.17 64.42 3.20 67.44 3.88 68.94C3.96 69.13 4.15 69.55 4.29 69.87C4.61 70.64 5.47 72.32 5.94 73.14C6.15 73.50 6.31 73.81 6.31 73.82C6.31 73.90 7.34 75.56 8.07 76.67C10.14 79.82 12.30 82.51 14.66 84.86C17.96 88.16 20.69 90.30 24.77 92.80C26.50 93.86 30.55 95.80 31.99 96.25C32.10 96.29 32.48 96.42 32.85 96.56C34.34 97.11 37.02 97.91 38.62 98.28C40.83 98.78 42.69 99.10 44.55 99.29C46.58 99.49 47.32 99.53 49.59 99.53C53.07 99.53 55.20 99.36 58.33 98.83C60.07 98.53 60.48 98.44 62.06 98.05C63.20 97.77 63.87 97.58 65.39 97.12C66.28 96.86 69.31 95.70 70.38 95.22C71.02 94.93 73.79 93.56 74.05 93.40C74.16 93.34 74.68 93.04 75.22 92.73C76.28 92.12 79.16 90.22 79.98 89.59C86.00 84.97 90.20 80.18 93.68 73.97C94.73 72.10 96.48 68.37 96.84 67.22C96.88 67.11 97.01 66.73 97.15 66.36C97.41 65.66 97.49 65.43 97.78 64.49C97.87 64.17 98.01 63.74 98.07 63.55C98.19 63.15 98.61 61.55 98.71 61.09C98.99 59.78 99.29 58.29 99.34 57.93C99.61 56.16 99.68 55.55 99.88 53.37C100.00 52.11 99.98 47.75 99.85 46.19M71.05 91.96C71.02 92.01 70.97 92.04 70.93 92.04C70.88 92.04 70.85 92.01 70.85 91.96C70.85 91.91 70.90 91.88 70.97 91.88C71.04 91.88 71.07 91.91 71.05 91.96"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-build" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 18h36v18H6z"/><path d="M6 18l6-8h24l6 8M12 36v-8h24v8" opacity=".6"/><path d="M10 30c3-2 5-2 8 0s5 2 8 0 5-2 8 0 5 2 6 1"/></g></symbol>
+  <symbol id="i-reno" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M8 40h32M10 40V22h28v18"/><path d="M14 22v-6h20v6M18 16v-6h12v6" opacity=".6"/><path d="M15 31h18"/></g></symbol>
+  <symbol id="i-fix" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><circle cx="18" cy="26" r="10"/><path d="M28 26h12v8H28M14 26h8M18 22v8"/><path d="M18 16v-6M14 10h8" opacity=".6"/></g></symbol>
+</svg>
+<script type="module" src="app.js?v=4"></script>
+<script>/* lf-open: counts a tagged preview link being opened (?r=). No cookies. Local Form */(function(){try{var r=new URLSearchParams(location.search).get('r');if(!r||!navigator.sendBeacon||sessionStorage.getItem('lf-open'))return;sessionStorage.setItem('lf-open','1');navigator.sendBeacon('https://localform.online/api/open',JSON.stringify({r:r,s:location.pathname.split('/')[1]||location.hostname,d:matchMedia('(pointer:coarse)').matches?'phone':'desktop'}))}catch(e){}})();</script>
 </body>
 </html>
