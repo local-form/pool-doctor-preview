@@ -39,8 +39,8 @@ function updatePlan() {
   const { shape: s, len: L, wid: W } = plan;
   const depth = s === 'Plunge' ? 4.5 : s === 'Lap' ? 4.25 : 5.25, area = s === 'Freeform' ? .8 : s === 'L-shape' ? .74 : 1;
   plan.gal = Math.round(L * W * area * depth * 7.48 / 100) * 100;
-  $('#planDims').textContent = `${L} × ${W} ft ${s.toLowerCase()}`;
-  $('#planGal').textContent = `about ${plan.gal.toLocaleString()} gallons`;
+  $('#planDims').textContent = `Concept sketch · ${L} × ${W} ft ${s.toLowerCase()}`;
+  $('#planGal').textContent = `about ${plan.gal.toLocaleString()} gallons at ${depth} ft average depth`;
   $('#lenOut').textContent = L + ' ft'; $('#widOut').textContent = W + ' ft'; fill(lenI); fill(widI);
   $('#dimL span').textContent = L + ' ft'; $('#dimW span').textContent = W + ' ft';
   yard?.set(plan);
@@ -65,6 +65,15 @@ grip.addEventListener('keydown', e => {
   if (!dl && !dw) return; e.preventDefault(); lenI.value = clampI(lenI, +lenI.value + dl); widI.value = clampI(widI, +widI.value + dw); updatePlan();
 });
 $('#heroSend').addEventListener('click', () => { readPlan(); openRequest('New pool', { kind: 'plan', text: planText() }); });
+// phones: the three services come first; the planner opens from "Design my pool" and the sketch stays pinned above the controls
+function openPlanner() {
+  if (phone()) { hero.classList.add('planning'); $('#svcPlan').setAttribute('aria-expanded', 'true'); }
+  hero.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+  if (phone()) setTimeout(() => $('#designer button').focus({ preventScroll: true }), reduced ? 0 : 500);
+}
+$('#svcPlan').addEventListener('click', openPlanner);
+$('#planDone').addEventListener('click', () => { hero.classList.remove('planning'); $('#svcPlan').setAttribute('aria-expanded', 'false'); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); $('#svcPlan').focus({ preventScroll: true }); });
+$$('a[href="#design"]:not(#dockMain)').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openPlanner(); }));
 import('./yard.js?v=3').then(({ mountYard }) => {
   const copy = $('.hero-copy');
   yard = mountYard(cv, { dpr: phone() ? 1.5 : 1.25, reduced, still: q.has('still'), labels: { L: $('#dimL'), W: $('#dimW') }, grip: $('#grip'),
@@ -149,14 +158,15 @@ function showPart(id, from3d) {
   if (!PARTS[id]) return; curPart = id;
   partBtns.forEach(b => b.setAttribute('aria-pressed', b.dataset.p === id));
   $('#partLine').textContent = PARTS[id][1];
-  symBox.innerHTML = SYM.map((x, i) => x.part === id ? `<button type="button" role="radio" aria-checked="false" data-i="${i}">${esc(x.t)}</button>` : '').join('');
+  symBox.innerHTML = SYM.map((x, i) => x.part === id ? `<button type="button" role="radio" aria-checked="false" tabindex="-1" data-i="${i}">${esc(x.t)}</button>` : '').join('');
+  const f0 = $('button', symBox); if (f0) f0.tabIndex = 0;
   box.hidden = true; box.innerHTML = '';
   if (!from3d) pad ? pad.select(id) : (padPending = id);
 }
 partBtns.forEach(b => b.addEventListener('click', () => showPart(b.dataset.p)));
 symBox.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  $$('button', symBox).forEach(x => x.setAttribute('aria-checked', x === b));
+  $$('button', symBox).forEach(x => { x.setAttribute('aria-checked', x === b); x.tabIndex = x === b ? 0 : -1; });
   const x = SYM[+b.dataset.i], label = `${PARTS[x.part][0]}: ${x.t}`;
   pad ? pad.flag(x.part) : (padPending = x.part);
   const sms = encodeURIComponent(`Hi Joe, pool problem: ${label}. Photo attached.`);
@@ -167,6 +177,11 @@ symBox.addEventListener('click', e => {
   box.hidden = false;
   $('#repReq').addEventListener('click', () => openRequest('Repair', { kind: 'sym', text: label }));
   if (phone()) box.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
+});
+symBox.addEventListener('keydown', e => {
+  const bs = $$('button', symBox), i = bs.indexOf(document.activeElement); if (i < 0) return;
+  const k = e.key, n = k === 'ArrowDown' || k === 'ArrowRight' ? i + 1 : k === 'ArrowUp' || k === 'ArrowLeft' ? i - 1 : k === 'Home' ? 0 : k === 'End' ? bs.length - 1 : null;
+  if (n === null) return; e.preventDefault(); const t = bs[(n + bs.length) % bs.length]; t.focus(); t.click();
 });
 showPart('pump');
 
@@ -214,7 +229,7 @@ const CARE = {
 const when = $('#when'), todo = $('#todo');
 when.innerHTML = Object.keys(CARE).map((k, i) => `<button type="button" role="tab" aria-selected="${i === 1}" data-k="${k}">${k}</button>`).join('');
 function showCare(k) {
-  $$('button', when).forEach(b => b.setAttribute('aria-selected', b.dataset.k === k));
+  $$('button', when).forEach(b => { b.setAttribute('aria-selected', b.dataset.k === k); b.tabIndex = b.dataset.k === k ? 0 : -1; });
   const [intro, list] = CARE[k];
   todo.style.animation = 'none'; void todo.offsetWidth; todo.style.animation = '';
   todo.innerHTML = `<p class="intro">${intro}</p>` + list.map(t => `<label><input type="checkbox"><span>${t}</span></label>`).join('');
@@ -239,53 +254,87 @@ const padIO = new IntersectionObserver(([e]) => {
 }, { rootMargin: '400px 0px' });
 padIO.observe(padBox);
 
-/* ---------- 09 request (preview: nothing sends) ---------- */
-const reqForm = $('#req'), tabs = $$('#reqType button'), carry = $('#carry');
-let reqType = 'New pool', carried = null;
+/* ---------- request (preview: builds a summary on this screen and sends nothing) ----------
+   One way in: openRequest(type, carry). Photo limit: MAX_PHOTOS images, kept in memory on this device only.
+   Before a real launch: wire delivery and confirm a test request arrives with contact details, service, plan or symptom, and photos. */
+const reqForm = $('#req'), tabs = $$('#reqType button'), carry = $('#carry'), MAX_PHOTOS = 6;
+let reqType = 'New pool', carried = null, photos = [];
 const detailLabels = { 'New pool': 'Anything Joe should know about your yard or the pool you want?', Renovation: 'What would you like redone? (plaster, liner, coping, deck…)', Repair: 'What\'s happening, and when did it start?', 'Contractor help': 'Your company, the job address area and what the build needs' };
+const applies = () => !!carried && ((carried.kind === 'plan' && reqType === 'New pool') || (carried.kind === 'sym' && reqType === 'Repair'));
 function setType(t) {
-  reqType = t; tabs.forEach(b => b.setAttribute('aria-checked', b.dataset.v === t));
+  reqType = t; tabs.forEach(b => { const on = b.dataset.v === t; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; });
   $('#fDetailL').textContent = detailLabels[t]; $('#poolMore').hidden = t !== 'New pool';
-  if (carried && !((carried.kind === 'plan' && t === 'New pool') || (carried.kind === 'sym' && t === 'Repair'))) carried = null;
   drawCarry();
 }
 function drawCarry() {
-  carry.hidden = !carried; if (!carried) return;
-  carry.innerHTML = `<b>${carried.kind === 'plan' ? 'Your plan' : 'What you\'re seeing'}:</b> ${esc(carried.text)} <button type="button" id="dropCarry">Remove</button>`;
+  const on = applies(); carry.hidden = !on; if (!on) return;
+  carry.innerHTML = `<span><b>${carried.kind === 'plan' ? 'Your plan' : 'What you\'re seeing'}:</b> ${esc(carried.text)}</span><button type="button" id="dropCarry">Remove</button>`;
   $('#dropCarry').addEventListener('click', () => { carried = null; drawCarry(); });
 }
 tabs.forEach((b, i) => {
   b.addEventListener('click', () => setType(b.dataset.v));
-  b.addEventListener('keydown', e => { const n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : null; if (n === null) return; e.preventDefault(); const t = tabs[(n + tabs.length) % tabs.length]; t.focus(); setType(t.dataset.v); });
-});
-function openRequest(type, carry) { carried = carry || null; setType(type); showForm(); $('#request').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' }); setTimeout(() => $('#fName').focus({ preventScroll: true }), reduced ? 0 : 700); }
-$$('[data-req]').forEach(a => a.addEventListener('click', () => { carried = null; setType(a.dataset.req); }));
-$$('a[href="#request"]:not([data-req])').forEach(a => a.addEventListener('click', () => setType('New pool')));
-chips($('#fWhen')); chips($('#fBudget')); chips($('#fStart'));
-$('#fPhotos').addEventListener('change', e => {
-  const t = $('#thumbs'); t.innerHTML = '';
-  [...e.target.files].slice(0, 6).forEach(f => { const im = new Image(); im.alt = 'Your photo: ' + f.name; im.src = URL.createObjectURL(f); t.append(im); });
-});
-reqForm.addEventListener('submit', e => {
-  e.preventDefault();
-  const name = $('#fName').value.trim(), ph = $('#fPhone').value.replace(/\D/g, ''), err = $('#reqErr');
-  $('#fName').setAttribute('aria-invalid', !name); $('#fPhone').setAttribute('aria-invalid', ph.length < 10);
-  if (!name || ph.length < 10) { err.textContent = !name ? 'Add your name so Joe knows who to call.' : 'Add a mobile number (10 digits) so Joe can call or text you back.'; const bad = !name ? $('#fName') : $('#fPhone'); (bad.closest('label') || bad).before(err); bad.focus(); err.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' }); return; }
-  err.textContent = '';
-  const rows = [['Request', reqType], carried && [carried.kind === 'plan' ? 'Plan' : 'Seeing', carried.text], ['Name', name], ['Mobile', $('#fPhone').value.trim()],
-    $('#fEmail').value.trim() && ['Email', $('#fEmail').value.trim()], $('#fTown').value && ['Town', $('#fTown').value], $('#fDetail').value.trim() && ['Details', $('#fDetail').value.trim()],
-    $('#fPhotos').files.length && ['Photos', $('#fPhotos').files.length + ' attached'], picked($('#fWhen')).length && ['Best time', picked($('#fWhen'))[0]], reqType === 'New pool' && picked($('#fBudget')).length && ['Budget', picked($('#fBudget'))[0]], reqType === 'New pool' && picked($('#fStart')).length && ['When', picked($('#fStart'))[0]]].filter(Boolean);
-  $('#doneTitle').textContent = `Thanks, ${name.split(' ')[0]}. Here's what Joe would get.`;
-  $('#doneBody').innerHTML = `<dl>${rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>`;
-  reqForm.hidden = true; $('#done').hidden = false; $('#done').focus();
+  b.addEventListener('keydown', e => { const k = e.key, n = k === 'ArrowRight' || k === 'ArrowDown' ? i + 1 : k === 'ArrowLeft' || k === 'ArrowUp' ? i - 1 : k === 'Home' ? 0 : k === 'End' ? tabs.length - 1 : null;
+    if (n === null) return; e.preventDefault(); const t = tabs[(n + tabs.length) % tabs.length]; t.focus(); setType(t.dataset.v); });
 });
 function showForm() { reqForm.hidden = false; $('#done').hidden = true; }
-$('#again').addEventListener('click', () => { reqForm.reset(); $('#thumbs').innerHTML = ''; $$('#fWhen button, #fBudget button, #fStart button').forEach(b => b.setAttribute('aria-pressed', 'false')); carried = null; setType('New pool'); showForm(); $('#fName').focus(); });
+function openRequest(type, c) {
+  if (c !== undefined) carried = c;                       // a new plan or symptom replaces the old one; a plain CTA keeps what's there
+  setType(type); showForm();
+  $('#request').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' }); setTimeout(() => $('#fName').focus({ preventScroll: true }), reduced ? 0 : 700);
+}
+$$('[data-req]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openRequest(a.dataset.req); }));
+$$('a[href="#request"]:not([data-req])').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openRequest(reqType); }));
+chips($('#fWhen')); chips($('#fBudget')); chips($('#fStart'));
+// photos: images only, first MAX_PHOTOS, never uploaded
+const thumbs = $('#thumbs'), photoNote = $('#photoNote');
+function drawPhotos() { $$('img', thumbs).forEach(i => URL.revokeObjectURL(i.src)); thumbs.innerHTML = '';
+  photos.forEach(f => { const im = new Image(); im.alt = 'Your photo: ' + f.name; im.src = URL.createObjectURL(f); thumbs.append(im); }); }
+$('#fPhotos').addEventListener('change', e => {
+  const all = [...e.target.files], imgs = all.filter(f => /^image\//.test(f.type)), skipped = all.length - imgs.length, over = Math.max(0, imgs.length - MAX_PHOTOS);
+  photos = imgs.slice(0, MAX_PHOTOS); drawPhotos();
+  photoNote.textContent = [over && `Kept the first ${MAX_PHOTOS} photos and left out ${over}.`, skipped && `Skipped ${skipped} file${skipped > 1 ? 's' : ''} that ${skipped > 1 ? 'aren\'t photos' : 'isn\'t a photo'}.`].filter(Boolean).join(' ');
+});
+// validation: each error sits under its own field and is tied to it for screen readers
+function setErr(input, msg) {
+  let e = $('#' + input.id + 'Err'); if (!e) { e = document.createElement('p'); e.className = 'err'; e.id = input.id + 'Err'; input.after(e); }
+  e.textContent = msg || ''; input.setAttribute('aria-invalid', !!msg); msg ? input.setAttribute('aria-describedby', e.id) : input.removeAttribute('aria-describedby');
+}
+const phoneOk = v => { const d = v.replace(/\D/g, ''); return /^[\d\s().+-]+$/.test(v.trim()) && (d.length === 10 || (d.length === 11 && d[0] === '1')); };   // (843) 555-0123, 843.555.0123, +1 843 555 0123
+const emailOk = v => !v || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+['fName', 'fPhone', 'fEmail'].forEach(id => $('#' + id).addEventListener('input', e => { if (e.target.getAttribute('aria-invalid') === 'true') setErr(e.target, ''); }));
+reqForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const nameI = $('#fName'), phI = $('#fPhone'), emI = $('#fEmail'), name = nameI.value.trim(), ph = phI.value.trim(), em = emI.value.trim();
+  setErr(nameI, name ? '' : 'Add your name so Joe knows who to call.');
+  setErr(phI, phoneOk(ph) ? '' : ph ? 'That number doesn\'t look right. Use a 10-digit US number, like (843) 555-0123.' : 'Add a mobile number so Joe can call or text you back.');
+  setErr(emI, emailOk(em) ? '' : 'That email doesn\'t look right. Fix it or leave it empty.');
+  const bad = [nameI, phI, emI].find(i => i.getAttribute('aria-invalid') === 'true');
+  if (bad) { bad.focus({ preventScroll: true }); bad.closest('label').scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' }); return; }
+  const pool = reqType === 'New pool';
+  const rows = [['Request', reqType], applies() && [carried.kind === 'plan' ? 'Plan' : 'Seeing', carried.text], ['Name', name], ['Mobile', ph],
+    em && ['Email', em], $('#fTown').value && ['Town', $('#fTown').value], $('#fDetail').value.trim() && ['Details', $('#fDetail').value.trim()],
+    photos.length && ['Photos', `${photos.length} selected, kept on this device`], picked($('#fWhen')).length && ['Best time', picked($('#fWhen'))[0]],
+    pool && picked($('#fBudget')).length && ['Budget', picked($('#fBudget'))[0]], pool && picked($('#fStart')).length && ['When', picked($('#fStart'))[0]]].filter(Boolean);
+  $('#doneTitle').textContent = `Thanks, ${name.split(' ')[0]}. Here's the summary this preview built.`;
+  $('#doneBody').innerHTML = `<dl>${rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` + (photos.length ? `<div class="thumbs">${$$('img', thumbs).map(i => `<img src="${i.src}" alt="${esc(i.alt)}">`).join('')}</div>` : '');
+  reqForm.hidden = true; $('#done').hidden = false; $('#done').focus();
+});
+$('#editReq').addEventListener('click', () => { showForm(); $('#fName').focus(); });
+$('#again').addEventListener('click', () => {
+  reqForm.reset(); photos = []; drawPhotos(); photoNote.textContent = ''; ['fName', 'fPhone', 'fEmail'].forEach(id => setErr($('#' + id), ''));
+  $$('#fWhen button, #fBudget button, #fStart button').forEach(b => b.setAttribute('aria-pressed', 'false')); carried = null; setType('New pool'); showForm(); $('#fName').focus();
+});
 setType('New pool');
 
 /* ---------- phone dock ---------- */
 const dock = $('#dock'); let inHero = true, inReq = false;
-const dockSet = () => dock.classList.toggle('on', !inHero && !inReq);
+const dockSet = () => { const on = !inHero && !inReq; dock.classList.toggle('on', on); dock.inert = !on; };
+const dockMain = $('#dockMain'), DOCK = { plan: 'Design my pool', reno: 'Quote my renovation', repair: 'Request a repair' }; let dockMode = 'plan';
+const setDock = m => { if (m !== dockMode) { dockMode = m; dockMain.textContent = DOCK[m]; } };
+const dockIO = new IntersectionObserver(es => es.forEach(e => { const m = e.target.id === 'repair' ? 'repair' : 'reno'; if (e.isIntersecting) setDock(m); else if (dockMode === m) setDock('plan'); }), { rootMargin: '-40% 0px -40% 0px' });
+dockIO.observe($('#renovate')); dockIO.observe($('#repair'));
+dockMain.addEventListener('click', e => { e.preventDefault(); dockMode === 'repair' ? openRequest('Repair') : dockMode === 'reno' ? openRequest('Renovation') : openPlanner(); });
+dock.inert = true;
 new IntersectionObserver(([e]) => { inHero = e.isIntersecting; dockSet(); }).observe(hero);
 new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { threshold: .05 }).observe($('#request'));
 
@@ -337,7 +386,7 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
       const g = ctx.createLinearGradient(0, 0, w, 0); g.addColorStop(0, mixc(at(0))); g.addColorStop(1, mixc(at(w))); return g; }
     return getComputedStyle(sec).backgroundColor;
   };
-  const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); it.up = edge(it.prev, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
+  const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); let pv = it.sec.previousElementSibling; while (pv && !pv.offsetHeight) pv = pv.previousElementSibling; it.up = edge(pv, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
   const draw = (it, t) => {
     const { ctx, w, h } = it, mid = h / 2, amp = h * (it.one ? .36 : .46), sh = t * it.sp + 16 * Math.sin(t * .45 + it.seed) + it.off, k = w < 700 ? .55 : 1;
     ctx.clearRect(0, 0, w, h);
@@ -360,8 +409,3 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
   addEventListener('resize', () => { items.forEach(it => { fit(it); draw(it, (performance.now() - t0) / 1000); }); kick(); });
   document.addEventListener('visibilitychange', kick);
 }
-
-// phones: no page pinch-zoom, so the page can never get stuck zoomed in (the 3D pad handles its own pinch)
-{ const stop = e => e.preventDefault();
-  for (const g of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(g, stop, { passive: false });
-  document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false }); }

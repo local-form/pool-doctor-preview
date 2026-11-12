@@ -6,12 +6,12 @@
 @font-face{font-family:Mono;src:url(fonts/jetbrains-mono-latin-500-normal.woff2) format('woff2');font-weight:500;font-display:swap}
 :root{--ink:#06111B;--ink2:#0B1A29;--ink3:#12263A;--royal:#1D5DB5;--royal2:#2E7FD0;--sky:#5DB6E6;--foam:#F3F8FB;--line:#D6E2EA;--mute:#4A5E6E;--amber:#F2A33A;--r:18px;--wrap:1240px}
 *,*::before,*::after{box-sizing:border-box;margin:0}
-html{touch-action:pan-x pan-y;overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:20px}
+html{touch-action:manipulation;overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:20px}
 body{background:var(--foam);color:var(--ink);font:400 17px/1.55 Hanken,system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
 img,svg,canvas{display:block;max-width:100%}
 a{color:inherit}
 button,input,select,textarea{font:inherit;color:inherit}
-button,a,input,select,textarea,label{touch-action:pan-x pan-y}
+button,a,input,select,textarea,label{touch-action:manipulation}
 button{cursor:pointer;background:none;border:0}
 :focus-visible{outline:3px solid var(--sky);outline-offset:3px;border-radius:6px}
 [hidden]{display:none!important}
@@ -513,3 +513,44 @@ input[type=file]::file-selector-button{min-height:44px;padding:0 16px;border-rad
   .chips.tiles button,.chips.sw button{font-size:10.5px;letter-spacing:-.01em}
 }
 .err:empty{display:none}
+
+/* ---- 2026-11-12 brief: services first on phones, request flow, calmer labels ---- */
+.svc,.plan-bar{display:none}
+.marker{font-size:13.5px;letter-spacing:.1em}
+.skipreq{margin-top:14px}.skipreq .link{font-size:16px;text-align:left}
+.demo{border-radius:12px;padding:12px 14px;background:rgba(242,163,58,.12);border:1px solid rgba(242,163,58,.55);color:#ffe2b8;font-size:15px}
+.demo b{color:#fff}
+.note{font-size:14px;color:#ffd9a6;margin-top:-6px}.note:empty{display:none}
+.fields label .err{margin-top:6px;font-size:14.5px;font-weight:600}
+.carry{display:flex;gap:10px 14px;align-items:baseline;justify-content:space-between;flex-wrap:wrap}
+.carry button{text-decoration:underline;text-underline-offset:4px;color:#fff;min-height:32px}
+.done .demo{margin:0 0 16px}.done .thumbs{margin-top:14px}
+.done-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.door:first-child{background:var(--royal)}
+@media(max-width:860px){
+  html{scroll-padding-bottom:104px}
+  :focus-visible{scroll-margin-bottom:112px}
+  .hero{overflow:clip}
+  .yard{height:max(270px,37svh)}
+  .hero .eyebrow{display:flex;font-size:11.5px;margin:6px 0 8px}
+  .svc{display:grid;gap:8px;margin-top:14px}
+  .svc .btn{width:100%;min-height:50px;justify-content:center}
+  .areas{font-size:13.5px;line-height:1.4;color:#a9c3d4;margin-top:4px}
+  .hero:not(.planning) .designer{display:none}
+  .hero.planning h1,.hero.planning .svc,.hero.planning .eyebrow{display:none}
+  .hero.planning .yard{position:sticky;top:0;z-index:4}
+  .hero.planning .plan-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 0 2px;font-size:15px}
+  .plan-bar button{min-height:40px;padding:0 16px;border-radius:99px;border:1.5px solid rgba(255,255,255,.35);font-weight:700;font-size:14px}
+  .doors{display:none}
+  .padbox{order:2}
+  .look{grid-template-columns:1fr}
+  .chips.sw button{font-size:13px;min-height:50px;grid-auto-flow:column;justify-content:center;align-items:center;gap:8px;padding:6px}
+  .chips.tiles button{font-size:12.5px}
+  .dl{font-size:12.5px}
+  .story-steps{display:grid;grid-template-columns:repeat(4,1fr);overflow:visible;margin:0;padding:0 0 14px;gap:6px;scroll-snap-type:none}
+  .story-steps button{min-width:0;padding:0 2px;font-size:13px;min-height:54px}
+  .story-steps button .mono{font-size:11.5px}
+  .readout{font-size:12.5px;gap:4px 10px}
+  .done-actions .btn{flex:1 1 100%}
+}
+@media(max-width:380px){.chips.tiles button{font-size:11.5px;letter-spacing:-.01em}.chips.sw button{font-size:12.5px}}

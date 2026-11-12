@@ -14,7 +14,7 @@
 <meta property="og:image" content="https://preview.localform.online/pool-doctor-preview/og.jpg">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/montserrat-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=12">
+<link rel="stylesheet" href="styles.css?v=13">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"HomeAndConstructionBusiness","name":"The Pool Doctor","telephone":"+1-843-737-3165","email":"thepooldoc@yahoo.com","founder":{"@type":"Person","name":"Joseph Penna"},"areaServed":["Charleston, SC","Sullivan's Island, SC","Isle of Palms, SC","James Island, SC","Summerville, SC"],"openingHours":"Mo-Fr 07:00-19:00","sameAs":["https://www.instagram.com/the_pooldoctor/"]}</script>
 </head>
 <body>
@@ -22,7 +22,7 @@
 <div class="pv">Concept preview by <a href="https://localform.online">Local Form</a></div>
 <header class="top" id="top">
   <a class="brand" href="#main" aria-label="The Pool Doctor, home"><span class="disc"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg></span><span class="word"><b>The<br>Pool<br>Doctor</b><small>Swimming pool service &amp; repair</small></span></a>
-  <nav class="nav" aria-label="Sections"><a href="#build">New pools</a><a href="#renovate">Renovations</a><a href="#repair">Repairs</a><a href="#care">Pool care</a><a href="#builders">Builders</a><a href="#reviews">Reviews</a></nav>
+  <nav class="nav" aria-label="Sections"><a href="#build">New pools</a><a href="#renovate">Renovations</a><a href="#repair">Repairs</a><a href="#care">Pool care guide</a><a href="#builders">Builders</a><a href="#reviews">Reviews</a></nav>
   <a class="call" href="tel:+18437373165"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-phone"/></svg><span>(843) 737-3165</span><b class="sr">Call Joe</b></a>
 </header>
 
@@ -36,8 +36,15 @@
     <button type="button" class="grip" id="grip" aria-label="Resize the pool: drag, or use the arrow keys"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
   </div>
   <div class="hero-copy">
-    <p class="eyebrow"><i></i><span>Charleston, SC &middot; Licensed SC pool contractor</span></p>
+    <p class="eyebrow"><i></i><span>Charleston, SC &middot; Joseph Penna, owner</span></p>
     <h1 id="hero-h">Design your pool. <em>The doctor builds&nbsp;it.</em></h1>
+    <div class="svc" id="svc">
+      <button type="button" class="btn btn-p" id="svcPlan" aria-expanded="false" aria-controls="designer">Design my pool<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <a class="btn btn-s" href="#renovate">Explore renovations</a>
+      <button type="button" class="btn btn-s" data-req="Repair">Request a repair</button>
+      <p class="areas">Serving Charleston, Sullivan's Island, Isle of Palms, James Island and Summerville.</p>
+    </div>
+    <div class="plan-bar" id="planBar"><b>Concept sketch</b><button type="button" id="planDone">Done</button></div>
     <form class="designer" id="designer" novalidate aria-label="Design your pool">
       <div class="dgroup"><p class="dl mono">Shape</p>
         <div class="tiles chips" data-k="shape" data-one>
@@ -62,7 +69,7 @@
         </div></div>
       <p class="readout mono" aria-live="polite"><span id="planDims">32 &times; 16 ft rectangle</span><span id="planGal">about 19,100 gallons</span></p>
       <div class="actions">
-        <button type="button" class="btn btn-p" id="heroSend">Send this to Joe<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        <button type="button" class="btn btn-p" id="heroSend">Continue with this plan<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
         <a class="btn btn-s" href="#repair">Something's wrong with my pool</a>
       </div>
     </form>
@@ -73,9 +80,9 @@
   <div class="pulse" style="--a:1;--b:1" aria-hidden="true"><div class="pl"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div><div class="pl hi"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div></div>
   
   <div class="wrap doors-grid">
-    <a class="door" href="#design" data-reveal><span class="mono">01</span><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-build"/></svg><b>Build a new pool</b><span>Sketch it up top, then Joe walks your yard.</span><i aria-hidden="true">&rarr;</i></a>
-    <a class="door" href="#renovate" data-reveal><span class="mono">02</span><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-reno"/></svg><b>Renovate</b><span>Plaster, liners, coping, pavers and decks.</span><i aria-hidden="true">&rarr;</i></a>
-    <a class="door" href="#repair" data-reveal><span class="mono">03</span><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-fix"/></svg><b>Fix a problem</b><span>Pumps, filters, heaters, salt cells, leaks.</span><i aria-hidden="true">&rarr;</i></a>
+    <a class="door" href="#design" data-reveal><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-build"/></svg><b>Build a new pool</b><span>Sketch it up top, then Joe walks your yard.</span><i aria-hidden="true">&rarr;</i></a>
+    <a class="door" href="#renovate" data-reveal><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-reno"/></svg><b>Renovate</b><span>Plaster, liners, coping, pavers and decks.</span><i aria-hidden="true">&rarr;</i></a>
+    <a class="door" href="#repair" data-reveal><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-fix"/></svg><b>Fix a problem</b><span>Pumps, filters, heaters, salt cells, leaks.</span><i aria-hidden="true">&rarr;</i></a>
   </div>
 </section>
 
@@ -83,7 +90,7 @@
   <div class="pulse" style="--a:1;--b:1" aria-hidden="true"><div class="pl"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div><div class="pl hi"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div></div>
   <div class="wrap">
     <header class="sec-head">
-      <p class="marker mono" data-reveal><span>01</span>The build</p>
+      <p class="marker mono" data-reveal>New pool builds</p>
       <h2 id="build-h" data-reveal>Stake to swim, one of Joe's own.</h2>
       <p class="lede" data-reveal>This is a pool Joe built, photographed as it went. Tap through it: every step happens in your yard too.</p>
     </header>
@@ -110,10 +117,9 @@
 </section>
 
 <section class="sec light" id="renovate" aria-labelledby="reno-h">
-  <div class="pulse" style="--a:1;--b:1" aria-hidden="true"><div class="pl"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div><div class="pl hi"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div></div>
   <div class="wrap">
     <header class="sec-head">
-      <p class="marker mono" data-reveal><span>02</span>Renovation</p>
+      <p class="marker mono" data-reveal>Renovations</p>
       <h2 id="reno-h" data-reveal>Same pool. New life.</h2>
       <p class="lede" data-reveal>Plaster, liners and the stone and decking around them. Here's a liner Joe replaced, from his own feed.</p>
     </header>
@@ -134,9 +140,10 @@
   <div class="pulse" style="--a:1;--b:1" aria-hidden="true"><div class="pl"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div><div class="pl hi"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div></div>
   <div class="wrap">
     <header class="sec-head">
-      <p class="marker mono" data-reveal><span>03</span>Something's wrong?</p>
+      <p class="marker mono" data-reveal>Pool repairs</p>
       <h2 id="repair-h" data-reveal>Tell the doctor where it hurts.</h2>
       <p class="lede" data-reveal>Pick the part, then what it's doing. You'll see the usual causes, and Joe will know where to start.</p>
+      <p class="skipreq" data-reveal><button type="button" class="link" data-req="Repair">Skip the checker and request a repair &rarr;</button></p>
     </header>
     <div class="clinic">
       <div class="padbox">
@@ -160,9 +167,9 @@
   <div class="pulse" style="--a:1;--b:1" aria-hidden="true"><div class="pl"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div><div class="pl hi"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div></div>
   <div class="wrap">
     <header class="sec-head care-head">
-      <p class="marker mono" data-reveal><span>04</span>Pool care key</p>
+      <p class="marker mono" data-reveal>Pool care guide</p>
       <h2 id="care-h" data-reveal>What it should read. What to do, and when.</h2>
-      <p class="lede" data-reveal>A quick reference for owners. Pick when, tick things off as you go.</p>
+      <p class="lede" data-reveal>For owners who look after their own water. Joe doesn't offer weekly cleaning, so this is the guide he'd hand you.</p>
     </header>
     <div class="care">
       <div class="key" data-reveal>
@@ -185,7 +192,7 @@
   <div class="pulse" style="--a:1;--b:1" aria-hidden="true"><div class="pl"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div><div class="pl hi"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div></div>
   <div class="wrap builders-in">
     <div>
-      <p class="marker mono" data-reveal><span>05</span>For builders &amp; contractors</p>
+      <p class="marker mono" data-reveal>For builders &amp; contractors</p>
       <h2 id="builders-h" data-reveal>Problem build? Call the doctor.</h2>
     </div>
     <div data-reveal>
@@ -199,7 +206,7 @@
   <div class="pulse" style="--a:1;--b:1" aria-hidden="true"><div class="pl"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div><div class="pl hi"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div></div>
   <div class="wrap">
     <header class="sec-head row">
-      <div><p class="marker mono" data-reveal><span>06</span>Reviews</p><h2 id="rev-h" data-reveal>What Charleston says about Joe.</h2></div>
+      <div><p class="marker mono" data-reveal>Reviews</p><h2 id="rev-h" data-reveal>What Charleston says about Joe.</h2></div>
       <p class="score" data-reveal><b>4.5</b><span class="stars" aria-hidden="true"></span><span class="mono">on Google</span></p>
     </header>
     <div class="revs">
@@ -214,11 +221,10 @@
 </section>
 
 <section class="sec dark joe" aria-labelledby="joe-h">
-  <div class="pulse" style="--a:1;--b:1" aria-hidden="true"><div class="pl"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div><div class="pl hi"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div></div>
   <div class="wrap joe-in">
     <figure class="joe-img" data-reveal><img src="img/j-marsh-lg.webp" srcset="img/j-marsh-sm.webp 600w, img/j-marsh-lg.webp 1000w" sizes="(max-width: 860px) 100vw, 44vw" alt="A boardwalk across the salt marsh, Joe's view from a job" loading="lazy" width="720" height="720"><figcaption class="mono">&ldquo;My corner office&rdquo; &middot; from Joe's Instagram</figcaption></figure>
     <div>
-      <p class="marker mono" data-reveal><span>07</span>Meet Joe</p>
+      <p class="marker mono" data-reveal>Meet Joe</p>
       <blockquote class="big" id="joe-h" data-reveal>&ldquo;I am The Pool Doctor. I am what it says. If you have a problem, I am the answer.&rdquo;</blockquote>
       <dl class="facts" data-reveal>
         <div><dt class="mono">Owner</dt><dd>Joseph Penna, on every job</dd></div>
@@ -232,10 +238,9 @@
 </section>
 
 <section class="sec light" id="area" aria-labelledby="area-h">
-  <div class="pulse" style="--a:1;--b:1" aria-hidden="true"><div class="pl"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div><div class="pl hi"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div></div>
   <div class="wrap area-in">
     <div>
-      <p class="marker mono" data-reveal><span>08</span>Where &amp; when</p>
+      <p class="marker mono" data-reveal>Service area and hours</p>
       <h2 id="area-h" data-reveal>Joe comes to you.</h2>
       <ul class="towns" data-reveal><li>Charleston</li><li>Sullivan's Island</li><li>Isle of Palms</li><li>James Island</li><li>Summerville</li></ul>
     </div>
@@ -254,9 +259,9 @@
   <div class="pulse" style="--a:1;--b:1" aria-hidden="true"><div class="pl"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div><div class="pl hi"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div></div>
   <div class="wrap req-in">
     <header class="sec-head">
-      <p class="marker mono" data-reveal><span>09</span>Request</p>
+      <p class="marker mono" data-reveal>Request</p>
       <h2 id="req-h" data-reveal>Get Joe on it.</h2>
-      <p class="lede" data-reveal>Tell him what you need. He calls or texts you back, usually the same day.</p>
+      <p class="lede" data-reveal>Tell him what you need. He calls or texts you back.</p>
     </header>
     <form class="req" id="req" novalidate>
       <fieldset><legend class="sr">What do you need?</legend>
@@ -271,32 +276,32 @@
         <p class="q">When</p>
         <div class="chips" id="fStart" data-one><button type="button" data-v="As soon as possible" aria-pressed="false">As soon as possible</button><button type="button" data-v="Within 6 months" aria-pressed="false">Within 6 months</button><button type="button" data-v="Next year" aria-pressed="false">Next year</button><button type="button" data-v="Just exploring" aria-pressed="false">Just exploring</button></div>
       </details>
+      <p class="demo" role="note"><b>Demo form.</b> This preview only builds a summary on your screen. Nothing is sent to Joe or anyone else.</p>
       <div class="fields">
         <label><span>Your name</span><input id="fName" name="name" autocomplete="name" required></label>
         <label><span>Mobile</span><input id="fPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required></label>
         <label><span>Email <small>optional</small></span><input id="fEmail" name="email" type="email" autocomplete="email"></label>
         <label><span>Town</span><select id="fTown" name="town"><option value="">Choose&hellip;</option><option>Charleston</option><option>Sullivan's Island</option><option>Isle of Palms</option><option>James Island</option><option>Summerville</option><option>Somewhere else</option></select></label>
         <label class="wide"><span id="fDetailL">Anything Joe should know?</span><textarea id="fDetail" name="detail" rows="3"></textarea></label>
-        <label class="wide file"><span>Photos <small>optional, stay on your phone in this preview</small></span><input id="fPhotos" type="file" accept="image/*" multiple></label>
+        <label class="wide file"><span>Photos <small>optional, up to 6, they stay on this device</small></span><input id="fPhotos" type="file" accept="image/*" multiple aria-describedby="photoNote"></label>
+        <p class="note wide" id="photoNote" role="status"></p>
         <div class="thumbs wide" id="thumbs"></div>
         <fieldset class="wide"><legend>Best time to reach you</legend><div class="chips" id="fWhen" data-one><button type="button" data-v="Morning" aria-pressed="false">Morning</button><button type="button" data-v="Afternoon" aria-pressed="false">Afternoon</button><button type="button" data-v="Evening" aria-pressed="false">Evening</button></div></fieldset>
       </div>
-      <p class="err" id="reqErr" role="alert"></p>
-      <button class="btn btn-p big" type="submit" id="reqBtn">Send my request<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-      <p class="fine">Preview only: nothing is sent from this page. On the live site, requests go straight to Joe.</p>
+      <button class="btn btn-p big" type="submit" id="reqBtn">Preview my request<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <p class="fine">Preview only: nothing is sent from this page.</p>
     </form>
     <div class="done" id="done" hidden tabindex="-1">
-      <p class="marker mono"><span>&#10003;</span>Request ready</p>
+      <p class="marker mono">Summary ready</p>
+      <p class="demo" role="note"><b>Demo only.</b> This summary was built on your screen. No inquiry was sent.</p>
       <h3 id="doneTitle"></h3>
       <div id="doneBody"></div>
-      <p class="fine">Preview only: nothing was sent. On the live site Joe gets this and calls or texts you back.</p>
-      <button type="button" class="btn btn-s" id="again">Start a new request</button>
+      <div class="done-actions"><button type="button" class="btn btn-p" id="editReq">Edit request</button><button type="button" class="btn btn-s" id="again">Start a new request</button></div>
     </div>
   </div>
 </section>
 
 <section class="sec light" id="faq" aria-labelledby="faq-h">
-  <div class="pulse" style="--a:1;--b:1" aria-hidden="true"><div class="pl"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div><div class="pl hi"><i></i><svg viewBox="0 0 513 77"><use href="#pulseLine"/></svg><i></i></div></div>
   <div class="wrap faq-in">
     <h2 id="faq-h" data-reveal>Questions</h2>
     <div class="faq">
@@ -320,7 +325,7 @@
 </footer>
 
 <a class="totop" id="totop" href="#main" aria-label="Back to the top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></a>
-<div class="dock" id="dock"><a class="btn btn-s up" id="dockTop" href="#main" aria-label="Back to the top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn btn-p" href="#design">Design my pool</a><a class="btn btn-s" href="tel:+18437373165" aria-label="Call Joe"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-phone"/></svg>Call</a></div>
+<div class="dock" id="dock"><a class="btn btn-s up" id="dockTop" href="#main" aria-label="Back to the top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn btn-p" id="dockMain" href="#design">Design my pool</a><a class="btn btn-s" href="tel:+18437373165" aria-label="Call Joe"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-phone"/></svg>Call</a></div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="pulseLine" viewBox="-180 -4 513 77"><path fill="currentColor" d="M325.30 43.59C323.62 44.92 322.17 46.07 319.12 46.07C316.08 46.07 314.63 44.92 312.95 43.59C311.16 42.17 309.14 40.57 305.24 40.57C301.34 40.57 299.32 42.17 297.53 43.59C295.85 44.92 294.40 46.07 291.36 46.07C288.32 46.07 286.87 44.92 285.19 43.59C283.40 42.17 281.37 40.57 277.48 40.57C273.58 40.57 271.55 42.17 269.77 43.59C268.09 44.92 266.64 46.07 263.60 46.07C260.55 46.07 259.10 44.92 257.42 43.59C255.64 42.17 253.62 40.57 249.73 40.57L249.73 40.56C247.53 40.56 245.44 39.54 244.00 37.76C242.54 35.96 241.91 33.64 242.24 31.25C242.76 27.46 245.76 24.58 249.38 24.41C253.94 24.19 256.11 28.77 257.03 31.68C257.23 32.34 257.90 32.73 258.57 32.61C259.32 32.47 259.81 31.76 259.67 31.02C259.29 28.97 258.18 24.87 255.14 20.89C250.12 14.30 241.37 11.48 233.37 13.86C226.48 15.92 221.81 21.38 220.89 28.46C219.77 37.02 215.64 40.83 207.50 40.83C204.14 40.83 201.05 39.03 199.23 36.01C198.71 35.15 197.84 34.63 196.88 34.63L196.88 34.63C195.93 34.63 195.05 35.15 194.54 36.01C192.72 39.03 189.63 40.83 186.27 40.83C182.91 40.83 179.82 39.03 178.00 36.01C177.49 35.15 176.61 34.63 175.66 34.63C174.70 34.63 173.82 35.15 173.31 36.01C171.67 38.73 168.99 40.47 166.01 40.78L166.01 40.77C162.99 40.77 161.43 41.87 160.04 42.85C158.81 43.72 157.74 44.47 155.51 44.47C153.28 44.47 152.21 43.72 150.98 42.85C149.60 41.87 148.03 40.77 145.01 40.77C142.00 40.77 140.43 41.87 139.05 42.85C137.81 43.72 136.75 44.47 134.51 44.47C132.28 44.47 131.22 43.72 129.98 42.85C128.60 41.87 127.03 40.77 124.02 40.77C121.00 40.77 119.43 41.87 118.05 42.85C116.82 43.72 115.75 44.47 113.52 44.47C111.29 44.47 110.22 43.72 108.99 42.85C107.61 41.87 106.04 40.77 103.02 40.77C100.01 40.77 98.44 41.87 97.06 42.85C95.82 43.72 94.76 44.47 92.53 44.47C90.29 44.47 89.23 43.72 87.99 42.85C86.72 41.95 85.29 40.94 82.72 40.79C82.66 40.78 82.60 40.78 82.54 40.78L82.41 40.78C82.28 40.77 82.16 40.77 82.03 40.77L82.03 40.78L73.98 40.78L71.39 36.98C71.12 36.58 70.67 36.37 70.20 36.42C69.74 36.47 69.34 36.78 69.15 37.23L65.96 44.78L61.12 31.45C60.92 30.88 60.38 30.52 59.80 30.57C59.22 30.62 58.75 31.07 58.63 31.67L57.08 39.57L54.97 39.57C54.36 39.57 53.84 40.01 53.70 40.64L49.82 58.35L45.19 1.29C45.13 0.59 44.58 0.04 43.92 0.02C43.26 0.00 42.69 0.51 42.59 1.21L37.14 41.95L33.51 34.04C33.29 33.56 32.84 33.26 32.35 33.26C32.35 33.26 32.34 33.26 32.33 33.26C31.85 33.26 31.40 33.54 31.18 34.01L27.87 40.78L17.06 40.78L8.50 40.78L5.91 36.98C5.64 36.58 5.19 36.37 4.72 36.42C4.26 36.47 3.86 36.78 3.67 37.23L0.48 44.78L-4.36 31.45C-4.57 30.88 -5.11 30.52 -5.68 30.57C-6.26 30.62 -6.74 31.07 -6.85 31.67L-8.41 39.57L-10.51 39.57C-11.12 39.57 -11.65 40.01 -11.78 40.64L-15.67 58.35L-20.30 1.29C-20.35 0.59 -20.90 0.04 -21.56 0.02C-22.23 0.00 -22.80 0.51 -22.89 1.21L-28.34 41.95L-31.97 34.04C-32.19 33.56 -32.64 33.26 -33.13 33.26C-33.62 33.25 -34.08 33.54 -34.31 34.01L-37.61 40.78L-48.42 40.78L-56.98 40.78L-59.57 36.98C-59.84 36.58 -60.30 36.37 -60.76 36.42C-61.22 36.47 -61.62 36.78 -61.82 37.23L-65.00 44.78L-69.84 31.45C-70.05 30.88 -70.59 30.52 -71.16 30.57C-71.74 30.62 -72.22 31.07 -72.34 31.67L-73.89 39.57L-75.99 39.57C-76.60 39.57 -77.13 40.01 -77.27 40.64L-81.15 58.35L-85.78 1.29C-85.84 0.59 -86.38 0.04 -87.04 0.02C-87.71 0.00 -88.28 0.51 -88.37 1.21L-93.83 41.95L-97.46 34.04C-97.67 33.56 -98.12 33.26 -98.61 33.26C-99.11 33.25 -99.56 33.54 -99.79 34.01L-103.09 40.78L-113.91 40.78L-122.46 40.78L-125.05 36.98C-125.33 36.58 -125.78 36.37 -126.24 36.42C-126.70 36.47 -127.11 36.78 -127.30 37.23L-130.49 44.78L-135.32 31.45C-135.53 30.88 -136.07 30.52 -136.65 30.57C-137.22 30.62 -137.70 31.07 -137.82 31.67L-139.37 39.57L-141.48 39.57C-142.08 39.57 -142.61 40.01 -142.75 40.64L-146.63 58.35L-151.26 1.29C-151.32 0.59 -151.86 0.04 -152.52 0.02C-153.19 0.00 -153.76 0.51 -153.85 1.21L-159.31 41.95L-162.94 34.04C-163.15 33.56 -163.60 33.26 -164.09 33.26C-164.10 33.26 -164.11 33.26 -164.11 33.26C-164.60 33.26 -165.04 33.54 -165.27 34.01L-168.57 40.78L-179.39 40.78C-180.11 40.78 -180.69 41.40 -180.69 42.17C-180.69 42.94 -180.11 43.56 -179.39 43.56L-167.78 43.56C-167.29 43.56 -166.85 43.27 -166.62 42.81L-164.15 37.74L-159.79 47.24C-159.54 47.79 -158.98 48.10 -158.41 48.00C-157.85 47.90 -157.40 47.43 -157.32 46.82L-152.88 13.64L-148.53 67.29C-148.47 67.97 -147.96 68.51 -147.32 68.56C-147.29 68.56 -147.26 68.56 -147.22 68.56C-146.62 68.56 -146.09 68.12 -145.95 67.49L-140.44 42.35L-138.31 42.35C-137.69 42.35 -137.16 41.89 -137.03 41.25L-136.17 36.84L-131.80 48.89C-131.61 49.41 -131.14 49.77 -130.61 49.78C-130.09 49.80 -129.60 49.47 -129.39 48.96L-125.84 40.56L-124.18 42.99C-123.94 43.35 -123.54 43.56 -123.13 43.56L-113.91 43.56L-102.30 43.56C-101.81 43.56 -101.36 43.27 -101.14 42.81L-98.66 37.74L-94.31 47.24C-94.05 47.79 -93.50 48.10 -92.93 48.00C-92.36 47.90 -91.92 47.43 -91.84 46.82L-87.40 13.64L-83.04 67.29C-82.99 67.97 -82.48 68.51 -81.84 68.56C-81.81 68.56 -81.77 68.56 -81.74 68.56C-81.14 68.56 -80.61 68.12 -80.47 67.49L-74.96 42.35L-72.83 42.35C-72.21 42.35 -71.68 41.89 -71.55 41.25L-70.68 36.84L-66.31 48.89C-66.12 49.41 -65.66 49.77 -65.13 49.78C-64.60 49.80 -64.12 49.47 -63.91 48.96L-60.36 40.56L-58.70 42.99C-58.45 43.35 -58.06 43.56 -57.64 43.56L-48.42 43.56L-36.82 43.56C-36.33 43.56 -35.88 43.27 -35.66 42.81L-33.18 37.74L-28.82 47.24C-28.57 47.79 -28.01 48.10 -27.45 48.00C-26.88 47.90 -26.44 47.43 -26.36 46.82L-21.92 13.64L-17.56 67.29C-17.51 67.97 -17.00 68.51 -16.35 68.56C-16.32 68.56 -16.29 68.56 -16.26 68.56C-15.66 68.56 -15.13 68.12 -14.99 67.49L-9.48 42.35L-7.35 42.35C-6.73 42.35 -6.19 41.89 -6.07 41.25L-5.20 36.84L-0.83 48.89C-0.64 49.41 -0.18 49.77 0.35 49.78C0.88 49.80 1.36 49.47 1.58 48.96L5.12 40.56L6.78 42.99C7.03 43.35 7.42 43.56 7.84 43.56L17.06 43.56L28.67 43.56C29.15 43.56 29.60 43.27 29.82 42.81L32.30 37.74L36.66 47.24C36.91 47.79 37.47 48.10 38.03 48.00C38.60 47.90 39.04 47.43 39.12 46.82L43.57 13.64L47.92 67.29C47.98 67.97 48.49 68.51 49.13 68.56C49.16 68.56 49.19 68.56 49.22 68.56C49.82 68.56 50.35 68.12 50.49 67.49L56.00 42.35L58.14 42.35C58.75 42.35 59.29 41.89 59.41 41.25L60.28 36.84L64.65 48.89C64.84 49.41 65.31 49.77 65.83 49.78C66.36 49.80 66.84 49.47 67.06 48.96L70.61 40.56L72.26 42.99C72.51 43.35 72.90 43.56 73.32 43.56L82.54 43.56C82.55 43.56 82.56 43.56 82.57 43.56C84.44 43.67 85.43 44.37 86.56 45.16C87.94 46.14 89.51 47.24 92.53 47.24C95.54 47.24 97.11 46.14 98.49 45.16C99.72 44.29 100.79 43.54 103.02 43.54C105.26 43.54 106.32 44.29 107.55 45.16C108.94 46.14 110.51 47.24 113.52 47.24C116.54 47.24 118.10 46.14 119.49 45.16C120.72 44.29 121.78 43.54 124.02 43.54C126.25 43.54 127.32 44.29 128.55 45.16C129.93 46.14 131.50 47.24 134.51 47.24C137.53 47.24 139.10 46.14 140.48 45.16C141.71 44.29 142.78 43.54 145.01 43.54C147.25 43.54 148.31 44.29 149.54 45.16C150.93 46.14 152.50 47.24 155.51 47.24C158.53 47.24 160.09 46.14 161.48 45.16C162.71 44.29 163.77 43.54 166.01 43.54L166.01 43.52C169.86 43.20 173.35 41.00 175.46 37.48C175.51 37.40 175.57 37.37 175.66 37.36C175.74 37.36 175.80 37.40 175.85 37.48C178.14 41.29 182.03 43.56 186.27 43.56C190.50 43.56 194.40 41.29 196.69 37.48C196.74 37.40 196.80 37.36 196.88 37.36C196.97 37.37 197.03 37.40 197.08 37.48C199.37 41.29 203.26 43.56 207.50 43.56C216.92 43.56 222.13 38.74 223.42 28.84C224.20 22.86 228.18 18.25 234.06 16.49C240.99 14.43 248.53 16.78 252.95 22.35C251.81 21.85 250.57 21.62 249.26 21.68C244.43 21.92 240.41 25.77 239.71 30.85C239.28 34.00 240.14 37.17 242.06 39.54C243.99 41.92 246.77 43.28 249.71 43.29L249.71 43.32C252.76 43.32 254.21 44.47 255.89 45.80C257.67 47.22 259.70 48.82 263.60 48.82C267.49 48.82 269.52 47.22 271.31 45.80C272.98 44.47 274.43 43.32 277.48 43.32C280.52 43.32 281.97 44.47 283.65 45.80C285.44 47.22 287.46 48.82 291.36 48.82C295.26 48.82 297.28 47.22 299.07 45.80C300.75 44.47 302.20 43.32 305.24 43.32C308.28 43.32 309.73 44.47 311.41 45.80C313.20 47.22 315.23 48.82 319.12 48.82C323.02 48.82 325.05 47.22 326.83 45.80C328.51 44.47 329.96 43.32 333.01 43.32L333.01 40.57C329.11 40.57 327.08 42.17 325.30 43.59M234.01 24.44C237.41 20.99 242.71 21.33 242.76 21.33L242.94 18.61C242.68 18.59 236.50 18.16 232.26 22.45C229.68 25.06 228.41 28.80 228.50 33.56C228.60 39.16 225.80 43.01 220.17 44.99L220.98 47.59C227.70 45.21 231.18 40.35 231.06 33.51C230.99 29.56 231.98 26.51 234.01 24.44M236.58 34.87L234.06 34.39C232.89 41.40 238.51 45.88 238.75 46.07L240.26 43.87C240.07 43.72 235.69 40.19 236.58 34.87"/></symbol>
@@ -332,7 +337,8 @@
   <symbol id="i-reno" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M8 40h32M10 40V22h28v18"/><path d="M14 22v-6h20v6M18 16v-6h12v6" opacity=".6"/><path d="M15 31h18"/></g></symbol>
   <symbol id="i-fix" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><circle cx="18" cy="26" r="10"/><path d="M28 26h12v8H28M14 26h8M18 22v8"/><path d="M18 16v-6M14 10h8" opacity=".6"/></g></symbol>
 </svg>
-<script type="module" src="app.js?v=17"></script>
+<script type="module" src="app.js?v=18"></script>
+
 
 
 
