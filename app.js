@@ -74,7 +74,7 @@ function openPlanner() {
 $('#svcPlan').addEventListener('click', openPlanner);
 $('#planDone').addEventListener('click', () => { hero.classList.remove('planning'); $('#svcPlan').setAttribute('aria-expanded', 'false'); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); $('#svcPlan').focus({ preventScroll: true }); });
 $$('a[href="#design"]:not(#dockMain)').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openPlanner(); }));
-import('./yard.js?v=5').then(({ mountYard }) => {
+import('./yard.js?v=6').then(({ mountYard }) => {
   const copy = $('.hero-copy');
   yard = mountYard(cv, { dpr: phone() ? 1.5 : 1.25, reduced, still: q.has('still'), labels: { L: $('#dimL'), W: $('#dimW') }, grip: $('#grip'),
     pad: phone() ? [18, 30] : [34, 30],

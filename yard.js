@@ -83,6 +83,7 @@ float wave(vec2 p){
   float h = vn(p * .5 + vec2(t * .22, t * .09)) + vn(p * 1.15 + vec2(-t * .18, t * .3) + 3.7) * .5 + vn(p * 2.6 + vec2(t * .45, -t * .26) + 9.1) * .22;
   if (uWall > .01) for (int i = 0; i < 3; i++) { vec2 im = vec2((float(i) - 1.) * uL * .22, uW * .5 - 1.1); float r = length(p - im);
     h += sin(r * 7. - t * 9.) * exp(-r * .9) * .5 * uWall; }
+  if (uSpa > .5) { float r = length(p - spaC() - vec2(-4.75, 0.)); h += sin(r * 8. - t * 10.) * exp(-r * .75) * .4 * uSpa; }
   return h;
 }
 void main(){
@@ -157,11 +158,16 @@ void main(){
   cop *= .8 + .2 * smoothstep(0., .25, d);
   col = mix(col, cop, smoothstep(fw, -fw, d - 1.1));
   // water
+  float spillM = 0.;
   float sd = spaD(p), inSpa = smoothstep(fw, -fw, sd);
   float depth = mix(3.6, 7.4, smoothstep(-uL * .25, uL * .3, p.x));
   float shelf = uShelf * smoothstep(-uL * .5 + 6.6, -uL * .5 + 6., p.x);
-  depth = mix(depth, .9, shelf); depth = mix(depth, 3.3, inSpa);
+  depth = mix(depth, .9, shelf); depth = mix(depth, mix(3.4, 1.7, smoothstep(-1.15, -.95, sd)), inSpa);   // spa: bench ring round the wall
   vec2 e = vec2(.06, 0.); vec2 n2 = vec2(wave(p + e) - wave(p - e), wave(p + e.yx) - wave(p - e.yx)) / (2. * e.x) * .12;
+  vec2 sq0 = p - spaC(); float jet = 0.;
+  if (uSpa > .01) { for (int i = 0; i < 6; i++) { float a = float(i) * 1.0472 + .52; vec2 jp = vec2(cos(a), sin(a)) * 2.3; jet += exp(-dot(sq0 - jp, sq0 - jp) * 1.1); }
+    vec2 tb = vec2(vn(sq0 * 2.4 + vec2(t * 1.7, -t * 1.1)) - .5, vn(sq0 * 2.4 + vec2(-t * 1.3, t * 1.9) + 5.) - .5);
+    n2 += tb * (.3 + jet * .8) * inSpa; }
   vec2 fp = p + n2 * (.4 + depth * .45);
   vec3 floorC = mix(texture2D(tPl, fp / 5.).rgb, vec3(.86), .55);
   floorC *= mix(1., .55 + .9 * h21(floor(fp * 16.)), uPeb * .6);
@@ -169,6 +175,7 @@ void main(){
   float fsh = smoothstep(-.6, .6, allD(p + TL * (.6 + depth * .32)));   // the pool wall shades the floor
   float c = pow(1. - cn(fp * 1.05), 6.) * .8 + pow(1. - cn(fp * 1.7 + 3.1), 7.) * .45;
   vec3 lit = floorC * (.5 + .62 * (1. - fsh)) + vec3(.9, 1., 1.) * c * (1. - fsh * .7) * .32;
+  lit *= 1. - .3 * smoothstep(.18, .0, abs(sd + 1.05)) * inSpa;          // edge of the spa bench
   vec3 ab = exp(-depth * 2. * vec3(.21, .05, .033));
   vec3 wat = lit * ab + vec3(.0, .24, .36) * (1. - ab.g);
   float tile = smoothstep(-.55, -.45, d);
@@ -180,19 +187,41 @@ void main(){
   // night: underwater lights on the front wall, fire glow
   float glow = 0.;
   for (int i = 0; i < 2; i++) { vec2 lp = vec2((float(i) * 2. - 1.) * uL * .22, -uW * .5 + .3); glow += 1.2 / (1. + dot(p - lp, p - lp) * .05); }
-  vec3 nwat = vec3(.02, .5, .72) * (.12 + glow * .8) + vec3(.4, .9, 1.) * c * glow * .35 + floorC * .02;
+  vec2 sL = vec2(2.7, 0.), eq = sq0 - vec2(-4.75, 0.); float sOn = smoothstep(.3, .9, uSpa);
+  float sg = 2.1 / (1. + dot(sq0 - sL, sq0 - sL) * .17) * sOn;
+  glow += .7 / (1. + dot(eq, eq) * .25) * sOn * (1. - inSpa);
+  float gw = mix(glow, sg + .3, inSpa);
+  vec3 nwat = vec3(.02, .5, .72) * (.12 + gw * .8) + vec3(.4, .9, 1.) * c * gw * .35 + floorC * .02;
+  nwat += vec3(.7, .97, 1.) * exp(-dot(sq0 - sL, sq0 - sL) * 1.6) * inSpa * sOn * .45;   // the lamp itself
   wat = mix(wat, nwat, uNight);
   // spa: raised wall ring and bubbling water
-  if (uSpa > .01) { float bub = smoothstep(.75, .95, vn((p - spaC()) * 3. + vec2(0., t * 2.))) * inSpa;
-    wat = mix(wat, vec3(.85, .97, 1.), bub * .35); }
+  if (uSpa > .01) {
+    float foam = smoothstep(.6, .88, fbm(sq0 * 1.9 + vec2(t * .9, -t * .6)) + jet * .3) * min(jet * 1.3, 1.) * inSpa;
+    vec2 bc = sq0 * 4.5, bi = floor(bc); float bh = h21(bi), bl = fract(t * (.5 + bh) + bh * 7.);   // fine bubbles that rise and pop
+    float bub = smoothstep(.15, .05, length(fract(bc) - .5 - (vec2(h21(bi + 3.), h21(bi + 9.)) - .5) * .5)) * step(.5, bh) * sin(bl * 3.1416) * inSpa * (.3 + jet);
+    vec3 fc = mix(vec3(.92, .98, 1.), vec3(.5, .88, 1.) * (.35 + sg * .45), uNight);
+    wat = mix(wat, fc, clamp(foam * .5 + bub * .55, 0., 1.));
+    float em = exp(-((eq.x + .5) * (eq.x + .5) * 1.1 + eq.y * eq.y * 2.2)) * (1. - inSpa) * sOn;
+    float sf = smoothstep(.42, .72, fbm(eq * 3. + vec2(t * 2.2, t * .3)));
+    vec3 ffc = mix(vec3(.93, .98, 1.), vec3(.55, .9, 1.) * (.45 + glow * .3), uNight);
+    wat = mix(wat, ffc, clamp(sf * em * 1.3 + em * .2, 0., 1.)); }
   col = mix(col, wat, smoothstep(fw, -fw, d));
   if (uSpa > .01) { float wallR = abs(sd - .3) - .3;                       // raised spa wall
     vec2 sq = p - spaC(); vec3 sw = mix(wallCol(p * 1.5, floor(uDeck)), wallCol(p * 1.5, ceil(uDeck)), fract(uDeck)) * .95 * (.9 + .2 * dot(normalize(sq), TL));
     col = mix(col, mix(sw, cop, smoothstep(.12, .2, abs(sd - .3))), smoothstep(fw, -fw, wallR) * step(.2, uSpa));
     // sheet of water spilling from the spa to the pool
-    float spill = step(abs(sq.y), .75) * smoothstep(-3.05, -3.2, sq.x) * step(-4.55, sq.x) * step(.9, uSpa);
-    float st = .6 + .4 * sin(sq.x * 14. + t * 12. + sq.y * 6.);
-    col = mix(col, mix(vec3(.55, .82, .92), vec3(.95, 1., 1.), st), spill * .9); }
+    // a clear sheet slides over the wall top (stone shows through), then tips over the edge and whitens as it falls
+    float u = (-sq.x - 3.1) / 1.5, v = sq.y / .75;               // u: 0 at the spa water, 1 at the pool water
+    float bow = .08 * sin(u * 3.1416);                            // the sheet bellies out a touch as it falls
+    spillM = smoothstep(1., .84, abs(v) - bow) * smoothstep(-.03, .04, u) * smoothstep(1.08, .99, u) * smoothstep(.85, .95, uSpa);
+    float sk = vn(vec2(v * 6., u * 3. - t * 4.)) * .6 + vn(vec2(v * 14. + 4., u * 6. - t * 7.5)) * .4;
+    float aer = smoothstep(.4, 1., u);
+    vec3 glass = col * vec3(.52, .76, .84) + vec3(.05, .2, .28);
+    vec3 sheet = mix(glass, vec3(.93, .98, 1.), clamp(aer * (.35 + .75 * sk) + smoothstep(.62, .9, sk) * .3 * (1. - aer), 0., 1.));
+    sheet += vec3(.9, .97, 1.) * smoothstep(.07, .0, abs(u - .43)) * (.35 + .25 * sin(v * 9. + t * 6.));   // the lip catches the light
+    sheet *= 1. - .25 * smoothstep(.75, 1., abs(v)) * (1. - aer);
+    vec3 nsheet = vec3(.04, .3, .48) * (.5 + sg * .25) + vec3(.45, .88, 1.) * (aer * (.3 + .5 * sk) + smoothstep(.07, .0, abs(u - .43)) * .4);
+    col = mix(col, mix(sheet, nsheet, uNight), spillM * .96); }
   // water falling from the scuppers
   if (uWall > .01) for (int i = 0; i < 3; i++) { float x = (float(i) - 1.) * uL * .22; vec2 q = p - vec2(x, uW * .5 + .2);
     float sm = smoothstep(.32, .12, abs(q.x)) * smoothstep(1.4, 1.1, q.y) * smoothstep(-1.4, -.9, q.y);
@@ -209,7 +238,7 @@ void main(){
   col = mix(col, umb, smoothstep(fw, -fw, ud));
   // light: dusk tint at night, then the glows
   vec3 nightTint = vec3(.13, .17, .3);
-  float isWater = smoothstep(fw, -fw, d);
+  float isWater = max(smoothstep(fw, -fw, d), spillM);
   col = mix(col, col * mix(vec3(1.), nightTint, uNight), 1. - isWater * uNight);
   col += vec3(.1, .45, .6) * glow * .12 * uNight * smoothstep(3., 0., d) * (1. - isWater);
   float fireL = uFire * exp(-fr * fr / 26.);
