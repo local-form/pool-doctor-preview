@@ -3,6 +3,7 @@ const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [..
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const phone = () => innerWidth < 861;
 const q = new URLSearchParams(location.search);
+const picked = root => $$('button[aria-pressed=true]', root).map(b => b.dataset.v);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 /* ---------- reveal (PREVIEW-STANDARD) ---------- */
@@ -16,57 +17,51 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
   setTimeout(() => els.forEach(e => { if (e.getBoundingClientRect().top < innerHeight) e.classList.add('is-visible'); }), 1500);
 })();
 
-/* ---------- hero: the pool builds itself on the heartbeat line ---------- */
-const names = ['Stakes in the grass', 'Dig', 'Steel', 'Shell', 'Stone & coping', 'Water', 'Lights on'];
-const hero = $('.hero'), cv = $('#pool'), knob = $('#knob'), ekg = $('#ekg'), playBtn = $('#play');
-const poster = $('#poster'); poster.addEventListener('error', () => poster.remove());
-const X = i => 8 + i * (684 / 6);
-let d = '';
-for (let i = 0; i < 7; i++) { const x = X(i);
-  d += (i ? ' L' : 'M') + (x - 14) + ' 32 L' + (x - 8) + ' 28 L' + (x - 4) + ' 32 L' + (x - 1) + ' 38 L' + (x + 3) + ' 6 L' + (x + 7) + ' 58 L' + (x + 10) + ' 26 L' + (x + 14) + ' 32';
-  if (i < 6) d += ' L' + (X(i + 1) - 14) + ' 32'; }
-const base = $('#ekgBase'), done = $('#ekgDone');
-base.setAttribute('d', d); done.setAttribute('d', d);
-const len = done.getTotalLength(); done.style.strokeDasharray = len;
-let shown = -1;
-function show(s) {
-  done.style.strokeDashoffset = len * (1 - s / 6); knob.style.left = (X(s) / 700 * 100) + '%';
-  const i = Math.round(s); if (i === shown) return; shown = i;
-  $('#stName').textContent = String(i + 1).padStart(2, '0') + ' · ' + names[i];
-  knob.setAttribute('aria-valuenow', i + 1); knob.setAttribute('aria-valuetext', names[i]);
-  $$('#stops span').forEach((e, k) => e.classList.toggle('on', k <= i));
+/* ---------- hero: design your pool from above ---------- */
+const hero = $('.hero'), cv = $('#yard'), poster = $('#poster');
+poster.addEventListener('error', () => poster.remove());
+const plan = { shape: 'Rectangle', len: 32, wid: 16, extras: [] };
+const lenI = $('#len'), widI = $('#wid');
+const fill = i => i.style.setProperty('--p', ((i.value - i.min) / (i.max - i.min) * 100) + '%');
+let yard = null;
+function readPlan() {
+  $$('#designer .chips').forEach(c => { const v = picked(c); plan[c.dataset.k] = c.hasAttribute('data-one') ? (v[0] || '') : v; });
+  plan.len = +lenI.value; plan.wid = +widI.value;
 }
-const s0 = Math.max(0, Math.min(6, +(q.get('s') ?? 6)));
-show(s0);
-let pool = null;
-const stopPlayUI = () => { playBtn.setAttribute('aria-pressed', 'false'); };
-import('./pool3d.js?v=3').then(({ mount }) => {
-  pool = mount(cv, { stage: s0, small: phone(), dpr: phone() ? 1.5 : 1.75, onStage: show, onPlayEnd: stopPlayUI });
-  const size = () => { pool.frame(cv.clientWidth, cv.clientHeight); pool.layout(phone() ? (innerHeight / innerWidth > 1.9 ? { offX: .02, offY: -.2, dist: .8, fov: 54 } : { offX: .02, offY: -.1, dist: .88, fov: 54 }) : { offX: .2, offY: -.02, dist: 1, fov: 30 }); };
-  size(); let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(size, 120); });
-  new IntersectionObserver(([e]) => pool.setVisible(e.isIntersecting)).observe(hero);
-  pool.loaded.then(() => { hero.classList.add('live'); window.__done = true; });
-  if (q.has('still')) pool.loaded.then(() => pool.renderOnce(3)); else pool.start();
-  window.__pool = pool;
-}).catch(() => { hero.classList.add('no3d'); window.__done = true; });
-
-function setStage(s, jump) { s = Math.max(0, Math.min(6, s)); pool?.stopPlay(); stopPlayUI(); if (pool) pool.set(s, jump); show(s); }
-const stageAt = x => { const r = ekg.getBoundingClientRect(); return ((x - r.left) / r.width * 700 - 8) / (684 / 6); };
-ekg.addEventListener('pointerdown', e => { ekg.setPointerCapture(e.pointerId); ekg.classList.add('drag'); setStage(stageAt(e.clientX)); });
-ekg.addEventListener('pointermove', e => { if (ekg.classList.contains('drag')) setStage(stageAt(e.clientX)); });
-const release = e => { if (!ekg.classList.contains('drag')) return; ekg.classList.remove('drag'); setStage(Math.round(stageAt(e.clientX))); };
-ekg.addEventListener('pointerup', release); ekg.addEventListener('pointercancel', release);
-knob.addEventListener('keydown', e => {
-  const cur = Math.round(pool ? pool.stage : shown), k = e.key;
-  const n = k === 'ArrowRight' || k === 'ArrowUp' ? cur + 1 : k === 'ArrowLeft' || k === 'ArrowDown' ? cur - 1 : k === 'Home' ? 0 : k === 'End' ? 6 : null;
-  if (n === null) return; e.preventDefault(); setStage(n);
-});
-playBtn.setAttribute('aria-pressed', 'false');
-playBtn.addEventListener('click', () => {
-  if (!pool) return;
-  if (playBtn.getAttribute('aria-pressed') === 'true') { pool.stopPlay(); stopPlayUI(); return; }
-  playBtn.setAttribute('aria-pressed', 'true'); pool.play();
-});
+function planText() {
+  const p = plan, bits = [`${p.shape} ${p.len}×${p.wid} ft`];
+  if (p.extras.length) bits.push(p.extras.map(e => e === 'Lights' ? 'LED lighting' : e).join(', '));
+  return bits.join(' · ');
+}
+function updatePlan() {
+  readPlan();
+  const { shape: s, len: L, wid: W } = plan;
+  const depth = s === 'Plunge' ? 4.5 : s === 'Lap' ? 4.25 : 5.25, area = s === 'Freeform' ? .8 : s === 'L-shape' ? .74 : 1;
+  plan.gal = Math.round(L * W * area * depth * 7.48 / 100) * 100;
+  $('#planDims').textContent = `${L} × ${W} ft ${s.toLowerCase()}`;
+  $('#planGal').textContent = `about ${plan.gal.toLocaleString()} gallons`;
+  $('#lenOut').textContent = L + ' ft'; $('#widOut').textContent = W + ' ft'; fill(lenI); fill(widI);
+  $('#dimL span').textContent = L + ' ft'; $('#dimW span').textContent = W + ' ft';
+  yard?.set(plan);
+}
+$$('#designer .chips').forEach(c => chips(c, b => {
+  if (c.dataset.k === 'shape') { const v = b.dataset.v; if (v === 'Plunge') { lenI.value = 14; widI.value = 8; } else if (v === 'Lap') { lenI.value = 45; widI.value = 9; } else if (+lenI.value < 20 || +widI.value < 11) { lenI.value = 32; widI.value = 16; } }
+  updatePlan();
+}));
+[lenI, widI].forEach(i => i.addEventListener('input', updatePlan));
+updatePlan();
+$('#heroSend').addEventListener('click', () => { readPlan(); openRequest('New pool', { kind: 'plan', text: planText() }); });
+import('./yard.js?v=1').then(({ mountYard }) => {
+  const copy = $('.hero-copy');
+  yard = mountYard(cv, { dpr: phone() ? 1.5 : 1.25, reduced, still: q.has('still'), labels: { L: $('#dimL'), W: $('#dimW') },
+    pad: phone() ? [18, 30] : [34, 30],
+    area: () => { const r = cv.getBoundingClientRect(); if (phone()) return { x: 0, y: 64, w: r.width, h: r.height - 72 };
+      const left = copy.getBoundingClientRect().right + 24; return { x: left, y: 80, w: r.width - left - 32, h: r.height - 110 }; } });
+  yard.set(plan);
+  new IntersectionObserver(([e]) => yard.setVisible(e.isIntersecting)).observe(cv);
+  yard.ready.then(() => { if (q.has('still')) yard.still(plan); hero.classList.add('live'); window.__done = true; });
+  window.__yard = yard;
+}).catch(e => { console.warn('yard', e); hero.classList.add('no3d'); window.__done = true; });
 
 /* ---------- 01 build story (Joe's own show pool, from his Instagram) ---------- */
 const story = [
@@ -106,63 +101,7 @@ function chips(root, onChange) {
     onChange?.(b);
   });
 }
-const picked = root => $$('button[aria-pressed=true]', root).map(b => b.dataset.v);
 
-/* ---------- 02 planner ---------- */
-const plan = { type: 'Concrete (gunite)', shape: 'Rectangle', len: 32, wid: 16, extras: [] };
-const lenI = $('#len'), widI = $('#wid');
-const fill = i => i.style.setProperty('--p', ((i.value - i.min) / (i.max - i.min) * 100) + '%');
-function readPlan() {
-  $$('#planForm .chips').forEach(c => { const v = picked(c); plan[c.dataset.k] = c.hasAttribute('data-one') ? (v[0] || '') : v; });
-  plan.len = +lenI.value; plan.wid = +widI.value;
-}
-function shapePath(s, x, y, w, h) {
-  if (s === 'Freeform') return `M${x + w * .12} ${y + h * .2}C${x + w * .3} ${y - h * .08} ${x + w * .52} ${y + h * .22} ${x + w * .72} ${y + h * .04}S${x + w * 1.02} ${y + h * .12} ${x + w} ${y + h * .5}S${x + w * .86} ${y + h * 1.04} ${x + w * .6} ${y + h * .96}S${x + w * .26} ${y + h * .78} ${x + w * .12} ${y + h * .92}S${x - w * .04} ${y + h * .4} ${x + w * .12} ${y + h * .2}Z`;
-  if (s === 'L-shape') { const a = h * .58, b = w * .3; return `M${x} ${y}H${x + w}V${y + a}H${x + b}V${y + h}H${x}Z`; }
-  return `M${x + 6} ${y}H${x + w - 6}Q${x + w} ${y} ${x + w} ${y + 6}V${y + h - 6}Q${x + w} ${y + h} ${x + w - 6} ${y + h}H${x + 6}Q${x} ${y + h} ${x} ${y + h - 6}V${y + 6}Q${x} ${y} ${x + 6} ${y}Z`;
-}
-function drawPlan() {
-  readPlan();
-  const L = plan.len, W = plan.wid, k = Math.min(420 / 50, 250 / 25) * .98, w = L * k, h = W * k, x = 300 - w / 2 - 20, y = 205 - h / 2;
-  const ex = new Set(plan.extras), s = plan.shape, deck = 4 * k;
-  let g = `<defs><pattern id="grass" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#14361f"/><path d="M2 8l1-3M7 9l1-3" stroke="#1f4d2c" stroke-width="1.2"/></pattern>
-    <linearGradient id="wat" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5DB6E6"/><stop offset="1" stop-color="#1D5DB5"/></linearGradient>
-    <pattern id="trav" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#d9cdb6"/><path d="M0 11H22M11 0V11M5 11V22" stroke="#bfb298" stroke-width="1"/></pattern></defs>
-    <rect width="600" height="420" rx="14" fill="url(#grass)"/>
-    <rect x="${x - deck}" y="${y - deck}" width="${w + deck * 2}" height="${h + deck * 2}" rx="10" fill="url(#trav)" opacity="${ex.has('New deck or pavers') ? 1 : .8}"/>`;
-  if (ex.has('Raised stone wall')) g += `<rect x="${x - deck}" y="${y - deck - 8}" width="${w + deck * 2}" height="10" rx="3" fill="#8a7a62"/>`;
-  g += `<path d="${shapePath(s, x, y, w, h)}" fill="url(#wat)" stroke="#f2ede2" stroke-width="5"/>`;
-  g += `<path d="${shapePath(s, x, y, w, h)}" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.2" stroke-dasharray="3 7" transform="translate(0 4)"/>`;
-  if (ex.has('Sun shelf')) g += `<rect x="${x + 4}" y="${y + 4}" width="${Math.min(w * .22, 70)}" height="${h - 8}" rx="4" fill="#8fd3f2" opacity=".75"/>`;
-  if (ex.has('Spa')) { const r = Math.max(22, Math.min(36, h * .26)); g += `<circle cx="${x + w + deck + r * .2}" cy="${y + h * .3}" r="${r}" fill="url(#wat)" stroke="#f2ede2" stroke-width="5"/>`; }
-  if (ex.has('Scuppers')) for (let i = 0; i < 3; i++) { const sx = x + w * (.3 + i * .2); g += `<rect x="${sx - 6}" y="${y - deck - 6}" width="12" height="8" rx="2" fill="#5a5145"/><path d="M${sx} ${y + 2}v${10}" stroke="#bfe7fb" stroke-width="3" stroke-linecap="round"/>`; }
-  if (ex.has('LED lighting')) [[.2, .9], [.5, .9], [.8, .9]].forEach(([a, b]) => { g += `<circle cx="${x + w * a}" cy="${y + h * b - 6}" r="5" fill="#fff6c7"/><circle cx="${x + w * a}" cy="${y + h * b - 6}" r="13" fill="#fff6c7" opacity=".25"/>`; });
-  if (ex.has('Fire pit')) g += `<circle cx="${x - deck - 34}" cy="${y + h + 4}" r="22" fill="#6c6156" stroke="#b08a5a" stroke-width="3"/><circle cx="${x - deck - 34}" cy="${y + h + 4}" r="10" fill="#f2a33a"/>`;
-  const eq = ['Heater', 'Salt system', 'Automation'].filter(e => ex.has(e)).length;
-  g += `<g transform="translate(${Math.min(560, x + w + deck + 30)} ${Math.min(360, y + h + deck - 20)})"><rect x="-26" y="-14" width="${40 + eq * 12}" height="30" rx="5" fill="#2b3a46"/><circle cx="-14" cy="1" r="7" fill="#1D5DB5"/><rect x="-2" y="-8" width="10" height="18" rx="2" fill="#5a6a78"/>${Array.from({ length: eq }, (_, i) => `<rect x="${12 + i * 12}" y="-8" width="9" height="18" rx="2" fill="${['#c64a3a', '#8fd3f2', '#3CC48A'][i]}"/>`).join('')}</g>`;
-  g += `<g font-family="Mono,monospace" font-size="13" fill="#fff" letter-spacing="1"><text x="${x + w / 2}" y="${y + h + deck + 24}" text-anchor="middle">${L} FT</text><text x="${x - deck - 14}" y="${y + h / 2}" text-anchor="middle" transform="rotate(-90 ${x - deck - 14} ${y + h / 2})">${W} FT</text></g>`;
-  $('#planSvg').innerHTML = g;
-  const depth = s === 'Plunge' ? 4.5 : s === 'Lap' ? 4.25 : 5.25, area = s === 'Freeform' ? .82 : s === 'L-shape' ? .74 : 1;
-  const gal = Math.round(L * W * area * depth * 7.48 / 100) * 100;
-  $('#planDims').textContent = `${L} × ${W} ft · ${s.toLowerCase()}`;
-  $('#planGal').textContent = `about ${gal.toLocaleString()} gallons`;
-  $('#lenOut').textContent = L + ' ft'; $('#widOut').textContent = W + ' ft'; fill(lenI); fill(widI);
-  plan.gal = gal;
-  $('#planSummary').textContent = planText();
-}
-function planText() {
-  const p = plan, bits = [p.type, `${p.shape} ${p.len}×${p.wid} ft`];
-  if (p.extras.length) bits.push(p.extras.join(', '));
-  ['access', 'ground', 'old', 'budget', 'when', 'town'].forEach(k => p[k] && bits.push(p[k]));
-  return bits.join(' · ');
-}
-$$('#planForm .chips').forEach(c => chips(c, b => {
-  if (c.dataset.k === 'shape') { if (b.dataset.v === 'Plunge') { lenI.value = 14; widI.value = 8; } else if (b.dataset.v === 'Lap') { lenI.value = 45; widI.value = 9; } }
-  drawPlan();
-}));
-[lenI, widI].forEach(i => i.addEventListener('input', drawPlan));
-drawPlan();
-$('#planSend').addEventListener('click', () => { readPlan(); openRequest('New pool', { kind: 'plan', text: planText() }); });
 
 /* ---------- 04 clinic: symptoms + 3D equipment pad ---------- */
 const PARTS = {
@@ -233,7 +172,7 @@ let reqType = 'New pool', carried = null;
 const detailLabels = { 'New pool': 'Anything Joe should know about your yard or the pool you want?', Renovation: 'What would you like redone? (plaster, liner, coping, deck…)', Repair: 'What\'s happening, and when did it start?', 'Contractor help': 'Your company, the job address area and what the build needs' };
 function setType(t) {
   reqType = t; tabs.forEach(b => b.setAttribute('aria-checked', b.dataset.v === t));
-  $('#fDetailL').textContent = detailLabels[t];
+  $('#fDetailL').textContent = detailLabels[t]; $('#poolMore').hidden = t !== 'New pool';
   if (carried && !((carried.kind === 'plan' && t === 'New pool') || (carried.kind === 'sym' && t === 'Repair'))) carried = null;
   drawCarry();
 }
@@ -249,7 +188,7 @@ tabs.forEach((b, i) => {
 function openRequest(type, carry) { carried = carry || null; setType(type); showForm(); $('#request').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' }); setTimeout(() => $('#fName').focus({ preventScroll: true }), reduced ? 0 : 700); }
 $$('[data-req]').forEach(a => a.addEventListener('click', () => { carried = null; setType(a.dataset.req); }));
 $$('a[href="#request"]:not([data-req])').forEach(a => a.addEventListener('click', () => setType('New pool')));
-chips($('#fWhen'));
+chips($('#fWhen')); chips($('#fBudget')); chips($('#fStart'));
 $('#fPhotos').addEventListener('change', e => {
   const t = $('#thumbs'); t.innerHTML = '';
   [...e.target.files].slice(0, 6).forEach(f => { const im = new Image(); im.alt = 'Your photo: ' + f.name; im.src = URL.createObjectURL(f); t.append(im); });
@@ -262,17 +201,17 @@ reqForm.addEventListener('submit', e => {
   err.textContent = '';
   const rows = [['Request', reqType], carried && [carried.kind === 'plan' ? 'Plan' : 'Seeing', carried.text], ['Name', name], ['Mobile', $('#fPhone').value.trim()],
     $('#fEmail').value.trim() && ['Email', $('#fEmail').value.trim()], $('#fTown').value && ['Town', $('#fTown').value], $('#fDetail').value.trim() && ['Details', $('#fDetail').value.trim()],
-    $('#fPhotos').files.length && ['Photos', $('#fPhotos').files.length + ' attached'], picked($('#fWhen')).length && ['Best time', picked($('#fWhen'))[0]]].filter(Boolean);
+    $('#fPhotos').files.length && ['Photos', $('#fPhotos').files.length + ' attached'], picked($('#fWhen')).length && ['Best time', picked($('#fWhen'))[0]], reqType === 'New pool' && picked($('#fBudget')).length && ['Budget', picked($('#fBudget'))[0]], reqType === 'New pool' && picked($('#fStart')).length && ['When', picked($('#fStart'))[0]]].filter(Boolean);
   $('#doneTitle').textContent = `Thanks, ${name.split(' ')[0]}. Here's what Joe would get.`;
   $('#doneBody').innerHTML = `<dl>${rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>`;
   reqForm.hidden = true; $('#done').hidden = false; $('#done').focus();
 });
 function showForm() { reqForm.hidden = false; $('#done').hidden = true; }
-$('#again').addEventListener('click', () => { reqForm.reset(); $('#thumbs').innerHTML = ''; $$('#fWhen button').forEach(b => b.setAttribute('aria-pressed', 'false')); carried = null; setType('New pool'); showForm(); $('#fName').focus(); });
+$('#again').addEventListener('click', () => { reqForm.reset(); $('#thumbs').innerHTML = ''; $$('#fWhen button, #fBudget button, #fStart button').forEach(b => b.setAttribute('aria-pressed', 'false')); carried = null; setType('New pool'); showForm(); $('#fName').focus(); });
 setType('New pool');
 
 /* ---------- phone dock ---------- */
 const dock = $('#dock'); let inHero = true, inReq = false;
 const dockSet = () => dock.classList.toggle('on', !inHero && !inReq);
-new IntersectionObserver(([e]) => { inHero = e.isIntersecting; dockSet(); }).observe($('.hero-copy .actions'));
+new IntersectionObserver(([e]) => { inHero = e.isIntersecting; dockSet(); }).observe(hero);
 new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { threshold: .05 }).observe($('#request'));
