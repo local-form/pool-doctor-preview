@@ -343,7 +343,7 @@ setType('New pool');
 
 /* ---------- phone dock ---------- */
 const dock = $('#dock'); let inHero = true, inReq = false;
-const dockSet = () => { const on = !inHero && !inReq; dock.classList.toggle('on', on); dock.inert = !on; };
+let inChk = false; const dockSet = () => { const on = !inHero && !inReq && !inChk; dock.classList.toggle('on', on); dock.inert = !on; };
 const dockMain = $('#dockMain'), DOCK = { plan: 'Design my pool', reno: 'Quote my renovation', repair: 'Request a repair' }; let dockMode = 'plan';
 const setDock = m => { if (m !== dockMode) { dockMode = m; dockMain.textContent = DOCK[m]; } };
 const dockIO = new IntersectionObserver(es => es.forEach(e => { const m = e.target.id === 'repair' ? 'repair' : 'reno'; if (e.isIntersecting) setDock(m); else if (dockMode === m) setDock('plan'); }), { rootMargin: '-40% 0px -40% 0px' });
@@ -352,6 +352,8 @@ dockMain.addEventListener('click', e => { e.preventDefault(); dockMode === 'repa
 dock.inert = true;
 new IntersectionObserver(([e]) => { inHero = e.isIntersecting; dockSet(); }).observe(hero);
 new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { threshold: .05 }).observe($('#request'));
+// the repair checker has its own buttons, so the bar steps aside while its controls are on screen
+new IntersectionObserver(([e]) => { inChk = e.isIntersecting; dockSet(); }, { rootMargin: '-12% 0px -12% 0px' }).observe($('.checker'));
 
 // back to top
 { const t = $('#totop'), hh = () => ($('.hero')?.offsetHeight || innerHeight) * .8;
@@ -379,7 +381,7 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
       const c = (n + .5 + (h1 - .5) * .42) * B * ch.bs, x = (s - c) / (B * ch.bs * (.72 + .4 * h4)) + .4;
       if (x <= 0 || x >= 1) continue;
       const ph = ((t * 1.05 - c / 760 + seed) % 1 + 1) % 1, kick = Math.exp(-ph * 5.5) + .5 * Math.exp(-(((ph + .72) % 1)) * 7);
-      v += (.5 + .3 * h2 + (h2 > .9 ? .08 : 0)) * ch.bg * (1 + .16 * kick) * (1 - water(c, seed, ch)) * beat(x);
+      v += (.5 + .3 * h2 + (h2 > .9 ? .08 : 0)) * ch.bg * (1 + ch.kick * kick) * (1 - water(c, seed, ch)) * beat(x);
     }
     // water: sets of real swells. Sharp crests, long flat troughs, crests pushed forward so they lean and start to curl, rolling faster than the line travels
     const w = water(s, seed, ch);
@@ -404,12 +406,13 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
       const g = ctx.createLinearGradient(0, 0, w, 0); g.addColorStop(0, mixc(at(0))); g.addColorStop(1, mixc(at(w))); return g; }
     return getComputedStyle(sec).backgroundColor;
   };
-  const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); let pv = it.sec.previousElementSibling; while (pv && !pv.offsetHeight) pv = pv.previousElementSibling; it.up = edge(pv, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
+  const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); it.ch.kick = w < 700 ? 0 : .08; let pv = it.sec.previousElementSibling; while (pv && !pv.offsetHeight) pv = pv.previousElementSibling; it.up = edge(pv, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
   const draw = (it, t) => {
-    const { ctx, w, h } = it, mid = h / 2, amp = h * (it.one ? (w < 700 ? .2 : .36) : .46), sh = t * it.sp + 16 * Math.sin(t * .45 + it.seed) + it.off, k = w < 700 ? .55 : 1;
+    const { ctx, w, h } = it, mid = h / 2, ph = w < 700, amp = h * (it.one ? (ph ? .2 : .36) : (ph ? .42 : .46)), k = ph ? .8 : 1,
+      sh = t * it.sp * (ph ? .55 : 1) + (ph ? 6 : 16) * Math.sin(t * .45 + it.seed) + it.off, tt = ph ? t * .6 : t;   // phones: slower travel and roll, wider spacing, no beat kick
     ctx.clearRect(0, 0, w, h);
     const line = new Path2D(), bDn = new Path2D(), bUp = new Path2D(), O = 2; bDn.moveTo(-60, mid + O); bUp.moveTo(-60, mid - O);
-    for (let x = -60; x <= w + 60; x += 1.5) { let v = trace(x / k - sh, t, it.seed, it.ch); if (it.one) v = Math.abs(v); const y = mid - v * amp, X = x + lean * k * (v > 0 ? 1 : 0); x > -60 ? line.lineTo(X, y) : line.moveTo(X, y); bDn.lineTo(X, y); bUp.lineTo(X, y); }
+    for (let x = -60; x <= w + 60; x += 1.5) { let v = trace(x / k - sh, tt, it.seed, it.ch); if (it.one) v = Math.max(v, 0); const y = mid - v * amp, X = x + lean * k * (v > 0 ? 1 : 0); x > -60 ? line.lineTo(X, y) : line.moveTo(X, y); bDn.lineTo(X, y); bUp.lineTo(X, y); }
     bDn.lineTo(w + 60, mid + O); bDn.closePath(); bUp.lineTo(w + 60, mid - O); bUp.closePath();
     // the trace IS the edge: lower section's colour fills what rises above the seam, upper section's fills what dips below
     if (it.dn && it.up) { ctx.fillStyle = it.up; ctx.fillRect(0, mid - O, w, O); ctx.fillStyle = it.dn; ctx.fillRect(0, mid, w, O); }   // seal the seam itself

@@ -624,3 +624,7 @@ input[type=file]::file-selector-button{min-height:44px;padding:0 16px;border-rad
   .fin-grid figure:not(.is-visible) img{transform:scale(1.14)}
 }
 @media(min-width:861px){.story-thumbs{grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}.story-thumbs button{border-radius:12px}.story-nav{margin-top:20px}}
+
+/* the browser's top bar and any overscroll pick up the page background: keep it dark like the hero and footer */
+html,body{background:#06111B}
+@media(max-width:860px){.dock{padding:6px;gap:6px}.dock .btn{min-height:44px;font-size:14.5px}.dock .up{flex-basis:44px;width:44px}}
