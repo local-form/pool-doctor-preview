@@ -62,6 +62,12 @@ vec3 deckCol(vec2 p, float k){
   vec3 c = mix(texture2D(tPl, p / 6.).rgb, vec3(.78), .35) * vec3(.84, .83, .8);
   vec2 j = abs(fract(p / 8. + .5) - .5) * 8.; return c * (1. - .35 * smoothstep(.07, .02, min(j.x, j.y)));
 }
+// coping to match the deck: tumbled paver soldier course, pale travertine bullnose, or a poured concrete edge
+vec3 copCol(vec2 p, float k){
+  if (k < .5) { vec2 j = abs(fract(p / 1.25 + .5) - .5) * 1.25; return texture2D(tP, p / 3.).rgb * vec3(1.1, 1.02, .9) * (1. - .3 * smoothstep(.09, .03, min(j.x, j.y))); }
+  if (k < 1.5) { vec3 c = texture2D(tP, p / 6. + .37).rgb; return mix(vec3(dot(c, vec3(.33))), c, .35) * vec3(1.42, 1.36, 1.24); }
+  return mix(texture2D(tPl, p / 4.).rgb, vec3(.8), .45) * vec3(.9, .9, .89);
+}
 float cn(vec2 p){ vec2 i = floor(p), f = fract(p); float d = 1.;
   for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) { vec2 g = vec2(x, y); vec2 o = vec2(h21(i + g), h21(i + g + 17.3)); o = .5 + .5 * sin(uTime * .8 + 6.2831 * o); d = min(d, length(g + o - f)); }
   return d; }
@@ -139,7 +145,8 @@ void main(){
     col = mix(col, lc, smoothstep(fw, -fw, fol)); }
   // coping (travertine bullnose) round pool and spa
   vec2 g = vec2(dFdx(d), dFdy(d)); vec2 en = length(g) > 0. ? normalize(g) : vec2(0.);
-  vec3 cop = texture2D(tP, p / 3.).rgb * vec3(1.13, 1.08, 1.) * (.93 + .14 * dot(en, TL) * smoothstep(.0, .5, d));
+  vec3 cop = mix(copCol(p, floor(uDeck)), copCol(p, ceil(uDeck)), fract(uDeck)) * (.93 + .14 * dot(en, TL) * smoothstep(.0, .5, d));
+  cop *= 1. - .22 * smoothstep(1.5, 2., uDeck) * smoothstep(.12, .0, abs(d - 1.02));   // concrete: a shadow joint where the edge meets the slab
   cop *= .8 + .2 * smoothstep(0., .25, d);
   col = mix(col, cop, smoothstep(fw, -fw, d - 1.1));
   // water

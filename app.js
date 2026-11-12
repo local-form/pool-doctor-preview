@@ -12,7 +12,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
   if (reduced || !('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('is-visible')); return; }
   const n = new Map();
   els.forEach(e => { const p = e.parentElement, i = n.get(p) || 0; e.style.setProperty('--d', i * .08 + 's'); n.set(p, i + 1); });
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } }), { threshold: .01, rootMargin: '0px 0px -8% 0px' });
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } }), { threshold: .01, rootMargin: innerWidth > 860 ? '0px 0px -16% 0px' : '0px 0px -8% 0px' });
   els.forEach(e => io.observe(e));
   setTimeout(() => els.forEach(e => { if (e.getBoundingClientRect().top < innerHeight) e.classList.add('is-visible'); }), 1500);
 })();
@@ -74,7 +74,7 @@ function openPlanner() {
 $('#svcPlan').addEventListener('click', openPlanner);
 $('#planDone').addEventListener('click', () => { hero.classList.remove('planning'); $('#svcPlan').setAttribute('aria-expanded', 'false'); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); $('#svcPlan').focus({ preventScroll: true }); });
 $$('a[href="#design"]:not(#dockMain)').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openPlanner(); }));
-import('./yard.js?v=3').then(({ mountYard }) => {
+import('./yard.js?v=4').then(({ mountYard }) => {
   const copy = $('.hero-copy');
   yard = mountYard(cv, { dpr: phone() ? 1.5 : 1.25, reduced, still: q.has('still'), labels: { L: $('#dimL'), W: $('#dimW') }, grip: $('#grip'),
     pad: phone() ? [18, 30] : [34, 30],
@@ -98,20 +98,32 @@ const story = [
 ];
 let si = 0;
 const sImg = $('#storyImg');
-function setStory(i) {
+function setStory(i, dir = 0) {
   si = (i + story.length) % story.length; const [f, t, b, alt] = story[si];
   $$('#storySteps button').forEach((e, k) => e.setAttribute('aria-pressed', k === si));
   $('#storyTitle').textContent = t; $('#storyBody').textContent = b; $('#storyCount').textContent = String(si + 1).padStart(2, '0') + ' / 07';
   sImg.classList.add('swap');
   const im = new Image(); im.src = `img/${f}-lg.webp`;
-  const go = () => { sImg.srcset = `img/${f}-sm.webp 600w, img/${f}-lg.webp 1000w`; sImg.src = `img/${f}-lg.webp`; sImg.alt = alt; sImg.classList.remove('swap'); };
+  const go = () => { sImg.srcset = `img/${f}-sm.webp 600w, img/${f}-lg.webp 1000w`; sImg.src = `img/${f}-lg.webp`; sImg.alt = alt; sImg.classList.remove('swap');
+    if (dir && !reduced) { sImg.style.transition = 'none'; sImg.style.transform = `translateX(${dir * 36}px)`; sImg.style.opacity = 0; void sImg.offsetWidth; sImg.style.transition = ''; }
+    sImg.style.transform = ''; sImg.style.opacity = ''; };
   im.decode ? im.decode().then(go, go) : go();
   const btn = $$('#storySteps button')[si]; if (phone() && btn) btn.parentElement.parentElement.scrollTo({ left: btn.offsetLeft - 16, behavior: reduced ? 'auto' : 'smooth' });
 }
 $('#storyBody').textContent = story[0][2];
 $$('#storySteps button').forEach(b => b.addEventListener('click', () => setStory(+b.dataset.i)));
-$('#storyPrev').addEventListener('click', () => setStory(si - 1));
-$('#storyNext').addEventListener('click', () => setStory(si + 1));
+$('#storyPrev').addEventListener('click', () => setStory(si - 1, -1));
+$('#storyNext').addEventListener('click', () => setStory(si + 1, 1));
+// swipe the photo: it follows the finger sideways, then the next step slides in. Up-and-down still scrolls the page.
+{ const m = $('.story-media'); let x0 = 0, y0 = 0, dx = 0, axis = '', on = false;
+  m.addEventListener('touchstart', e => { if (e.touches.length !== 1) return; on = true; axis = ''; dx = 0; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; sImg.style.transition = 'none'; }, { passive: true });
+  m.addEventListener('touchmove', e => { if (!on) return; const t = e.touches[0]; dx = t.clientX - x0; const dy = t.clientY - y0;
+    if (!axis && Math.abs(dx) + Math.abs(dy) > 8) axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    if (axis === 'x') { sImg.style.transform = `translateX(${dx * .9}px)`; sImg.style.opacity = Math.max(.35, 1 - Math.abs(dx) / 420); } }, { passive: true });
+  const end = () => { if (!on) return; on = false; sImg.style.transition = '';
+    if (axis === 'x' && Math.abs(dx) > 48) { const d = dx < 0 ? 1 : -1; sImg.style.transform = `translateX(${-d * 70}px)`; sImg.style.opacity = 0; m.classList.add('swiped'); setStory(si + d, d); }
+    else { sImg.style.transform = ''; sImg.style.opacity = ''; } };
+  m.addEventListener('touchend', end); m.addEventListener('touchcancel', end); }
 story.forEach(([f]) => { if (f !== 'b1-stakes') { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = `img/${f}-${phone() ? 'sm' : 'lg'}.webp`; document.head.append(l); } });
 
 /* ---------- chips ---------- */
@@ -353,31 +365,34 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
   const hash = n => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
   const noise = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return hash(i) * (1 - u) + hash(i + 1) * u; };
   const ss = (a, b, x) => { const v = Math.max(0, Math.min(1, (x - a) / (b - a))); return v * v * (3 - 2 * v); };
-  const water = (s, seed) => ss(.44, .62, noise(s / 520 + seed));
+  const water = (s, seed, ch) => ss(ch.wt, ch.wt + .18, noise(s / ch.ws + seed));
   const B = 112; let lean = 0;                                             // lean: how far (px) this point is pushed forward, set by trace()
-  const trace = (s, t, seed) => {
-    let v = 0; const j = Math.floor(s / B); lean = 0;
+  const trace = (s, t, seed, ch) => {
+    let v = 0; const j = Math.floor(s / (B * ch.bs)); lean = 0;
     // heartbeat: tall uneven spikes; a pulse travels down the line about once a second and kicks each spike as it passes (lub, then a softer dub)
     for (let n = j - 1; n <= j + 1; n++) {
       const h1 = hash(n * 3.17 + seed), h2 = hash(n * 5.31 + seed + 9), h3 = hash(n * 7.77 + seed + 21), h4 = hash(n * 1.93 + seed + 33);
       if (h3 < .08) continue;                                              // a skipped beat now and then
-      const c = (n + .5 + (h1 - .5) * .42) * B, x = (s - c) / (B * (.8 + .35 * h4)) + .4;
+      const c = (n + .5 + (h1 - .5) * .42) * B * ch.bs, x = (s - c) / (B * ch.bs * (.72 + .4 * h4)) + .4;
       if (x <= 0 || x >= 1) continue;
       const ph = ((t * 1.05 - c / 760 + seed) % 1 + 1) % 1, kick = Math.exp(-ph * 5.5) + .5 * Math.exp(-(((ph + .72) % 1)) * 7);
-      v += (.62 + .16 * h2) * (1 + .16 * kick) * (1 - water(c, seed)) * beat(x);
+      v += (.5 + .3 * h2 + (h2 > .9 ? .08 : 0)) * ch.bg * (1 + .16 * kick) * (1 - water(c, seed, ch)) * beat(x);
     }
     // water: sets of real swells. Sharp crests, long flat troughs, crests pushed forward so they lean and start to curl, rolling faster than the line travels
-    const w = water(s, seed);
+    const w = water(s, seed, ch);
     if (w > .001) {
-      const set = .55 + .45 * noise(s / 210 + seed + 70 - t * .1), ph = (s + 30 * Math.sin(s / 310 + seed)) / 104 * 6.2832 - t * 2.5;   // every moving part runs forward, the way the line travels
-      const c1 = Math.pow(.5 + .5 * Math.sin(ph), 1.5);
-      const hgt = w * set * c1 * .78;
+      const set = .55 + .45 * noise(s / 210 + seed + 70 - t * .1), ph = (s + 34 * Math.sin(s / 310 + seed) + 14 * Math.sin(s / 137 + seed * 2.)) / ch.wl * 6.2832 - t * ch.roll;   // every moving part runs forward, the way the line travels
+      const ci = Math.floor(ph / 6.2832 + .25), ah = .5 + .5 * hash(ci * 1.7 + seed), shp = 1.15 + 1.5 * hash(ci * 2.3 + seed + 5);   // this wave's own height and sharpness; they travel with it
+      const c1 = Math.pow(.5 + .5 * Math.sin(ph), shp) * ah;
+      const hgt = w * set * c1 * ch.wg;
       v += hgt - w * .26;
-      lean = 15 * hgt * hgt;                                    // the top of the crest is thrown forward so it curls over its own face
+      lean = ch.ln * hgt * hgt;                                    // the top of the crest is thrown forward so it curls over its own face
     }
     return v;
   };
-  const items = $$('.pulse').map((el, i) => { const cv = document.createElement('canvas'); el.append(cv); el.classList.add('live'); return { el, cv, ctx: cv.getContext('2d'), on: false, off: i * 1733.3, seed: i * 17.37 + 3, sp: 52 + (i * 7 % 5) * 6, w: 0, h: 0, sec: el.parentElement, prev: el.parentElement.previousElementSibling }; });
+  const items = $$('.pulse').map((el, i) => { const cv = document.createElement('canvas'); el.append(cv); el.classList.add('live'); return { el, cv, ctx: cv.getContext('2d'), on: false, off: i * 1733.3, seed: i * 17.37 + 3, sp: 46 + hash(i * 3.1 + 2) * 30,
+    // character: how much water vs heartbeat, wave length and height, how hard the crests lean, beat spacing and height
+    ch: { wt: .36 + .2 * hash(i * 5.7 + 1), ws: 420 + 260 * hash(i * 2.9 + 4), wl: 82 + 56 * hash(i * 4.3 + 7), wg: .78 + .3 * hash(i * 6.1 + 9), ln: 8 + 18 * hash(i * 7.9 + 11), roll: 1.9 + 1.1 * hash(i * 8.3 + 13), bs: .85 + .45 * hash(i * 9.1 + 15), bg: .9 + .25 * hash(i * 1.3 + 17) }, w: 0, h: 0, sec: el.parentElement, prev: el.parentElement.previousElementSibling }; });
   // the colour a section shows along one of its edges, so humps and dips can be filled with the right side's colour
   const mixc = t => { t = Math.max(0, Math.min(1, t)); return `rgb(${Math.round(29 + (15 - 29) * t)},${Math.round(93 + (58 - 93) * t)},${Math.round(181 + (117 - 181) * t)})`; };
   const edge = (sec, bottom, ctx, w) => {
@@ -388,10 +403,10 @@ new IntersectionObserver(([e]) => { inReq = e.isIntersecting; dockSet(); }, { th
   };
   const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); let pv = it.sec.previousElementSibling; while (pv && !pv.offsetHeight) pv = pv.previousElementSibling; it.up = edge(pv, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
   const draw = (it, t) => {
-    const { ctx, w, h } = it, mid = h / 2, amp = h * (it.one ? .36 : .46), sh = t * it.sp + 16 * Math.sin(t * .45 + it.seed) + it.off, k = w < 700 ? .55 : 1;
+    const { ctx, w, h } = it, mid = h / 2, amp = h * (it.one ? (w < 700 ? .2 : .36) : .46), sh = t * it.sp + 16 * Math.sin(t * .45 + it.seed) + it.off, k = w < 700 ? .55 : 1;
     ctx.clearRect(0, 0, w, h);
     const line = new Path2D(), bDn = new Path2D(), bUp = new Path2D(), O = 2; bDn.moveTo(-60, mid + O); bUp.moveTo(-60, mid - O);
-    for (let x = -60; x <= w + 60; x += 1.5) { let v = trace(x / k - sh, t, it.seed); if (it.one) v = Math.abs(v); const y = mid - v * amp, X = x + lean * k * (v > 0 ? 1 : 0); x > -60 ? line.lineTo(X, y) : line.moveTo(X, y); bDn.lineTo(X, y); bUp.lineTo(X, y); }
+    for (let x = -60; x <= w + 60; x += 1.5) { let v = trace(x / k - sh, t, it.seed, it.ch); if (it.one) v = Math.abs(v); const y = mid - v * amp, X = x + lean * k * (v > 0 ? 1 : 0); x > -60 ? line.lineTo(X, y) : line.moveTo(X, y); bDn.lineTo(X, y); bUp.lineTo(X, y); }
     bDn.lineTo(w + 60, mid + O); bDn.closePath(); bUp.lineTo(w + 60, mid - O); bUp.closePath();
     // the trace IS the edge: lower section's colour fills what rises above the seam, upper section's fills what dips below
     if (it.dn && it.up) { ctx.fillStyle = it.up; ctx.fillRect(0, mid - O, w, O); ctx.fillStyle = it.dn; ctx.fillRect(0, mid, w, O); }   // seal the seam itself
