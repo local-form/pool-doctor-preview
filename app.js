@@ -74,7 +74,7 @@ function openPlanner() {
 $('#svcPlan').addEventListener('click', openPlanner);
 $('#planDone').addEventListener('click', () => { hero.classList.remove('planning'); $('#svcPlan').setAttribute('aria-expanded', 'false'); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); $('#svcPlan').focus({ preventScroll: true }); });
 $$('a[href="#design"]:not(#dockMain)').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openPlanner(); }));
-import('./yard.js?v=4').then(({ mountYard }) => {
+import('./yard.js?v=5').then(({ mountYard }) => {
   const copy = $('.hero-copy');
   yard = mountYard(cv, { dpr: phone() ? 1.5 : 1.25, reduced, still: q.has('still'), labels: { L: $('#dimL'), W: $('#dimW') }, grip: $('#grip'),
     pad: phone() ? [18, 30] : [34, 30],
@@ -100,7 +100,7 @@ let si = 0;
 const sImg = $('#storyImg');
 function setStory(i, dir = 0) {
   si = (i + story.length) % story.length; const [f, t, b, alt] = story[si];
-  $$('#storySteps button').forEach((e, k) => e.setAttribute('aria-pressed', k === si));
+  $$('#storySteps button, #storyThumbs button').forEach(e => e.setAttribute('aria-pressed', +e.dataset.i === si));
   $('#storyTitle').textContent = t; $('#storyBody').textContent = b; $('#storyCount').textContent = String(si + 1).padStart(2, '0') + ' / 07';
   sImg.classList.add('swap');
   const im = new Image(); im.src = `img/${f}-lg.webp`;
@@ -111,6 +111,9 @@ function setStory(i, dir = 0) {
   const btn = $$('#storySteps button')[si]; if (phone() && btn) btn.parentElement.parentElement.scrollTo({ left: btn.offsetLeft - 16, behavior: reduced ? 'auto' : 'smooth' });
 }
 $('#storyBody').textContent = story[0][2];
+// desktop: a strip of the seven photos to jump between steps (phones swipe instead)
+if (!phone()) { $('#storyThumbs').innerHTML = story.map(([f, t], i) => `<button type="button" data-i="${i}" aria-pressed="${i === 0}" aria-label="Step ${i + 1}: ${t}"><img src="img/${f}-sm.webp" alt="" loading="lazy" width="600" height="600"></button>`).join('');
+  $$('#storyThumbs button').forEach(b => b.addEventListener('click', () => setStory(+b.dataset.i, +b.dataset.i > si ? 1 : -1))); }
 $$('#storySteps button').forEach(b => b.addEventListener('click', () => setStory(+b.dataset.i)));
 $('#storyPrev').addEventListener('click', () => setStory(si - 1, -1));
 $('#storyNext').addEventListener('click', () => setStory(si + 1, 1));

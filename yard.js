@@ -68,6 +68,13 @@ vec3 copCol(vec2 p, float k){
   if (k < 1.5) { vec3 c = texture2D(tP, p / 6. + .37).rgb; return mix(vec3(dot(c, vec3(.33))), c, .35) * vec3(1.42, 1.36, 1.24); }
   return mix(texture2D(tPl, p / 4.).rgb, vec3(.8), .45) * vec3(.9, .9, .89);
 }
+// raised walls (water wall, spa) to match the deck: stacked slate with pavers, pale cut stone with travertine, smooth render with concrete
+vec3 wallCol(vec2 p, float k){
+  vec3 sl = texture2D(tS, p / 3.).rgb;
+  if (k < .5) return sl * .95;
+  if (k < 1.5) return mix(vec3(dot(sl, vec3(.33))), sl, .3) * vec3(1.75, 1.66, 1.48) + vec3(.1, .09, .07);
+  return mix(texture2D(tPl, p / 3.).rgb, vec3(.74), .55) * vec3(.86, .87, .88);
+}
 float cn(vec2 p){ vec2 i = floor(p), f = fract(p); float d = 1.;
   for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) { vec2 g = vec2(x, y); vec2 o = vec2(h21(i + g), h21(i + g + 17.3)); o = .5 + .5 * sin(uTime * .8 + 6.2831 * o); d = min(d, length(g + o - f)); }
   return d; }
@@ -107,8 +114,8 @@ void main(){
   col *= 1. - .48 * sh * day;
   // raised stone wall with three bronze scuppers
   float dw = wallD(p);
-  if (uWall > .01) { vec3 st = texture2D(tS, p / 3.).rgb * .95; vec2 q = p - vec2(0., uW * .5 + 2.4);
-    st = mix(st, texture2D(tP, p / 2.5).rgb * 1.1, step(.35, abs(q.y)));   // travertine cap
+  if (uWall > .01) { vec3 st = mix(wallCol(p, floor(uDeck)), wallCol(p, ceil(uDeck)), fract(uDeck)); vec2 q = p - vec2(0., uW * .5 + 2.4);
+    st = mix(st, mix(copCol(p, floor(uDeck)), copCol(p, ceil(uDeck)), fract(uDeck)) * 1.04, step(.35, abs(q.y)));   // cap in the coping material
     col = mix(col, st, smoothstep(fw, -fw, dw)); }
   // fire pit: stone ring, dark rock bed and embers
   vec2 fq = p - fireC(); float fr = length(fq);
@@ -180,7 +187,7 @@ void main(){
     wat = mix(wat, vec3(.85, .97, 1.), bub * .35); }
   col = mix(col, wat, smoothstep(fw, -fw, d));
   if (uSpa > .01) { float wallR = abs(sd - .3) - .3;                       // raised spa wall
-    vec2 sq = p - spaC(); vec3 sw = texture2D(tS, p / 2.).rgb * .9 * (.9 + .2 * dot(normalize(sq), TL));
+    vec2 sq = p - spaC(); vec3 sw = mix(wallCol(p * 1.5, floor(uDeck)), wallCol(p * 1.5, ceil(uDeck)), fract(uDeck)) * .95 * (.9 + .2 * dot(normalize(sq), TL));
     col = mix(col, mix(sw, cop, smoothstep(.12, .2, abs(sd - .3))), smoothstep(fw, -fw, wallR) * step(.2, uSpa));
     // sheet of water spilling from the spa to the pool
     float spill = step(abs(sq.y), .75) * smoothstep(-3.05, -3.2, sq.x) * step(-4.55, sq.x) * step(.9, uSpa);
