@@ -194,7 +194,7 @@ symBox.addEventListener('click', e => {
   box.innerHTML = `<h3>Usual causes</h3><ul>${x.c.map(c => `<li>${c}</li>`).join('')}</ul>
     ${x.warn ? `<p class="warn">${esc(x.warn)}</p>` : ''}
     <div class="cta"><a class="btn btn-p" href="tel:+18437373165">Call Joe</a><a class="btn btn-s" href="sms:+18437373165?&body=${sms}">Text a photo</a><button type="button" class="btn btn-s" id="repReq">Request a repair</button></div>
-    <p class="fine">General guide only. Joe confirms what's wrong before anything gets replaced.</p>`;
+    <p class="fine">General guide only. What's wrong gets confirmed before anything is replaced.</p>`;
   box.hidden = false;
   $('#repReq').addEventListener('click', () => openRequest('Repair', { kind: 'sym', text: label }));
   if (phone()) box.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
@@ -217,7 +217,7 @@ const GAUGE = [
 ];
 $('#gauges').innerHTML = GAUGE.map(([n, t, lo, hi, a, b, s]) => `<li><b>${n}</b><em>${t}</em><span class="bar" aria-hidden="true"><i style="--l:${(a - lo) / (hi - lo) * 100}%;--w:${(b - a) / (hi - lo) * 100}%"></i></span><small>${s}</small></li>`).join('');
 const CARE = {
-  'New pool': ['The usual rules for fresh plaster in the first month. Ask Joe if yours needs something else.', [
+  'New pool': ['The usual rules for fresh plaster in the first month. Ask if yours needs something else.', [
     '<b>Brush the whole pool twice a day</b> for the first two weeks to clear plaster dust',
     '<b>Run the pump around the clock</b> for the first few days',
     '<b>Test and balance every day</b> the first week, starting from your startup numbers',
@@ -280,7 +280,7 @@ padIO.observe(padBox);
    Before a real launch: wire delivery and confirm a test request arrives with contact details, service, plan or symptom, and photos. */
 const reqForm = $('#req'), tabs = $$('#reqType button'), carry = $('#carry'), MAX_PHOTOS = 6;
 let reqType = 'New pool', carried = null, photos = [];
-const detailLabels = { 'New pool': 'Anything Joe should know about your yard or the pool you want?', Renovation: 'What would you like redone? (plaster, liner, coping, deck…)', Repair: 'What\'s happening, and when did it start?', 'Contractor help': 'Your company, the job address area and what the build needs' };
+const detailLabels = { 'New pool': 'Anything to know about your yard or the pool you want?', Renovation: 'What would you like redone? (plaster, liner, coping, deck…)', Repair: 'What\'s happening, and when did it start?', 'Contractor help': 'Your company, the job address area and what the build needs' };
 const applies = () => !!carried && ((carried.kind === 'plan' && reqType === 'New pool') || (carried.kind === 'sym' && reqType === 'Repair'));
 function setType(t) {
   reqType = t; tabs.forEach(b => { const on = b.dataset.v === t; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; });
@@ -330,8 +330,8 @@ const emailOk = v => !v || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 reqForm.addEventListener('submit', e => {
   e.preventDefault();
   const nameI = $('#fName'), phI = $('#fPhone'), emI = $('#fEmail'), name = nameI.value.trim(), ph = phI.value.trim(), em = emI.value.trim();
-  setErr(nameI, name ? '' : 'Add your name so Joe knows who to call.');
-  setErr(phI, phoneOk(ph) ? '' : ph ? 'That number doesn\'t look right. Use a 10-digit US number, like (843) 555-0123.' : 'Add a mobile number so Joe can call or text you back.');
+  setErr(nameI, name ? '' : 'Add your name so you get a call back.');
+  setErr(phI, phoneOk(ph) ? '' : ph ? 'That number doesn\'t look right. Use a 10-digit US number, like (843) 555-0123.' : 'Add a mobile number for a call or text back.');
   setErr(emI, emailOk(em) ? '' : 'That email doesn\'t look right. Fix it or leave it empty.');
   const bad = [nameI, phI, emI].find(i => i.getAttribute('aria-invalid') === 'true');
   if (bad) { bad.focus({ preventScroll: true }); bad.closest('label').scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' }); return; }
@@ -384,7 +384,7 @@ new IntersectionObserver(([e]) => { inChk = e.isIntersecting; dockSet(); }, { ro
     for (const b of beats) { const r = b.r, sR = mix(.016, .2, r) * L, sb = sR * mix(1, 1.5, r), d = s - b.x;
       if (d < -Math.max(.5 * L, 4.5 * sb) || d > .6 * L) continue;
       const e = (1 - r) * (1 - r);   // the small P, Q, S and T bumps melt away first, so the spike becomes one clean crest
-      v += b.g * (mix(1.1, .5, r) * AG(d, sb, sR * mix(1, .6, r))
+      v += b.g * (1 + .45 * it.K * (1 - r)) * (mix(.95, .5, r) * AG(d, sb, sR * mix(1, .6, r))
         + e * (.12 * G(d, -.2 * L, .045 * L) - .16 * G(d, -.04 * L, .014 * L) - .3 * G(d, .045 * L, .016 * L) + .24 * G(d, .26 * L, .06 * L))); }
     const m = ss(it.a, it.a + .4, s / w);   // the swell underneath grows in as the beats turn to water, rolling the same way
     if (m > 0) v += m * (.09 * Math.sin(s * .042 - tt * 3.4 + it.seed) + .05 * Math.sin(s * .067 - tt * 4.1 + it.seed * 2.3));
@@ -402,12 +402,18 @@ new IntersectionObserver(([e]) => { inChk = e.isIntersecting; dockSet(); }, { ro
   };
   const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); let pv = it.sec.previousElementSibling; while (pv && !pv.offsetHeight) pv = pv.previousElementSibling; it.up = edge(pv, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
   const draw = (it, t) => {
-    const { ctx, w, h } = it, mid = h / 2, ph = w < 861, amp = h * (it.one ? (ph ? .2 : .36) : (ph ? .4 : .44)),
+    const { ctx, w, h } = it, mid = h / 2, ph = w < 861, amp = h * (it.one ? (ph ? .175 : .275) : (ph ? .35 : .336)),   // canvas is taller than the line needs, so a full beat never clips
+     
       V = ph ? 62 : 118, T = ph ? 1.75 : 1.2, L = ph ? 92 : 112, tt = t + it.off;   // phones: slower travel, wider spacing
     // beats on the line now: one born about every T seconds just off the start, moving at V px/s
     const beats = [], life = (w + 2 * L) / V;
-    for (let k = Math.floor((tt - life) / T) - 1; k <= Math.floor(tt / T) + 1; k++) { const x = -L + V * (tt - (k + (hash(k * 1.7 + it.seed) - .5) * .3) * T);
+    let lb = -1e9;
+    for (let k = Math.floor((tt - life) / T) - 1; k <= Math.floor(tt / T) + 1; k++) { const bt = (k + (hash(k * 1.7 + it.seed) - .5) * .3) * T, x = -L + V * (tt - bt);
+      if (bt <= tt && bt > lb) lb = bt;
       if (x > -L && x < w + L) beats.push({ x, g: .82 + .18 * hash(k * 2.9 + it.seed), r: ss(it.a, it.a + .4, x / w) }); }
+    // the heart itself: every time a new beat enters, the spikes still on the monitor jump (lub), then a softer second jump (dub), then rest.
+    // The gaps wander a little, like a real resting pulse. Phones beat softer.
+    const tb = tt - lb, K = (Math.exp(-tb * 10) + (tb > .22 ? .5 * Math.exp(-(tb - .22) * 12) : 0)) * (ph ? .5 : 1); it.K = K;
     ctx.clearRect(0, 0, w, h);
     const line = new Path2D(), bDn = new Path2D(), bUp = new Path2D(), O = 2; bDn.moveTo(-4, mid + O); bUp.moveTo(-4, mid - O);
     for (let x = -4; x <= w + 4; x += 1) { let v = trace(it.flip ? w - x : x, w, beats, it, tt, L); if (it.one) v = Math.max(v, 0); const y = mid - v * amp;
@@ -420,6 +426,10 @@ new IntersectionObserver(([e]) => { inChk = e.isIntersecting; dockSet(); }, { ro
     ctx.lineJoin = ctx.lineCap = 'round';
     ctx.strokeStyle = 'rgba(93,182,230,.2)'; ctx.lineWidth = ph ? 4 : 5; ctx.stroke(line);
     ctx.strokeStyle = '#7cc9f2'; ctx.lineWidth = ph ? 1.8 : 2; ctx.stroke(line);
+    if (K > .02) {   // each beat flashes the heartbeat end of the line, fading out where it turns to water
+      const e0 = it.flip ? w : 0, e1 = it.flip ? w - (it.a + .25) * w : (it.a + .25) * w, g = ctx.createLinearGradient(e0, 0, e1, 0);
+      g.addColorStop(0, `rgba(160,220,255,${(.55 * K).toFixed(3)})`); g.addColorStop(1, 'rgba(160,220,255,0)');
+      ctx.strokeStyle = g; ctx.lineWidth = ph ? 5 : 7; ctx.stroke(line); }
   };
   let raf = 0; const t0 = performance.now();
   const loop = () => { raf = 0; const t = (performance.now() - t0) / 1000; let any = false; for (const it of items) if (it.on) { draw(it, t); any = true; } if (any && !reduced && !document.hidden) raf = requestAnimationFrame(loop); };
