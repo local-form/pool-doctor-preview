@@ -371,43 +371,27 @@ new IntersectionObserver(([e]) => { inChk = e.isIntersecting; dockSet(); }, { ro
   const up = e => { e.preventDefault(); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); history.replaceState(null, '', location.pathname + location.search); $('.brand').focus({ preventScroll: true }); };
   t.addEventListener('click', up); $('#dockTop').addEventListener('click', up); }
 
-// live heartbeat-to-wave line on every section seam: the trace runs across like a monitor,
-// beats first, then the beats settle into rolling water. Baseline = the seam itself.
+// live heartbeat-to-wave line on every section seam. One motif: a crisp heartbeat enters at one end,
+// travels along the seam, and as it goes its spike widens and settles into a rolling swell. Baseline = the seam itself.
 { const G = (x, m, s) => Math.exp(-((x - m) * (x - m)) / (2 * s * s));
-  const beat = x => .12 * G(x, .2, .045) - .16 * G(x, .36, .014) + G(x, .4, .016) - .3 * G(x, .445, .016) + .24 * G(x, .66, .06);   // P Q R S T, x in 0..1
-  // No fixed loop: beats come at uneven gaps and heights, sometimes skip, and give way to stretches of
-  // rolling water wherever a slow noise field says so. Every divider gets its own seed and speed.
+  const AG = (d, sb, sf) => { const s = d < 0 ? sb : sf; return Math.exp(-(d * d) / (2 * s * s)); };   // crest with a gentle back and a steeper front
   const hash = n => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
-  const noise = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return hash(i) * (1 - u) + hash(i + 1) * u; };
   const ss = (a, b, x) => { const v = Math.max(0, Math.min(1, (x - a) / (b - a))); return v * v * (3 - 2 * v); };
-  const water = (s, seed, ch) => ss(ch.wt, ch.wt + .18, noise(s / ch.ws + seed));
-  const B = 112; let lean = 0;                                             // lean: how far (px) this point is pushed forward, set by trace()
-  const trace = (s, t, seed, ch) => {
-    let v = 0; const j = Math.floor(s / (B * ch.bs)); lean = 0;
-    // heartbeat: tall uneven spikes; a pulse travels down the line about once a second and kicks each spike as it passes (lub, then a softer dub)
-    for (let n = j - 1; n <= j + 1; n++) {
-      const h1 = hash(n * 3.17 + seed), h2 = hash(n * 5.31 + seed + 9), h3 = hash(n * 7.77 + seed + 21), h4 = hash(n * 1.93 + seed + 33);
-      if (h3 < .08) continue;                                              // a skipped beat now and then
-      const c = (n + .5 + (h1 - .5) * .42) * B * ch.bs, x = (s - c) / (B * ch.bs * (.72 + .4 * h4)) + .4;
-      if (x <= 0 || x >= 1) continue;
-      const ph = ((t * 1.05 - c / 760 + seed) % 1 + 1) % 1, kick = Math.exp(-ph * 5.5) + .5 * Math.exp(-(((ph + .72) % 1)) * 7);
-      v += (.5 + .3 * h2 + (h2 > .9 ? .08 : 0)) * ch.bg * (1 + ch.kick * kick) * (1 - water(c, seed, ch)) * beat(x);
-    }
-    // water: sets of real swells. Sharp crests, long flat troughs, crests pushed forward so they lean and start to curl, rolling faster than the line travels
-    const w = water(s, seed, ch);
-    if (w > .001) {
-      const set = .55 + .45 * noise(s / 210 + seed + 70 - t * .1), ph = (s + 34 * Math.sin(s / 310 + seed) + 14 * Math.sin(s / 137 + seed * 2.)) / ch.wl * 6.2832 - t * ch.roll;   // every moving part runs forward, the way the line travels
-      const ci = Math.floor(ph / 6.2832 + .25), ah = .5 + .5 * hash(ci * 1.7 + seed), shp = 1.15 + 1.5 * hash(ci * 2.3 + seed + 5);   // this wave's own height and sharpness; they travel with it
-      const c1 = Math.pow(.5 + .5 * Math.sin(ph), shp) * ah;
-      const hgt = w * set * c1 * ch.wg;
-      v += hgt - w * .26;
-      lean = ch.ln * hgt * hgt;                                    // the top of the crest is thrown forward so it curls over its own face
-    }
+  const mix = (a, b, t) => a + (b - a) * t;
+  // the line's height at travel position s (px), given the beats on it right now
+  const trace = (s, w, beats, it, tt, L) => {
+    let v = 0;
+    for (const b of beats) { const r = b.r, sR = mix(.016, .2, r) * L, sb = sR * mix(1, 1.5, r), d = s - b.x;
+      if (d < -Math.max(.5 * L, 4.5 * sb) || d > .6 * L) continue;
+      const e = (1 - r) * (1 - r);   // the small P, Q, S and T bumps melt away first, so the spike becomes one clean crest
+      v += b.g * (mix(1.1, .5, r) * AG(d, sb, sR * mix(1, .6, r))
+        + e * (.12 * G(d, -.2 * L, .045 * L) - .16 * G(d, -.04 * L, .014 * L) - .3 * G(d, .045 * L, .016 * L) + .24 * G(d, .26 * L, .06 * L))); }
+    const m = ss(it.a, it.a + .4, s / w);   // the swell underneath grows in as the beats turn to water, rolling the same way
+    if (m > 0) v += m * (.09 * Math.sin(s * .042 - tt * 3.4 + it.seed) + .05 * Math.sin(s * .067 - tt * 4.1 + it.seed * 2.3));
     return v;
   };
-  const items = $$('.pulse').map((el, i) => { const cv = document.createElement('canvas'); el.append(cv); el.classList.add('live'); return { el, cv, ctx: cv.getContext('2d'), on: false, off: i * 1733.3, seed: i * 17.37 + 3, sp: 46 + hash(i * 3.1 + 2) * 30,
-    // character: how much water vs heartbeat, wave length and height, how hard the crests lean, beat spacing and height
-    ch: { wt: .36 + .2 * hash(i * 5.7 + 1), ws: 420 + 260 * hash(i * 2.9 + 4), wl: 82 + 56 * hash(i * 4.3 + 7), wg: .78 + .3 * hash(i * 6.1 + 9), ln: 8 + 18 * hash(i * 7.9 + 11), roll: 1.9 + 1.1 * hash(i * 8.3 + 13), bs: .85 + .45 * hash(i * 9.1 + 15), bg: .9 + .25 * hash(i * 1.3 + 17) }, w: 0, h: 0, sec: el.parentElement, prev: el.parentElement.previousElementSibling }; });
+  const items = $$('.pulse').map((el, i) => { const cv = document.createElement('canvas'); el.append(cv); el.classList.add('live');
+    return { el, cv, ctx: cv.getContext('2d'), on: false, seed: i * 17.37 + 3, off: 2.3 + hash(i * 3.3 + 1) * 7, flip: i % 2 === 1, a: .2 + .16 * hash(i * 5.7 + 1), w: 0, h: 0, sec: el.parentElement }; });
   // the colour a section shows along one of its edges, so humps and dips can be filled with the right side's colour
   const mixc = t => { t = Math.max(0, Math.min(1, t)); return `rgb(${Math.round(29 + (15 - 29) * t)},${Math.round(93 + (58 - 93) * t)},${Math.round(181 + (117 - 181) * t)})`; };
   const edge = (sec, bottom, ctx, w) => {
@@ -416,21 +400,26 @@ new IntersectionObserver(([e]) => { inChk = e.isIntersecting; dockSet(); }, { ro
       const g = ctx.createLinearGradient(0, 0, w, 0); g.addColorStop(0, mixc(at(0))); g.addColorStop(1, mixc(at(w))); return g; }
     return getComputedStyle(sec).backgroundColor;
   };
-  const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); it.ch.kick = w < 861 ? 0 : .08; let pv = it.sec.previousElementSibling; while (pv && !pv.offsetHeight) pv = pv.previousElementSibling; it.up = edge(pv, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
+  const fit = it => { const d = Math.min(2, devicePixelRatio || 1), w = it.el.clientWidth, h = it.el.clientHeight; it.w = w; it.h = h; it.cv.width = Math.round(w * d); it.cv.height = Math.round(h * d); it.ctx.setTransform(d, 0, 0, d, 0, 0); let pv = it.sec.previousElementSibling; while (pv && !pv.offsetHeight) pv = pv.previousElementSibling; it.up = edge(pv, true, it.ctx, w); it.dn = edge(it.sec, false, it.ctx, w); it.one = !it.up; if (it.up === it.dn) it.up = it.dn = null; };
   const draw = (it, t) => {
-    const { ctx, w, h } = it, mid = h / 2, ph = w < 861, amp = h * (it.one ? (ph ? .2 : .36) : (ph ? .42 : .46)), k = ph ? .8 : 1,
-      sh = t * it.sp * (ph ? .55 : 1) + (ph ? 6 : 16) * Math.sin(t * .45 + it.seed) + it.off, tt = ph ? t * .6 : t;   // phones: slower travel and roll, wider spacing, no beat kick
+    const { ctx, w, h } = it, mid = h / 2, ph = w < 861, amp = h * (it.one ? (ph ? .2 : .36) : (ph ? .4 : .44)),
+      V = ph ? 62 : 118, T = ph ? 1.75 : 1.2, L = ph ? 92 : 112, tt = t + it.off;   // phones: slower travel, wider spacing
+    // beats on the line now: one born about every T seconds just off the start, moving at V px/s
+    const beats = [], life = (w + 2 * L) / V;
+    for (let k = Math.floor((tt - life) / T) - 1; k <= Math.floor(tt / T) + 1; k++) { const x = -L + V * (tt - (k + (hash(k * 1.7 + it.seed) - .5) * .3) * T);
+      if (x > -L && x < w + L) beats.push({ x, g: .82 + .18 * hash(k * 2.9 + it.seed), r: ss(it.a, it.a + .4, x / w) }); }
     ctx.clearRect(0, 0, w, h);
-    const line = new Path2D(), bDn = new Path2D(), bUp = new Path2D(), O = 2; bDn.moveTo(-60, mid + O); bUp.moveTo(-60, mid - O);
-    for (let x = -60; x <= w + 60; x += 1.5) { let v = trace(x / k - sh, tt, it.seed, it.ch); if (it.one) v = Math.max(v, 0); const y = mid - v * amp, X = x + lean * k * (v > 0 ? 1 : 0); x > -60 ? line.lineTo(X, y) : line.moveTo(X, y); bDn.lineTo(X, y); bUp.lineTo(X, y); }
-    bDn.lineTo(w + 60, mid + O); bDn.closePath(); bUp.lineTo(w + 60, mid - O); bUp.closePath();
+    const line = new Path2D(), bDn = new Path2D(), bUp = new Path2D(), O = 2; bDn.moveTo(-4, mid + O); bUp.moveTo(-4, mid - O);
+    for (let x = -4; x <= w + 4; x += 1) { let v = trace(it.flip ? w - x : x, w, beats, it, tt, L); if (it.one) v = Math.max(v, 0); const y = mid - v * amp;
+      x > -4 ? line.lineTo(x, y) : line.moveTo(x, y); bDn.lineTo(x, y); bUp.lineTo(x, y); }
+    bDn.lineTo(w + 4, mid + O); bDn.closePath(); bUp.lineTo(w + 4, mid - O); bUp.closePath();
     // the trace IS the edge: lower section's colour fills what rises above the seam, upper section's fills what dips below
     if (it.dn && it.up) { ctx.fillStyle = it.up; ctx.fillRect(0, mid - O, w, O); ctx.fillStyle = it.dn; ctx.fillRect(0, mid, w, O); }   // seal the seam itself
     if (it.dn) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, mid + O); ctx.clip(); ctx.fillStyle = it.dn; ctx.fill(bDn); ctx.restore(); }
     if (it.up) { ctx.save(); ctx.beginPath(); ctx.rect(0, mid - O, w, h - mid + O); ctx.clip(); ctx.fillStyle = it.up; ctx.fill(bUp); ctx.restore(); }
     ctx.lineJoin = ctx.lineCap = 'round';
-    ctx.strokeStyle = 'rgba(93,182,230,.28)'; ctx.lineWidth = 6; ctx.stroke(line);
-    ctx.strokeStyle = '#7cc9f2'; ctx.lineWidth = 2; ctx.stroke(line);
+    ctx.strokeStyle = 'rgba(93,182,230,.2)'; ctx.lineWidth = ph ? 4 : 5; ctx.stroke(line);
+    ctx.strokeStyle = '#7cc9f2'; ctx.lineWidth = ph ? 1.8 : 2; ctx.stroke(line);
   };
   let raf = 0; const t0 = performance.now();
   const loop = () => { raf = 0; const t = (performance.now() - t0) / 1000; let any = false; for (const it of items) if (it.on) { draw(it, t); any = true; } if (any && !reduced && !document.hidden) raf = requestAnimationFrame(loop); };
